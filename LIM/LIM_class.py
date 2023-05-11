@@ -1,5 +1,7 @@
 import utils as ut
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 # Implementing Linear inverse model (LIM)
 '''
@@ -164,13 +166,103 @@ class LIM:
         # Compute the Green's function at time tau*lag.
         G_tau = eigenvectors_left_norm @ np.diag(eigenvalues ** (lag / self.tau)) @ eigenvectors_right.T
 
-        print("G_tau: {}".format(G_tau))
+        print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
         # Compute the forecast x(t+tau) = G_tau * x(t).
         x_frcst = np.einsum('ij,jk', np.real(G_tau), x)
 
         return x_frcst
 
-    def euler_maruyama(self, x, dt, n_samples=1):
+    def geometric_brownian_motion(self, mu):
+        """
+        Simulate the system using the geometric Brownian motion method.
+        """
+
+        # Plot settings
+        plt.rcParams['figure.figsize'] = (9, 6)
+        plt.rcParams['lines.linewidth'] = 3
+        plt.rcParams['xtick.bottom'] = False
+        plt.rcParams['ytick.left'] = False
+        pal = ["#FBB4AE", "#B3CDE3", "#CCEBC5", "#CFCCC4"]
+
+        # SDE model parameters
+        mu, sigma, X0 = 2, 1, 1
+
+        # Simulation parameters
+        T, N = 1, 2 ** 7
+        dt = 1.0 / N
+        t = np.arange(dt, 1 + dt, dt)  # Start at dt because Y = X0 at t = 0
+
+        # Initiate plot object
+        plt.title('Sample Solution Paths for Geometric Brownian Motion')
+        plt.ylabel('Y(t)')
+        plt.xlabel('t')
+
+        # Create and plot sample paths
+        for i in range(len(pal)):
+            # Create Brownian Motion
+            np.random.seed(i)
+            dB = np.sqrt(dt) * np.random.randn(N)
+            B = np.cumsum(dB)
+
+            # Compute exact solution
+            Y = X0 * np.exp((mu - 0.5 * sigma ** 2) * t + sigma * B)
+
+            # Add line to plot
+            plt.plot(t, Y, label="Sample Path " + str(i + 1), color=pal[i])
+
+        # Add legend
+        plt.legend(loc=2)
+
+        # --------------
+        # Left-hand plot
+        # --------------
+
+        # Initiate lineplot object
+        fig = plt.figure(figsize=(14, 6))
+        ax = fig.add_subplot(121)
+        plt.ylabel('Y(t)')
+        plt.xlabel('t')
+        plt.title('Sample Solution Paths for Geometric Brownian Motion')
+        plt.axvline(x=.50, linestyle='--', color=pal[0])
+        plt.axvline(x=.75, linestyle='--', color=pal[1])
+
+        # Simulate sample paths
+        Y_1, Y_2, Y_total = [], [], []
+        for i in range(10000):
+
+            # Create Brownian Motion
+            np.random.seed(i)
+            dB = np.sqrt(dt) * np.random.randn(N)
+            B = np.cumsum(dB)
+
+            # Exact Solution
+            Y = X0 * np.exp(((mu - 0.5 * sigma ** 2) * t) + (sigma * B))
+            Y_1.append(Y[int(0.50 * N)])
+            Y_2.append(Y[int(0.75 * N)])
+            Y_total.append(Y)
+
+            # Plot first 200 sample paths
+            if i < 200:
+                ax.plot(t, Y, label="Sample Path " + str(i), color=pal[3], alpha=0.1)
+
+        # Plot average line
+        ax.plot(t, np.mean(Y_total, 0), label="Sample Path " + str(i), color=pal[2])
+
+        # --------------
+        # Right-hand plot
+        # --------------
+
+        fig.add_subplot(122)
+        plt.xlabel('Y(0.5), Y(0.75)')
+        plt.ylabel('Relative Frequency')
+        plt.xlim(0, 50)
+        plt.title('Distribution of Y(0.5) and Y(0.75)')
+        plt.hist(Y_1, color=pal[0], bins=30, density=1, alpha=0.8)
+        plt.hist(Y_2, color=pal[1], bins=150, density=1, alpha=0.8)
+        plt.axvline(np.mean(Y_total, 0)[int(0.50 * N)], linestyle='--', color=pal[0])
+        plt.axvline(np.mean(Y_total, 0)[int(0.75 * N)], linestyle='--', color=pal[1])
+
+    def euler_maruyama(self, input_data, T, dt):
         """Simulate the system using the Euler-Maruyama method.
 
         Args:
@@ -183,8 +275,102 @@ class LIM:
             x_sim (np.ndarray): Simulated data.
                 Dimensions (n_components, n_time).
         """
-        pass
 
+        # Plot settings
+        plt.rcParams['figure.figsize'] = (9, 6)
+        plt.rcParams['lines.linewidth'] = 3
+        plt.rcParams['xtick.bottom'] = False
+        plt.rcParams['ytick.left'] = False
+        pal = ["#FBB4AE", "#B3CDE3", "#CCEBC5", "#CFCCC4"]
+
+        # SDE model parameters
+        mu, sigma, X0 = 2, 1, 1
+
+        # Simulation parameters
+        T, N = 1, 2 ** 7
+        dt = 1.0 / N
+        t = np.arange(dt, 1 + dt, dt)  # Start at dt because Y = X0 at t = 0
+
+        # Create Brownian Motion
+        np.random.seed(1)
+        dB = np.sqrt(dt) * np.random.randn(N)
+        print("Browninan Motion: {} + format {}".format(dB, dB.shape))
+        B = np.cumsum(dB)
+
+        # Use own noise covariance matrix
+        random_noise = np.sqrt(dt) * self.noise_covariance
+        print("Random Noise: {} + format {}".format(random_noise, random_noise.shape))
+        Q = np.cumsum(random_noise)
+
+        print("Browninan Motion: {} + format {}".format(dB, dB.shape))
+        print("Noise Covariance: {} + format {}".format(random_noise, random_noise.shape))
+
+
+
+        # Define the time vector
+        t = np.arange(0, T, dt)
+
+        X0 = input_data
+
+        # Exact Solution
+        #Y = X0 * np.exp((mu - 0.5 * sigma ** 2) * t + (sigma * B))
+
+        # EM Approximation - small dt
+        X_em_small, X = [], X0
+        for j in range(N):
+            X += (np.einsum('ij,jk', np.real(self.logarithmic_matrix), X) * dt + (np.einsum('ij,jk', np.real(self.noise_covariance), X) * np.sqrt(dt)))
+            X_em_small.append(X)
+            print("X: {} + format {}".format(X, X.shape))
+
+        # EM Approximation - big dt
+        X_em_big, X, R = [], X0, 2
+        coarse_grid = np.arange(dt, 1 + dt, R * dt)
+        for j in range(int(N / R)):
+            X += mu * X * (R * dt) + sigma * X * sum(dB[R * (j - 1):R * j])
+            X_em_big.append(X)
+
+            # Plot
+        plt.plot(t, Y, label="Exact ($Y_t$)", color=pal[0])
+        plt.plot(t, X_em_small, label="EM ($X_t$): Fine Grid", color=pal[1], ls='--')
+        plt.plot(coarse_grid, X_em_big, label="EM ($X_t$): Coarse Grid", color=pal[2], ls='--')
+        plt.title('E-M Approximation vs. Exact Simulation')
+        plt.xlabel('t')
+        plt.legend(loc=2)
+
+    def simulate_sde(self,x , T, dt):
+        """
+        Simulates a stochastic differential equation of the form:
+        Y(t + dt) = Y(t) + L(Y(t) dt + S ~ N(0,Q) * sqrt(dt))
+        where Y is a scalar process, L is the drift term, Q is the variance of the stochastic term,
+        T is the simulation time, dt is the time increment, and Y0 is the initial value of the process.
+
+        return t -> an array of time values representing the time steps used in the simulation, from 0 to T with increments of dt
+        return Y -> an array of the simulated values of the process Y at each time step
+        """
+        # Define the time vector
+        t = np.arange(0, T, dt)
+
+        # Generate the noise term
+        #dW = np.random.normal(loc=0, scale=np.sqrt(dt), size=len(t))
+        dW = self.noise_covariance
+        #print("dW: {} + format {}".format(dW, dW.shape))
+
+        # Simulate the process using the Euler-Maruyama method
+        Y = [np.zeros_like(x) for i in range(T)]
+        #print("Y: {}".format(Y))
+        print("Data input : {} + format {}".format(x, x.shape))
+
+        Y[0] = x
+        #print("Y: {} + format {}".format(Y[0], Y[0].shape))
+        #print("Logarithmic Matrix: {} + format {}".format(self.logarithmic_matrix, self.logarithmic_matrix.shape))
+        #npsum_test = np.einsum('ij,jk', self.logarithmic_matrix, Y[0])
+        #print("Npsum test: {} + format {}".format(npsum_test, npsum_test.shape))
+
+        for i in range(1, len(t)):
+            Y[i] = Y[i - 1] + (np.einsum('ij,jk', np.real(self.logarithmic_matrix), Y[i - 1]) * dt) # + dW[i] * np.sqrt(dt)
+            print("Y[i]: {} + format {}".format(Y[i], Y[i].shape))
+
+        return t, Y
     def G_tau_independence_check(self, data):
 
         x_1 = data[:, :-(self.tau+1)]
@@ -212,3 +398,9 @@ class LIM:
             print("WARNING: Consider using a larger time-lag.")
         if max(eigenvalues.real) > 1:
             print("WARNING: Eigenvalues greater than 1 detected.")
+
+
+
+if __name__ == "__main__":
+    model = LIM(2)
+
