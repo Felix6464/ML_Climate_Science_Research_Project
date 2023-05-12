@@ -160,7 +160,10 @@ class LIM:
 
         num_forecast_times = len(forecast_leads)
 
-        forecast_output_shape = (num_forecast_times, input_data.shape[0], input_data.shape[1])
+        try:
+            forecast_output_shape = (num_forecast_times, input_data.shape[0], input_data.shape[1])
+        except:
+            forecast_output_shape = (num_forecast_times, input_data.shape[0])
 
         forecast_output = np.zeros(forecast_output_shape)
         forecast_output2 = np.zeros(forecast_output_shape)
@@ -180,7 +183,7 @@ class LIM:
 
         return forecast_output, forecast_output2
 
-    def noise_integration(self, input_data, forecast_leads, timesteps=1440, out_arr=None, seed=None):
+    def noise_integration(self, input_data, forecast_leads=None, timesteps=1440, out_arr=None, seed=None):
 
         """Perform a numerical integration forced by stochastic noise
 
@@ -219,7 +222,8 @@ class LIM:
         t_delta = 1 / timesteps
 
         state_start = input_data
-        out_arr = np.zeros((timesteps + 1,input_data.shape[0], input_data.shape[0]))
+        print("State start : {} + shape : {}".format(state_start, state_start.shape))
+        out_arr = np.zeros((timesteps + 1, input_data.shape[0], input_data.shape[0]))
 
         q_eigenvalues, q_eigenvectors, scale_factor = self.get_noise_eigenvalues()
         q_eigenvalues = q_eigenvalues[:, None]
@@ -227,9 +231,10 @@ class LIM:
 
         for i in range(timesteps):
             deterministic_part = (self.logarithmic_matrix @ state_start) * t_delta
+            #deterministic_part = np.einsum('ij,jk', np.real(self.logarithmic_matrix), state_start) * t_delta
             random_part = np.random.normal(size=(input_data.shape[0], q_eigenvalues.shape[0]))
             stochastic_part = q_eigenvectors @ np.sqrt(q_eigenvalues * t_delta) * random_part
-            #print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
+            print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
             #print("Stochastic part : {} + shape : {}".format(stochastic_part, stochastic_part.shape))
             #print("Random part : {} + shape : {}".format(random_part, random_part.shape))
 
@@ -241,7 +246,7 @@ class LIM:
 
             print("Output at timestep {} is {}".format(i, state_mid))
 
-        #print("Ouput array : {}".format(out_arr))
+        #print("Output array : {}".format(out_arr))
         return out_arr, state_mid
 
     def get_noise_eigenvalues(self):
@@ -391,79 +396,6 @@ class LIM:
         plt.hist(Y_2, color=pal[1], bins=150, density=1, alpha=0.8)
         plt.axvline(np.mean(Y_total, 0)[int(0.50 * N)], linestyle='--', color=pal[0])
         plt.axvline(np.mean(Y_total, 0)[int(0.75 * N)], linestyle='--', color=pal[1])
-
-    def euler_maruyama(self, input_data, T, dt):
-        """Simulate the system using the Euler-Maruyama method.
-
-        Args:
-            input_data (np.ndarray): Input data to estimate Green's function from.
-                Dimensions (n_components, n_time).
-            dt (float): Time step.
-            n_samples (int): Number of samples to simulate.
-
-        Returns:
-            x_sim (np.ndarray): Simulated data.
-                Dimensions (n_components, n_time).
-        """
-
-        # Plot settings
-        plt.rcParams['figure.figsize'] = (9, 6)
-        plt.rcParams['lines.linewidth'] = 3
-        plt.rcParams['xtick.bottom'] = False
-        plt.rcParams['ytick.left'] = False
-        pal = ["#FBB4AE", "#B3CDE3", "#CCEBC5", "#CFCCC4"]
-
-        # Simulation parameters
-        T, N = 1, 2 ** 7
-        dt = 1.0 / N
-        t = np.arange(dt, 1 + dt, dt)  # Start at dt because Y = X0 at t = 0
-
-        # Create Brownian Motion
-        np.random.seed(1)
-        dB = np.sqrt(dt) * np.random.randn(N)
-        print("Browninan Motion: {} + format {}".format(dB, dB.shape))
-        B = np.cumsum(dB)
-
-        # Use own noise covariance matrix
-        random_noise = np.sqrt(dt) * self.noise_covariance
-        print("Random Noise: {} + format {}".format(random_noise, random_noise.shape))
-        Q = np.cumsum(random_noise)
-
-        print("Browninan Motion: {} + format {}".format(dB, dB.shape))
-        print("Noise Covariance: {} + format {}".format(random_noise, random_noise.shape))
-
-
-
-        # Define the time vector
-        t = np.arange(0, T, dt)
-
-        X0 = input_data
-
-        # Exact Solution
-        #Y = X0 * np.exp((mu - 0.5 * sigma ** 2) * t + (sigma * B))
-
-        # EM Approximation - small dt
-        X_em_small, X = [], X0
-        for j in range(N):
-            X += (np.einsum('ij,jk', np.real(self.logarithmic_matrix), X) * dt + (np.einsum('ij,jk', np.real(self.noise_covariance), X) * np.sqrt(dt)))
-            X_em_small.append(X)
-            print("X: {} + format {}".format(X, X.shape))
-
-        print("X_em_small: {} ".format(X_em_small))
-        # EM Approximation - big dt
-        X_em_big, X, R = [], X0, 2
-        coarse_grid = np.arange(dt, 1 + dt, R * dt)
-        for j in range(int(N / R)):
-            X += (np.einsum('ij,jk', np.real(self.logarithmic_matrix), X) * dt + (np.einsum('ij,jk', np.real(self.noise_covariance), X) * np.sqrt(dt)))
-            X_em_big.append(X)
-
-            # Plot
-        plt.plot(t, X0, label="Exact ($Y_t$)", color=pal[0])
-        plt.plot(t, X_em_small, label="EM ($X_t$): Fine Grid", color=pal[1], ls='--')
-        plt.plot(coarse_grid, X_em_big, label="EM ($X_t$): Coarse Grid", color=pal[2], ls='--')
-        plt.title('E-M Approximation vs. Exact Simulation')
-        plt.xlabel('t')
-        plt.legend(loc=2)
 
     def G_tau_independence_check(self, data):
 
