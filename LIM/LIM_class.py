@@ -231,10 +231,9 @@ class LIM:
 
         for i in range(timesteps):
             deterministic_part = (self.logarithmic_matrix @ state_start) * t_delta
-            #deterministic_part = np.einsum('ij,jk', np.real(self.logarithmic_matrix), state_start) * t_delta
             random_part = np.random.normal(size=(input_data.shape[0], q_eigenvalues.shape[0]))
             stochastic_part = q_eigenvectors @ np.sqrt(q_eigenvalues * t_delta) * random_part
-            print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
+            #print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
             #print("Stochastic part : {} + shape : {}".format(stochastic_part, stochastic_part.shape))
             #print("Random part : {} + shape : {}".format(random_part, random_part.shape))
 
