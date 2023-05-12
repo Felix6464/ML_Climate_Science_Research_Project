@@ -1,6 +1,10 @@
 import utils as ut
 import numpy as np
+from numpy.linalg import pinv, eigvals, eig, eigh
 import matplotlib.pyplot as plt
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Implementing Linear inverse model (LIM)
@@ -81,7 +85,6 @@ class LIM:
 
         # Compute Logarithmic Matrix = ln(green_function)/tau
         eigenvalues, eigenvectors, _ = ut.matrix_decomposition(self.green_function)
-        print("Eigenvalues - real: {}".format(eigenvalues.real))
 
         self.G_tau_independence_check(data)
         self.G_eigenvalue_check(eigenvalues)
@@ -137,18 +140,149 @@ class LIM:
 
         return noise_covariance
 
-    def forecast_mean(self, x, lag=1):
-        """Forecast the mean of x at time t+tau using the Green's function G.
+    def forecast(self, input_data, forecast_leads):
+        """Forecast of input_data at time specified by the forecast_lead times
+         using the Green's function G.
 
         Args:
-            x (np.ndarray): Input data to estimate Green's function from.
+            input_data (np.ndarray): Input data to estimate Green's function from.
                 Dimensions (n_components, n_time).
-            lag (int): Time-lag for forecasting.
+            forecast_leads List<int>: Time-lag for forecasting. Each value is interpreted as a tau value
+                                      for which the forecast matrix is determined as G_1^tau
 
         Returns:
             x_frcst (np.ndarray): Forecast.
                 Dimensions (n_components, n_time).
         """
+
+        print('Performing LIM forecast for tau values: '
+                    + str(forecast_leads))
+
+        num_forecast_times = len(forecast_leads)
+
+        forecast_output_shape = (num_forecast_times, input_data.shape[0], input_data.shape[1])
+
+        forecast_output = np.zeros(forecast_output_shape)
+        forecast_output2 = np.zeros(forecast_output_shape)
+
+        for i, tau in enumerate(forecast_leads):
+            g_tau = np.linalg.matrix_power(self.green_function, tau)
+            g_tau_2 = self.get_G_tau(tau)
+
+            forecast = np.einsum('ij,jk', np.real(g_tau), input_data)
+            forecast_output[i] = forecast
+
+            forecast2 = np.einsum('ij,jk', np.real(g_tau_2), input_data)
+            forecast_output2[i] = forecast2
+
+            #print("Forecast for tau : {} + forecast {}".format(tau, forecast))
+            #print("Forecast2 for tau : {} + forecast {}".format(tau, forecast2))
+
+        return forecast_output, forecast_output2
+
+    def noise_integration(self, input_data, forecast_leads, timesteps=1440, out_arr=None, seed=None):
+
+        """Perform a numerical integration forced by stochastic noise
+
+        Performs LIM forecast over the times specified by the
+        forecast_lead times.
+
+        Parameters
+        ----------
+        input_data (np.ndarray):
+            Input data to estimate Green's function from.
+            Dimensions (n_components, n_time).
+        forecast_leads List<int>:
+            Time-lag for forecasting. Each value is interpreted as a tau value
+            for which the forecast matrix is determined as G_1^tau
+        out_arr: Optional, ndarray
+            Optional output container for data at the resolution of deltaT.
+            Expected dimensions of (timesteps + 1, input_data.shape[0], input_data.shape[0])
+        timesteps: int
+            Number of timesteps in a single tau segment of the noise
+            integration.
+            E.g., for tau=1-year, 1440 timesteps is ~6hr timestep.
+        seed: Optional, int
+            Seed for the random number generator to perform a reproducible
+            stochastic forecast
+
+        Returns
+        -----
+        ndarray
+            Final state of the LIM noise integration forecast. Same dimension
+            as input_data.
+        """
+
+        if seed is not None:
+            np.random.seed(seed)
+
+        t_delta = 1 / timesteps
+
+        state_start = input_data
+        out_arr = np.zeros((timesteps + 1,input_data.shape[0], input_data.shape[0]))
+
+        q_eigenvalues, q_eigenvectors, scale_factor = self.get_noise_eigenvalues()
+        q_eigenvalues = q_eigenvalues[:, None]
+
+
+        for i in range(timesteps):
+            deterministic_part = (self.logarithmic_matrix @ state_start) * t_delta
+            random_part = np.random.normal(size=(input_data.shape[0], q_eigenvalues.shape[0]))
+            stochastic_part = q_eigenvectors @ np.sqrt(q_eigenvalues * t_delta) * random_part
+            #print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
+            #print("Stochastic part : {} + shape : {}".format(stochastic_part, stochastic_part.shape))
+            #print("Random part : {} + shape : {}".format(random_part, random_part.shape))
+
+            state_new = state_start + deterministic_part + stochastic_part
+            state_mid = (state_start + state_new) / 2
+            state_start = state_new
+
+            out_arr[i+1] = state_mid
+
+            print("Output at timestep {} is {}".format(i, state_mid))
+
+        #print("Ouput array : {}".format(out_arr))
+        return out_arr, state_mid
+
+    def get_noise_eigenvalues(self):
+
+        q_eigenvalues, q_eigenvectors = eigh(self.noise_covariance)
+
+        sort_idx = q_eigenvalues.argsort()
+        q_eigenvalues = q_eigenvalues[sort_idx][::-1]
+        q_eigenvectors = q_eigenvectors[:, sort_idx][:, ::-1]
+
+        num_neg = (q_eigenvalues < 0).sum()
+        max_neg_vals = 5
+
+        if num_neg > 0:
+            num_left = len(q_eigenvalues) - num_neg
+            if num_neg > max_neg_vals:
+                print('Found {:d} modes with negative eigenvalues in'
+                             ' the noise covariance term, Q.'.format(num_neg))
+                raise ValueError('More than {:d} negative eigenvalues of Q '
+                                 'detected.  Consider further dimensional '
+                                 'reduction.'.format(max_neg_vals))
+
+            else:
+                print('Removing negative eigenvalues and rescaling {:d} '
+                            'remaining eigenvalues of Q.'.format(num_left))
+                pos_q_evals = q_eigenvalues[q_eigenvalues > 0]
+                scale_factor = q_eigenvalues.sum() / pos_q_evals.sum()
+                print('Q eigenvalue rescaling: {:1.2f}'.format(scale_factor))
+
+                q_eigenvalues = q_eigenvalues[:-num_neg] * scale_factor
+                q_eigenvectors = q_eigenvectors[:, :-num_neg]
+        else:
+            scale_factor = None
+
+        return q_eigenvalues, q_eigenvectors, scale_factor
+
+    def get_G_tau(self, tau, lag=1):
+        """
+        Compute the Green's function G at time tau.
+        """
+
         # Compute the matrix decomposition of G.
         eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
 
@@ -166,11 +300,7 @@ class LIM:
         # Compute the Green's function at time tau*lag.
         G_tau = eigenvectors_left_norm @ np.diag(eigenvalues ** (lag / self.tau)) @ eigenvectors_right.T
 
-        print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
-        # Compute the forecast x(t+tau) = G_tau * x(t).
-        x_frcst = np.einsum('ij,jk', np.real(G_tau), x)
-
-        return x_frcst
+        return G_tau
 
     def geometric_brownian_motion(self, mu):
         """
@@ -266,7 +396,7 @@ class LIM:
         """Simulate the system using the Euler-Maruyama method.
 
         Args:
-            x (np.ndarray): Input data to estimate Green's function from.
+            input_data (np.ndarray): Input data to estimate Green's function from.
                 Dimensions (n_components, n_time).
             dt (float): Time step.
             n_samples (int): Number of samples to simulate.
@@ -282,9 +412,6 @@ class LIM:
         plt.rcParams['xtick.bottom'] = False
         plt.rcParams['ytick.left'] = False
         pal = ["#FBB4AE", "#B3CDE3", "#CCEBC5", "#CFCCC4"]
-
-        # SDE model parameters
-        mu, sigma, X0 = 2, 1, 1
 
         # Simulation parameters
         T, N = 1, 2 ** 7
@@ -322,55 +449,22 @@ class LIM:
             X_em_small.append(X)
             print("X: {} + format {}".format(X, X.shape))
 
+        print("X_em_small: {} ".format(X_em_small))
         # EM Approximation - big dt
         X_em_big, X, R = [], X0, 2
         coarse_grid = np.arange(dt, 1 + dt, R * dt)
         for j in range(int(N / R)):
-            X += mu * X * (R * dt) + sigma * X * sum(dB[R * (j - 1):R * j])
+            X += (np.einsum('ij,jk', np.real(self.logarithmic_matrix), X) * dt + (np.einsum('ij,jk', np.real(self.noise_covariance), X) * np.sqrt(dt)))
             X_em_big.append(X)
 
             # Plot
-        plt.plot(t, Y, label="Exact ($Y_t$)", color=pal[0])
+        plt.plot(t, X0, label="Exact ($Y_t$)", color=pal[0])
         plt.plot(t, X_em_small, label="EM ($X_t$): Fine Grid", color=pal[1], ls='--')
         plt.plot(coarse_grid, X_em_big, label="EM ($X_t$): Coarse Grid", color=pal[2], ls='--')
         plt.title('E-M Approximation vs. Exact Simulation')
         plt.xlabel('t')
         plt.legend(loc=2)
 
-    def simulate_sde(self,x , T, dt):
-        """
-        Simulates a stochastic differential equation of the form:
-        Y(t + dt) = Y(t) + L(Y(t) dt + S ~ N(0,Q) * sqrt(dt))
-        where Y is a scalar process, L is the drift term, Q is the variance of the stochastic term,
-        T is the simulation time, dt is the time increment, and Y0 is the initial value of the process.
-
-        return t -> an array of time values representing the time steps used in the simulation, from 0 to T with increments of dt
-        return Y -> an array of the simulated values of the process Y at each time step
-        """
-        # Define the time vector
-        t = np.arange(0, T, dt)
-
-        # Generate the noise term
-        #dW = np.random.normal(loc=0, scale=np.sqrt(dt), size=len(t))
-        dW = self.noise_covariance
-        #print("dW: {} + format {}".format(dW, dW.shape))
-
-        # Simulate the process using the Euler-Maruyama method
-        Y = [np.zeros_like(x) for i in range(T)]
-        #print("Y: {}".format(Y))
-        print("Data input : {} + format {}".format(x, x.shape))
-
-        Y[0] = x
-        #print("Y: {} + format {}".format(Y[0], Y[0].shape))
-        #print("Logarithmic Matrix: {} + format {}".format(self.logarithmic_matrix, self.logarithmic_matrix.shape))
-        #npsum_test = np.einsum('ij,jk', self.logarithmic_matrix, Y[0])
-        #print("Npsum test: {} + format {}".format(npsum_test, npsum_test.shape))
-
-        for i in range(1, len(t)):
-            Y[i] = Y[i - 1] + (np.einsum('ij,jk', np.real(self.logarithmic_matrix), Y[i - 1]) * dt) # + dW[i] * np.sqrt(dt)
-            print("Y[i]: {} + format {}".format(Y[i], Y[i].shape))
-
-        return t, Y
     def G_tau_independence_check(self, data):
 
         x_1 = data[:, :-(self.tau+1)]
@@ -398,6 +492,42 @@ class LIM:
             print("WARNING: Consider using a larger time-lag.")
         if max(eigenvalues.real) > 1:
             print("WARNING: Eigenvalues greater than 1 detected.")
+
+    def forecast_mean(self, input_data, lag=1):
+        """Forecast the mean of x at time t+tau using the Green's function G.
+
+        Args:
+            input_data (np.ndarray): Input data to estimate Green's function from.
+                Dimensions (n_components, n_time).
+            lag (int): Time-lag for forecasting.
+
+        Returns:
+            x_frcst (np.ndarray): Forecast.
+                Dimensions (n_components, n_time).
+        """
+        # Compute the matrix decomposition of G.
+        eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
+
+        # Sort the eigenvalues in decreasing order of decay time.
+        decay_times = -self.tau / np.log(eigenvalues)
+        sorted_indices = np.argsort(decay_times)[::-1]
+        eigenvalues = eigenvalues[sorted_indices]
+        eigenvectors_left = eigenvectors_left[:, sorted_indices]
+        eigenvectors_right = eigenvectors_right[:, sorted_indices]
+
+        # Compute weights to normalize eigenvectors left and right.
+        weights = eigenvectors_left.T @ eigenvectors_right
+        eigenvectors_left_norm = eigenvectors_left @ np.linalg.inv(weights)
+
+        # Compute the Green's function at time tau*lag.
+        G_tau = eigenvectors_left_norm @ np.diag(eigenvalues ** (lag / self.tau)) @ eigenvectors_right.T
+
+        print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
+        # Compute the forecast x(t+tau) = G_tau * x(t).
+        x_frcst = np.einsum('ij,jk', np.real(G_tau), input_data)
+
+        return x_frcst
+
 
 
 
