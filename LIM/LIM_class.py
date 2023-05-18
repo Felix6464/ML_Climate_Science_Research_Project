@@ -219,34 +219,56 @@ class LIM:
         if seed is not None:
             np.random.seed(seed)
 
-        t_delta = 1 / timesteps
+        # Compute the matrix decomposition of G.
+        eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
+
+        #print("Eigenvalues : {} + shape : {}".format(eigenvalues, eigenvalues.shape))
+        #print("Eigenvalues real : {} + shape : {}".format(np.real(eigenvalues), np.real(eigenvalues).shape))
+        #t_decay = [1/np.log(eigenvalue) for eigenvalue in eigenvalues]
+        #t_decay = [1/np.log(np.real(eigenvalue)) for eigenvalue in eigenvalues]
+        #print("t_decay : {}".format(t_decay))
+        #t_delta = min(t_decay) - 1e-5
+        #print("t_delta : {}".format(t_delta))
+        #print("t_delta_real : {}".format(np.real(t_delta)))
+        #integration_steps = int(abs(np.floor(np.real(t_delta))))
+        #print("integration_steps : {}".format(integration_steps))
+
+        integration_steps = 120
+        t_delta = 1/120
 
         state_start = input_data
         print("State start : {} + shape : {}".format(state_start, state_start.shape))
-        out_arr = np.zeros((timesteps + 1, input_data.shape[0], input_data.shape[0]))
+        out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
+        out_arr[0] = state_start
 
         q_eigenvalues, q_eigenvectors, scale_factor = self.get_noise_eigenvalues()
         q_eigenvalues = q_eigenvalues[:, None]
 
+        state_mid = []
 
-        for i in range(timesteps):
-            deterministic_part = (self.logarithmic_matrix @ state_start) * t_delta
-            random_part = np.random.normal(size=(input_data.shape[0], q_eigenvalues.shape[0]))
-            stochastic_part = q_eigenvectors @ np.sqrt(q_eigenvalues * t_delta) * random_part
-            #print("Deterministic part : {} + shape : {}".format(deterministic_part, deterministic_part.shape))
-            #print("Stochastic part : {} + shape : {}".format(stochastic_part, stochastic_part.shape))
-            #print("Random part : {} + shape : {}".format(random_part, random_part.shape))
+        for t in range(timesteps):
 
-            state_new = state_start + deterministic_part + stochastic_part
-            state_mid = (state_start + state_new) / 2
-            state_start = state_new
+            for i in range(integration_steps):
 
-            out_arr[i+1] = state_mid
+                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
+                random_part = np.array(np.random.multivariate_normal([0 for n in range(10)], self.noise_covariance))
+                stochastic_part = np.array(np.mat(random_part, np.sqrt(t_delta)))[0]
 
-            print("Output at timestep {} is {}".format(i, state_mid))
+                #print("Deterministic part : {} + shape : {} + type: {}".format(deterministic_part, deterministic_part.shape, type(deterministic_part)))
+                #print("Stochastic part : {} + shape : {} + type {}".format(stochastic_part, stochastic_part.shape, type(stochastic_part)))
+                #print("Random part : {} + shape : {} + type {}".format(random_part, random_part.shape, type(random_part)))
 
-        #print("Output array : {}".format(out_arr))
-        return out_arr, state_mid
+                state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
+                state_mid = (state_start + state_new) / 2
+                state_start = state_new
+                #print("State new _bef : {} + shape : {} + type: {}".format(state_new, state_new.shape, type(state_new)))
+                #print("Input data : {} + shape : {} + type {}".format(input_data, input_data.shape, type(input_data)))
+                #print("State new : {} + shape : {} + type: {}".format(state_start, state_start.shape, type(state_start)))
+
+            #print("Output at timestep {} is {}".format(t, state_mid))
+            out_arr[t+1] = state_mid
+
+        return out_arr
 
     def get_noise_eigenvalues(self):
 
