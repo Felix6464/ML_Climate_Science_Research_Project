@@ -237,7 +237,7 @@ class LIM:
         t_delta = 1/120
 
         state_start = input_data
-        print("State start : {} + shape : {}".format(state_start, state_start.shape))
+        #print("State start : {} + shape : {}".format(state_start, state_start.shape))
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
 
@@ -475,7 +475,7 @@ class LIM:
         # Compute the Green's function at time tau*lag.
         G_tau = eigenvectors_left_norm @ np.diag(eigenvalues ** (lag / self.tau)) @ eigenvectors_right.T
 
-        print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
+        #print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
         # Compute the forecast x(t+tau) = G_tau * x(t).
         x_frcst = np.einsum('ij,jk', np.real(G_tau), input_data)
 
