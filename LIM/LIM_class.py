@@ -105,7 +105,7 @@ class LIM:
             print("WARNING: Risk of nyquist mode.")
             print(f"WARNING: The imaginary part of L is {np.max(np.abs(np.imag(self.logarithmic_matrix)))}!")
             print(f"WARNING: Eigenvalues of G are [{np.min(eigenvalues)}, {np.max(eigenvalues)}]!")
-            self.logarithmic_matrix = self.logarithmic_matrix.real
+            self.logarithmic_matrix = self.logarithmic_matrix
         else:
             self.logarithmic_matrix = np.real(self.logarithmic_matrix)
 
@@ -123,7 +123,7 @@ class LIM:
         """
 
         # Estimate the noise covariance using the Lyapunov equation
-        noise_covariance = -self.logarithmic_matrix @ self.C_0 - self.C_0 @ self.logarithmic_matrix.T
+        noise_covariance = -(self.logarithmic_matrix @ self.C_0 + self.C_0 @ self.logarithmic_matrix.T)
 
         # Check if the covariance matrix has negative values
         if np.min(noise_covariance) < -1e-5:
@@ -181,7 +181,7 @@ class LIM:
             #print("Forecast for tau : {} + forecast {}".format(tau, forecast))
             #print("Forecast2 for tau : {} + forecast {}".format(tau, forecast2))
 
-        return forecast_output, forecast_output2
+        return forecast_output2
 
     def noise_integration(self, input_data, forecast_leads=None, timesteps=1440, out_arr=None, seed=None):
 
@@ -222,51 +222,41 @@ class LIM:
         # Compute the matrix decomposition of G.
         eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
 
-        #print("Eigenvalues : {} + shape : {}".format(eigenvalues, eigenvalues.shape))
-        #print("Eigenvalues real : {} + shape : {}".format(np.real(eigenvalues), np.real(eigenvalues).shape))
-        #t_decay = [1/np.log(eigenvalue) for eigenvalue in eigenvalues]
-        #t_decay = [1/np.log(np.real(eigenvalue)) for eigenvalue in eigenvalues]
-        #print("t_decay : {}".format(t_decay))
-        #t_delta = min(t_decay) - 1e-5
-        #print("t_delta : {}".format(t_delta))
-        #print("t_delta_real : {}".format(np.real(t_delta)))
-        #integration_steps = int(abs(np.floor(np.real(t_delta))))
-        #print("integration_steps : {}".format(integration_steps))
+        t_decay = [-1/np.log(eigenvalue) for eigenvalue in eigenvalues]
+        t_delta = np.real(min(t_decay)) - 0.1
+        print("t_delta : {}".format(t_delta))
 
-        integration_steps = 120
-        t_delta = 1/120
+        t_delta = 1
+        t_delta_int = t_delta * 2
+        #integration_steps = 2
 
         state_start = input_data
-        #print("State start : {} + shape : {}".format(state_start, state_start.shape))
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
-
-        q_eigenvalues, q_eigenvectors, scale_factor = self.get_noise_eigenvalues()
-        q_eigenvalues = q_eigenvalues[:, None]
 
         state_mid = []
 
         for t in range(timesteps):
 
-            for i in range(integration_steps):
+            #for i in range(integration_steps):
 
-                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
-                random_part = np.array(np.random.multivariate_normal([0 for n in range(10)], self.noise_covariance))
-                stochastic_part = np.array(np.mat(random_part, np.sqrt(t_delta)))[0]
+            deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_int)
+            random_part = np.array(np.random.multivariate_normal([0 for n in range(10)], self.noise_covariance))
+            stochastic_part = np.array(random_part * np.sqrt(t_delta_int))
 
-                #print("Deterministic part : {} + shape : {} + type: {}".format(deterministic_part, deterministic_part.shape, type(deterministic_part)))
-                #print("Stochastic part : {} + shape : {} + type {}".format(stochastic_part, stochastic_part.shape, type(stochastic_part)))
-                #print("Random part : {} + shape : {} + type {}".format(random_part, random_part.shape, type(random_part)))
+            #print("Deterministic part : {} + shape : {} + type: {}".format(deterministic_part, deterministic_part.shape, type(deterministic_part)))
+            #print("Stochastic part : {} + shape : {} + type {}".format(stochastic_part, stochastic_part.shape, type(stochastic_part)))
+            #print("Random part : {} + shape : {} + type {}".format(random_part, random_part.shape, type(random_part)))
 
-                state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
-                state_mid = (state_start + state_new) / 2
-                state_start = state_new
-                #print("State new _bef : {} + shape : {} + type: {}".format(state_new, state_new.shape, type(state_new)))
-                #print("Input data : {} + shape : {} + type {}".format(input_data, input_data.shape, type(input_data)))
-                #print("State new : {} + shape : {} + type: {}".format(state_start, state_start.shape, type(state_start)))
+            state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
+            state_mid = (state_start + state_new) / 2
+            state_start = state_new
+            #print("State new _bef : {} + shape : {} + type: {}".format(state_new, state_new.shape, type(state_new)))
+            #print("Input data : {} + shape : {} + type {}".format(input_data, input_data.shape, type(input_data)))
+            #print("State new : {} + shape : {} + type: {}".format(state_start, state_start.shape, type(state_start)))
 
             #print("Output at timestep {} is {}".format(t, state_mid))
-            out_arr[t+1] = state_mid
+            out_arr[t+1] = state_mid.real
 
         return out_arr
 
