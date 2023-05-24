@@ -224,7 +224,7 @@ class LIM:
 
         t_decay = [-1/np.log(eigenvalue) for eigenvalue in eigenvalues]
         t_delta = np.real(min(t_decay)) - 0.1
-        print("t_delta : {}".format(t_delta))
+        #print("t_delta : {}".format(t_delta))
 
         t_delta = 1
         t_delta_int = t_delta * 2
@@ -257,8 +257,9 @@ class LIM:
 
             #print("Output at timestep {} is {}".format(t, state_mid))
             out_arr[t+1] = state_mid.real
+            times = np.arange(timesteps + 1) * t_delta
 
-        return out_arr
+        return out_arr, times
 
     def get_noise_eigenvalues(self):
 
