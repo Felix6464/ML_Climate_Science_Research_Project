@@ -223,39 +223,25 @@ class LIM:
         eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
 
         t_decay = [-1/np.log(eigenvalue) for eigenvalue in eigenvalues]
-        t_delta = np.real(min(t_decay)) - 0.1
-        #print("t_delta : {}".format(t_delta))
+        t_delta = np.real(min(t_decay)) - 0.001
 
-        t_delta = 1
         t_delta_int = t_delta * 2
-        #integration_steps = 2
 
         state_start = input_data
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
-
         state_mid = []
 
         for t in range(timesteps):
-
-            #for i in range(integration_steps):
 
             deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_int)
             random_part = np.array(np.random.multivariate_normal([0 for n in range(10)], self.noise_covariance))
             stochastic_part = np.array(random_part * np.sqrt(t_delta_int))
 
-            #print("Deterministic part : {} + shape : {} + type: {}".format(deterministic_part, deterministic_part.shape, type(deterministic_part)))
-            #print("Stochastic part : {} + shape : {} + type {}".format(stochastic_part, stochastic_part.shape, type(stochastic_part)))
-            #print("Random part : {} + shape : {} + type {}".format(random_part, random_part.shape, type(random_part)))
-
             state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
             state_mid = (state_start + state_new) / 2
             state_start = state_new
-            #print("State new _bef : {} + shape : {} + type: {}".format(state_new, state_new.shape, type(state_new)))
-            #print("Input data : {} + shape : {} + type {}".format(input_data, input_data.shape, type(input_data)))
-            #print("State new : {} + shape : {} + type: {}".format(state_start, state_start.shape, type(state_start)))
 
-            #print("Output at timestep {} is {}".format(t, state_mid))
             out_arr[t+1] = state_mid.real
             times = np.arange(timesteps + 1) * t_delta
 

@@ -93,7 +93,10 @@ class SpatioTemporalPCA:
         eof_map = []
         for i, comp in enumerate(self.pca.components_):
             eof = flattened2map(comp, self.ids_notNaN)
-            eof = eof.drop(['time', 'month'])
+            try:
+                eof = eof.drop(['time', 'month'])
+            except:
+                eof = eof.drop(['time'])
             eof_map.append(eof)
 
         return xr.concat(eof_map, dim='eof')
