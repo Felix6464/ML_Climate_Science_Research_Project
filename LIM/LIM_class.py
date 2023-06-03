@@ -56,6 +56,7 @@ class LIM:
 
         # Initialize class variables
         self.green_function = None
+        self.g_eigenvalues = None
         self.logarithmic_matrix = None
         self.noise_covariance = None
 
@@ -85,6 +86,7 @@ class LIM:
 
         # Compute Logarithmic Matrix = ln(green_function)/tau
         eigenvalues, eigenvectors, _ = ut.matrix_decomposition(self.green_function)
+        self.g_eigenvalues = eigenvalues
 
         self.G_tau_independence_check(data)
         self.G_eigenvalue_check(eigenvalues)
@@ -183,7 +185,7 @@ class LIM:
 
         return forecast_output2
 
-    def noise_integration(self, input_data, forecast_leads=None, timesteps=1440, out_arr=None, seed=None):
+    def noise_integration(self, input_data, timesteps, out_arr=None, seed=10, num_comp=10):
 
         """Perform a numerical integration forced by stochastic noise
 
@@ -195,9 +197,6 @@ class LIM:
         input_data (np.ndarray):
             Input data to estimate Green's function from.
             Dimensions (n_components, n_time).
-        forecast_leads List<int>:
-            Time-lag for forecasting. Each value is interpreted as a tau value
-            for which the forecast matrix is determined as G_1^tau
         out_arr: Optional, ndarray
             Optional output container for data at the resolution of deltaT.
             Expected dimensions of (timesteps + 1, input_data.shape[0], input_data.shape[0])
@@ -220,30 +219,34 @@ class LIM:
             np.random.seed(seed)
 
         # Compute the matrix decomposition of G.
-        eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
 
-        t_decay = [-1/np.log(eigenvalue) for eigenvalue in eigenvalues]
-        t_delta = np.real(min(t_decay)) - 0.001
-
+        t_decay = [abs(-(1/np.log(eigenvalue))) for eigenvalue in self.g_eigenvalues]
+        #t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in eigenvalues]
+        #print("t_decay: {}".format(t_decay))
+        t_delta = min(t_decay) - 0.0001
+        print("t_delta: {}".format(t_delta))
         t_delta_int = t_delta * 2
 
         state_start = input_data
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
-        state_mid = []
 
         for t in range(timesteps):
 
-            deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_int)
-            random_part = np.array(np.random.multivariate_normal([0 for n in range(10)], self.noise_covariance))
-            stochastic_part = np.array(random_part * np.sqrt(t_delta_int))
+            for i in range(2):
 
-            state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
-            state_mid = (state_start + state_new) / 2
-            state_start = state_new
+                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
+                random_part = np.array(np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
+                stochastic_part = np.array(random_part * np.sqrt(t_delta))
 
-            out_arr[t+1] = state_mid.real
+                #state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
+                state_new = state_start + deterministic_part + stochastic_part
+                state_mid = (state_start + state_new) / 2
+                state_start = state_new
+
+            out_arr[t+1] = state_mid
             times = np.arange(timesteps + 1) * t_delta
+
 
         return out_arr, times
 

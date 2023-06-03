@@ -3,6 +3,29 @@ import xarray as xr
 from sklearn.decomposition import PCA
 
 
+def apply_mask(mask, array):
+    # Create a masked array using the where function
+    masked_array = xr.where(mask == 100, np.nan, array)
+
+    return masked_array
+
+
+def calculate_monthly_anomalies(data):
+
+    # Calculate the climatological mean for each month
+    climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
+
+    # Calculate the anomalies by subtracting the climatological mean for each month
+    anomalies = data.groupby('time.month') - climatological_mean
+
+    return anomalies
+
+def crop_xarray(input_data):
+
+    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, 110))
+
+    return cropped_ds
+
 def map2flatten(x_map: xr.Dataset) -> list:
     """Flatten dataset/dataarray and remove NaNs.
     Args:
@@ -25,6 +48,8 @@ def map2flatten(x_map: xr.Dataset) -> list:
     else:
         idx_notNaN = ~np.isnan(x_flatten)
     x_proc = x_flatten.isel(z=idx_notNaN.data)
+
+    #print("X-proc : {}".format(x_proc))
 
     return x_proc, idx_notNaN
 
