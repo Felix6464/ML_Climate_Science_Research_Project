@@ -60,7 +60,7 @@ class LIM:
         self.logarithmic_matrix = None
         self.noise_covariance = None
 
-    def fit(self, data):
+    def fit(self, data, eps=0.01):
         """
         Fit LIM to data.
 
@@ -82,11 +82,18 @@ class LIM:
 
         # Compute Green's function as C_tau x the inverse of C_0
         # time-evolution operator
+        #print("Min eigenvalue of C_0:", np.min(np.linalg.inv(self.C_0)))
+        self.C_0 = self.C_0 + eps
+        #print("Min eigenvalue of C_0:", np.min(np.clip(np.linalg.inv(self.C_0), a_min=0.00001, a_max=None)))
+
         self.green_function = self.C_tau @ np.linalg.inv(self.C_0)
+        #print("Min of G:", np.min(self.green_function))
 
         # Compute Logarithmic Matrix = ln(green_function)/tau
         eigenvalues, eigenvectors, _ = ut.matrix_decomposition(self.green_function)
         self.g_eigenvalues = eigenvalues
+        #print("Min eigenvalue of G:", np.min(self.g_eigenvalues))
+
 
         self.G_tau_independence_check(data)
         self.G_eigenvalue_check(eigenvalues)
@@ -220,11 +227,10 @@ class LIM:
 
         # Compute the matrix decomposition of G.
 
-        t_decay = [abs(-(1/np.log(eigenvalue))) for eigenvalue in self.g_eigenvalues]
-        #t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in eigenvalues]
+        #t_decay = [abs(-(1/np.log(eigenvalue))) for eigenvalue in self.g_eigenvalues]
+        t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
         #print("t_decay: {}".format(t_decay))
-        t_delta = min(t_decay) - 0.0001
-        print("t_delta: {}".format(t_delta))
+        t_delta = min(t_decay) - 1e-5
         t_delta_int = t_delta * 2
 
         state_start = input_data
@@ -239,7 +245,6 @@ class LIM:
                 random_part = np.array(np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
                 stochastic_part = np.array(random_part * np.sqrt(t_delta))
 
-                #state_new = state_start + np.real(deterministic_part) + np.real(stochastic_part)
                 state_new = state_start + deterministic_part + stochastic_part
                 state_mid = (state_start + state_new) / 2
                 state_start = state_new
@@ -414,15 +419,15 @@ class LIM:
         # Check if G is independent of tau -> eigenvalues should be equal
         # Compute the Frobenius norm of the difference between G and G_1
         fro_norm = np.linalg.norm(self.green_function - green_function_1, ord='fro')
-        print("Frobenius norm: {}".format(fro_norm))
+        #print("Frobenius norm: {}".format(fro_norm))
 
     def G_eigenvalue_check(self, eigenvalues):
 
         # Check for stability -> eigenvalues of G should be between 0 and 1
         if min(eigenvalues.real) < 0:
             print("WARNING: Negative eigenvalues detected.")
-            print("WARNING: The logarithmic matrix may not be stable.")
-            print("WARNING: Consider using a larger time-lag.")
+            #print("WARNING: The logarithmic matrix may not be stable.")
+            #print("WARNING: Consider using a larger time-lag.")
         if max(eigenvalues.real) > 1:
             print("WARNING: Eigenvalues greater than 1 detected.")
 

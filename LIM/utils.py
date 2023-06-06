@@ -1,7 +1,20 @@
 import numpy as np
 import xarray as xr
 from sklearn.decomposition import PCA
+import mpmath
 
+
+def inverse_matrix(matrix):
+    # Convert the matrix to mpmath matrix type
+    mp_matrix = mpmath.matrix(matrix.tolist())
+
+    # Compute the inverse of the matrix
+    inverse = mp_matrix**-1
+
+    # Convert the inverse matrix back to a NumPy array
+    inverse_array = np.array(inverse.tolist(), dtype=np.float64)
+
+    return inverse_array
 
 def apply_mask(mask, array):
     # Create a masked array using the where function
@@ -14,9 +27,11 @@ def calculate_monthly_anomalies(data):
 
     # Calculate the climatological mean for each month
     climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
-
+    #print("climatological_mean : {}".format(climatological_mean))
     # Calculate the anomalies by subtracting the climatological mean for each month
     anomalies = data.groupby('time.month') - climatological_mean
+    print("Data groub by month : {}".format(data.groupby('time.month')))
+    print("anomalies : {}".format(anomalies))
 
     return anomalies
 
