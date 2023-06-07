@@ -20,6 +20,21 @@ class LSTMNetwork(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
+# Define the encoder-decoder LSTM model
+class EncoderDecoderLSTM(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(EncoderDecoderLSTM, self).__init__()
+
+        self.encoder = nn.LSTM(input_size, hidden_size)
+        self.decoder = nn.LSTM(hidden_size, hidden_size)
+        self.fc = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        _, (hidden_state, cell_state) = self.encoder(x)
+        decoder_output, _ = self.decoder(x[-1].unsqueeze(0), (hidden_state, cell_state))
+        output = self.fc(decoder_output)
+        return output
+
 
 
 class TimeSeriesDataset(Dataset):

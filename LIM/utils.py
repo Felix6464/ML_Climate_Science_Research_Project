@@ -16,6 +16,16 @@ def inverse_matrix(matrix):
 
     return inverse_array
 
+def reshape_xarray(input_data):
+    # Define the target latitude and longitude dimensions
+    target_lat = xr.DataArray(np.arange(-90, 91, 0.94), dims='lat', coords={'lat': input_data['lat']})
+    target_lon = xr.DataArray(np.arange(-180, 180, 1.25), dims='lon', coords={'lon': input_data['lon']})
+
+    # Reshape the input data using xr.interp()
+    reshaped_data = input_data.interp(lat=target_lat, lon=target_lon, method='nearest')
+
+    return reshaped_data
+
 def apply_mask(mask, array):
     # Create a masked array using the where function
     masked_array = xr.where(mask == 100, np.nan, array)
@@ -27,17 +37,14 @@ def calculate_monthly_anomalies(data):
 
     # Calculate the climatological mean for each month
     climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
-    #print("climatological_mean : {}".format(climatological_mean))
     # Calculate the anomalies by subtracting the climatological mean for each month
     anomalies = data.groupby('time.month') - climatological_mean
-    print("Data groub by month : {}".format(data.groupby('time.month')))
-    print("anomalies : {}".format(anomalies))
 
     return anomalies
 
 def crop_xarray(input_data):
 
-    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, 110))
+    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, -70))
 
     return cropped_ds
 
@@ -63,8 +70,6 @@ def map2flatten(x_map: xr.Dataset) -> list:
     else:
         idx_notNaN = ~np.isnan(x_flatten)
     x_proc = x_flatten.isel(z=idx_notNaN.data)
-
-    #print("X-proc : {}".format(x_proc))
 
     return x_proc, idx_notNaN
 

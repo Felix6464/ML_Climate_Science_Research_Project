@@ -1,31 +1,33 @@
-
+import numpy as np
 import matplotlib.pyplot as plt
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 
 
 # Custom dataset class for sequence prediction
-class SequencePredictionDataset(Dataset):
-    def __init__(self, data):
-        self.data = data  # Remove the last value as it has no target
+class MultivariateDataset(Dataset):
+    def __init__(self, data, sequence_length):
+        self.data = data
+        self.sequence_length = sequence_length
 
     def __len__(self):
-        return len(self.data)
+        return len(self.data[0]) - self.sequence_length
 
     def __getitem__(self, idx):
-        input_value = self.data[idx-1]
-        target = self.data[idx]
-        return input_value, target
+        sequence = np.array([self.data[i][idx:idx + self.sequence_length] for i in range(len(self.data))])
+        target = np.array([self.data[i][idx + self.sequence_length] for i in range(len(self.data))])
+        return sequence, target
 
 # Feedforward network for sequence prediction
 class FeedforwardNetwork(nn.Module):
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, output_size):
         super(FeedforwardNetwork, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.fc3 = nn.Linear(hidden_size, 1)
+        self.fc3 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         x = self.fc1(x)
@@ -36,28 +38,31 @@ class FeedforwardNetwork(nn.Module):
         return x
 
 # Create a DataLoader for sequence prediction
-def create_dataloader(data, batch_size, shuffle=False):
-    dataset = SequencePredictionDataset(data)
+def create_dataloader(data, batch_size, sequence_length, shuffle=False):
+    dataset = MultivariateDataset(data, sequence_length)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataloader
 
 
 # Function for training a model
 def train(model, dataloader, num_epochs, learning_rate, criterion=nn.MSELoss()):
+
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     losses = []
+    criterion = nn.MSELoss()
 
     for epoch in range(num_epochs):
         running_loss = 0.0
 
         for inputs, targets in dataloader:
             optimizer.zero_grad()
-            inputs = inputs.unsqueeze(1)  # Add an extra dimension for input shape (batch_size, 1)
-            outputs = model(inputs)
+            inputs = inputs.view(-1, 1).T
             #print("Input : {} + shape : {} ".format(inputs, inputs.shape))
-            #print("Output : {} + shape : {} ".format(outputs, outputs.shape))
-            #print("Target : {} + shape : {} ".format(targets, targets.shape))
-            loss = criterion(outputs.squeeze(), targets)
+            outputs = model(inputs)
+            #print("Output : {} + shape : {} + type : {} ".format(outputs, outputs.shape, type(outputs)))
+            #print("Target : {} + shape : {} + type : {} ".format(targets, targets.shape, type(targets)))
+            loss = criterion(outputs, targets)
+            #print("Loss : {} + type : {} ".format(loss, type(loss)))
             loss.backward()
             optimizer.step()
             running_loss += loss.item()

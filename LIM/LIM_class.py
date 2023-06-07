@@ -83,7 +83,7 @@ class LIM:
         # Compute Green's function as C_tau x the inverse of C_0
         # time-evolution operator
         #print("Min eigenvalue of C_0:", np.min(np.linalg.inv(self.C_0)))
-        self.C_0 = self.C_0 + eps
+        #self.C_0 = self.C_0 + eps
         #print("Min eigenvalue of C_0:", np.min(np.clip(np.linalg.inv(self.C_0), a_min=0.00001, a_max=None)))
 
         self.green_function = self.C_tau @ np.linalg.inv(self.C_0)
@@ -225,13 +225,8 @@ class LIM:
         if seed is not None:
             np.random.seed(seed)
 
-        # Compute the matrix decomposition of G.
-
-        #t_decay = [abs(-(1/np.log(eigenvalue))) for eigenvalue in self.g_eigenvalues]
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
-        #print("t_decay: {}".format(t_decay))
         t_delta = min(t_decay) - 1e-5
-        t_delta_int = t_delta * 2
 
         state_start = input_data
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
