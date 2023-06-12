@@ -19,8 +19,7 @@ class LSTM_Encoder(nn.Module):
         """
         : param input_size:     the number of features in the input_data
         : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers (i.e., 2 means there are
-        :                       2 stacked LSTMs)
+        : param num_layers:     number of recurrent layers
         """
 
         super(LSTM_Encoder, self).__init__()
@@ -64,8 +63,7 @@ class LSTM_Decoder(nn.Module):
         """
         : param input_size:     the number of features in the input_data
         : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers (i.e., 2 means there are
-        :                       2 stacked LSTMs)
+        : param num_layers:     number of recurrent layers
         """
 
         super(LSTM_Decoder, self).__init__()
@@ -84,7 +82,6 @@ class LSTM_Decoder(nn.Module):
         : return output, hidden:            output gives all the hidden states in the sequence;
         :                                   hidden gives the hidden state and cell state for the last
         :                                   element in the sequence
-
         '''
 
         lstm_out, self.hidden = self.lstm(x_input.unsqueeze(0), encoder_hidden_states)
@@ -131,8 +128,7 @@ class LSTM_seq2seq(nn.Module):
                                           Otherwise, we predict recursively. If teacher_forcing_ratio = 1, we train only using
                                           teacher forcing.
         :param learning_rate:             Float >= 0; learning rate
-        :param dynamic_tf:                Use dynamic teacher forcing (True/False); dynamic teacher forcing
-                                          reduces the amount of teacher forcing for each epoch
+        :param dynamic_tf:                dynamic teacher forcing reduces the amount of teacher forcing for each epoch
         :return losses:                   Array of loss function for each epoch
         """
 
@@ -297,7 +293,6 @@ def windowed_dataset(y, input_window=5, output_window=1, stride=1, num_features=
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
-
     : param Xtrain:                    windowed training input data (input window size, # examples, # features)
     : param Ytrain:                    windowed training target data (output window size, # examples, # features)
     : param Xtest:                     windowed test input data (input window size, # examples, # features)
@@ -307,10 +302,10 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
 
     '''
 
-    X_train_torch = torch.from_numpy(Xtrain).type(torch.Tensor)
-    Y_train_torch = torch.from_numpy(Ytrain).type(torch.Tensor)
+    X_train = torch.from_numpy(Xtrain).type(torch.Tensor)
+    Y_train = torch.from_numpy(Ytrain).type(torch.Tensor)
 
-    X_test_torch = torch.from_numpy(Xtest).type(torch.Tensor)
-    Y_test_torch = torch.from_numpy(Ytest).type(torch.Tensor)
+    X_test = torch.from_numpy(Xtest).type(torch.Tensor)
+    Y_test = torch.from_numpy(Ytest).type(torch.Tensor)
 
-    return X_train_torch, Y_train_torch, X_test_torch, Y_test_torch
+    return X_train, Y_train, X_test, Y_test
