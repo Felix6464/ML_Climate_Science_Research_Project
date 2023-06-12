@@ -136,16 +136,11 @@ class LIM:
 
         # Check if the covariance matrix has negative values
         if np.min(noise_covariance) < -1e-5:
-            print(f"WARNING: Covariance matrix has negative values!")
+            print(f"Covariance matrix has negative values!")
 
         # Check for Nyquist mode
         # If the imaginary part of the largest eigenvalue of Q is too large, print a warning message
         eigenvalues_noise, _, _ = ut.matrix_decomposition(noise_covariance)
-
-        # Compute the eigenvalues of Q
-        eps = 1e-5
-        if np.max(np.abs(np.imag(eigenvalues_noise))) > eps:
-            print(f"WARNING: Imaginary part of max eigval of Q is {np.max(np.abs(np.imag(eigenvalues_noise)))}!")
 
         return noise_covariance
 
@@ -175,22 +170,15 @@ class LIM:
             forecast_output_shape = (num_forecast_times, input_data.shape[0])
 
         forecast_output = np.zeros(forecast_output_shape)
-        forecast_output2 = np.zeros(forecast_output_shape)
 
         for i, tau in enumerate(forecast_leads):
-            g_tau = np.linalg.matrix_power(self.green_function, tau)
-            g_tau_2 = self.get_G_tau(tau)
+            #g_tau = np.linalg.matrix_power(self.green_function, tau)
+            g_tau = self.get_G_tau(tau)
 
             forecast = np.einsum('ij,jk', np.real(g_tau), input_data)
             forecast_output[i] = forecast
 
-            forecast2 = np.einsum('ij,jk', np.real(g_tau_2), input_data)
-            forecast_output2[i] = forecast2
-
-            #print("Forecast for tau : {} + forecast {}".format(tau, forecast))
-            #print("Forecast2 for tau : {} + forecast {}".format(tau, forecast2))
-
-        return forecast_output2
+        return forecast_output
 
     def noise_integration(self, input_data, timesteps, out_arr=None, seed=10, num_comp=10):
 
@@ -308,96 +296,6 @@ class LIM:
 
         return G_tau
 
-    def geometric_brownian_motion(self, mu):
-        """
-        Simulate the system using the geometric Brownian motion method.
-        """
-
-        # Plot settings
-        plt.rcParams['figure.figsize'] = (9, 6)
-        plt.rcParams['lines.linewidth'] = 3
-        plt.rcParams['xtick.bottom'] = False
-        plt.rcParams['ytick.left'] = False
-        pal = ["#FBB4AE", "#B3CDE3", "#CCEBC5", "#CFCCC4"]
-
-        # SDE model parameters
-        mu, sigma, X0 = 2, 1, 1
-
-        # Simulation parameters
-        T, N = 1, 2 ** 7
-        dt = 1.0 / N
-        t = np.arange(dt, 1 + dt, dt)  # Start at dt because Y = X0 at t = 0
-
-        # Initiate plot object
-        plt.title('Sample Solution Paths for Geometric Brownian Motion')
-        plt.ylabel('Y(t)')
-        plt.xlabel('t')
-
-        # Create and plot sample paths
-        for i in range(len(pal)):
-            # Create Brownian Motion
-            np.random.seed(i)
-            dB = np.sqrt(dt) * np.random.randn(N)
-            B = np.cumsum(dB)
-
-            # Compute exact solution
-            Y = X0 * np.exp((mu - 0.5 * sigma ** 2) * t + sigma * B)
-
-            # Add line to plot
-            plt.plot(t, Y, label="Sample Path " + str(i + 1), color=pal[i])
-
-        # Add legend
-        plt.legend(loc=2)
-
-        # --------------
-        # Left-hand plot
-        # --------------
-
-        # Initiate lineplot object
-        fig = plt.figure(figsize=(14, 6))
-        ax = fig.add_subplot(121)
-        plt.ylabel('Y(t)')
-        plt.xlabel('t')
-        plt.title('Sample Solution Paths for Geometric Brownian Motion')
-        plt.axvline(x=.50, linestyle='--', color=pal[0])
-        plt.axvline(x=.75, linestyle='--', color=pal[1])
-
-        # Simulate sample paths
-        Y_1, Y_2, Y_total = [], [], []
-        for i in range(10000):
-
-            # Create Brownian Motion
-            np.random.seed(i)
-            dB = np.sqrt(dt) * np.random.randn(N)
-            B = np.cumsum(dB)
-
-            # Exact Solution
-            Y = X0 * np.exp(((mu - 0.5 * sigma ** 2) * t) + (sigma * B))
-            Y_1.append(Y[int(0.50 * N)])
-            Y_2.append(Y[int(0.75 * N)])
-            Y_total.append(Y)
-
-            # Plot first 200 sample paths
-            if i < 200:
-                ax.plot(t, Y, label="Sample Path " + str(i), color=pal[3], alpha=0.1)
-
-        # Plot average line
-        ax.plot(t, np.mean(Y_total, 0), label="Sample Path " + str(i), color=pal[2])
-
-        # --------------
-        # Right-hand plot
-        # --------------
-
-        fig.add_subplot(122)
-        plt.xlabel('Y(0.5), Y(0.75)')
-        plt.ylabel('Relative Frequency')
-        plt.xlim(0, 50)
-        plt.title('Distribution of Y(0.5) and Y(0.75)')
-        plt.hist(Y_1, color=pal[0], bins=30, density=1, alpha=0.8)
-        plt.hist(Y_2, color=pal[1], bins=150, density=1, alpha=0.8)
-        plt.axvline(np.mean(Y_total, 0)[int(0.50 * N)], linestyle='--', color=pal[0])
-        plt.axvline(np.mean(Y_total, 0)[int(0.75 * N)], linestyle='--', color=pal[1])
-
     def G_tau_independence_check(self, data):
 
         x_1 = data[:, :-(self.tau+1)]
@@ -420,50 +318,13 @@ class LIM:
 
         # Check for stability -> eigenvalues of G should be between 0 and 1
         if min(eigenvalues.real) < 0:
-            print("WARNING: Negative eigenvalues detected.")
-            #print("WARNING: The logarithmic matrix may not be stable.")
-            #print("WARNING: Consider using a larger time-lag.")
+            print("Negative eigenvalues detected.")
         if max(eigenvalues.real) > 1:
-            print("WARNING: Eigenvalues greater than 1 detected.")
-
-    def forecast_mean(self, input_data, lag=1):
-        """Forecast the mean of x at time t+tau using the Green's function G.
-
-        Args:
-            input_data (np.ndarray): Input data to estimate Green's function from.
-                Dimensions (n_components, n_time).
-            lag (int): Time-lag for forecasting.
-
-        Returns:
-            x_frcst (np.ndarray): Forecast.
-                Dimensions (n_components, n_time).
-        """
-        # Compute the matrix decomposition of G.
-        eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
-
-        # Sort the eigenvalues in decreasing order of decay time.
-        decay_times = -self.tau / np.log(eigenvalues)
-        sorted_indices = np.argsort(decay_times)[::-1]
-        eigenvalues = eigenvalues[sorted_indices]
-        eigenvectors_left = eigenvectors_left[:, sorted_indices]
-        eigenvectors_right = eigenvectors_right[:, sorted_indices]
-
-        # Compute weights to normalize eigenvectors left and right.
-        weights = eigenvectors_left.T @ eigenvectors_right
-        eigenvectors_left_norm = eigenvectors_left @ np.linalg.inv(weights)
-
-        # Compute the Green's function at time tau*lag.
-        G_tau = eigenvectors_left_norm @ np.diag(eigenvalues ** (lag / self.tau)) @ eigenvectors_right.T
-
-        #print("G_tau: {} + format {}".format(G_tau, G_tau.shape))
-        # Compute the forecast x(t+tau) = G_tau * x(t).
-        x_frcst = np.einsum('ij,jk', np.real(G_tau), input_data)
-
-        return x_frcst
+            print("Eigenvalues greater than 1 detected.")
 
 
 
 
 if __name__ == "__main__":
-    model = LIM(2)
+    model = LIM(1)
 

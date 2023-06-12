@@ -115,83 +115,78 @@ class LSTM_seq2seq(nn.Module):
 
     def train_model(self, input_tensor, target_tensor, n_epochs, target_len, batch_size,
                     training_prediction='recursive', teacher_forcing_ratio=0.5, learning_rate=0.01, dynamic_tf=False):
-
         """
-        train lstm encoder-decoder
+        Train an LSTM encoder-decoder model.
 
-        : param input_tensor:              input data with shape (seq_len, # in batch, number features); PyTorch tensor
-        : param target_tensor:             target data with shape (seq_len, # in batch, number features); PyTorch tensor
-        : param n_epochs:                  number of epochs
-        : param target_len:                number of values to predict
-        : param batch_size:                number of samples per gradient update
-        : param training_prediction:       type of prediction to make during training ('recursive', 'teacher_forcing', or
-        :                                  'mixed_teacher_forcing'); default is 'recursive'
-        : param teacher_forcing_ratio:     float [0, 1) indicating how much teacher forcing to use when
-        :                                  training_prediction = 'teacher_forcing.' For each batch in training, we generate a random
-        :                                  number. If the random number is less than teacher_forcing_ratio, we use teacher forcing.
-        :                                  Otherwise, we predict recursively. If teacher_forcing_ratio = 1, we train only using
-        :                                  teacher forcing.
-        : param learning_rate:             float >= 0; learning rate
-        : param dynamic_tf:                use dynamic teacher forcing (True/False); dynamic teacher forcing
-        :                                  reduces the amount of teacher forcing for each epoch
-        : return losses:                   array of loss function for each epoch
+        :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
+        :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
+        :param n_epochs:                  Number of epochs
+        :param target_len:                Number of values to predict
+        :param batch_size:                Number of samples per gradient update
+        :param training_prediction:       Type of prediction to make during training ('recursive', 'teacher_forcing', or
+                                          'mixed_teacher_forcing'); default is 'recursive'
+        :param teacher_forcing_ratio:     Float [0, 1) indicating how much teacher forcing to use when
+                                          training_prediction = 'teacher_forcing.' For each batch in training, we generate a random
+                                          number. If the random number is less than teacher_forcing_ratio, we use teacher forcing.
+                                          Otherwise, we predict recursively. If teacher_forcing_ratio = 1, we train only using
+                                          teacher forcing.
+        :param learning_rate:             Float >= 0; learning rate
+        :param dynamic_tf:                Use dynamic teacher forcing (True/False); dynamic teacher forcing
+                                          reduces the amount of teacher forcing for each epoch
+        :return losses:                   Array of loss function for each epoch
         """
 
-        # initialize array of losses
+        # Initialize array to store losses for each epoch
         losses = np.full(n_epochs, np.nan)
 
+        # Initialize optimizer and criterion
         optimizer = optim.Adam(self.parameters(), lr=learning_rate)
         criterion = nn.MSELoss()
 
-        # calculate number of batch iterations
-        n_batches = int(input_tensor.shape[1] / batch_size)
+        # Calculate the number of batch iterations
+        n_batches = input_tensor.shape[1] // batch_size
 
         with trange(n_epochs) as tr:
-            for it in tr:
+            for epoch in tr:
+                batch_loss = 0.0
 
-                batch_loss = 0.
-                batch_loss_tf = 0.
-                batch_loss_no_tf = 0.
-                num_tf = 0
-                num_no_tf = 0
+                for batch_idx in range(n_batches):
+                    # Select data for the current batch
+                    input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                    target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
 
-                for b in range(n_batches):
-                    # select data
-                    input_batch = input_tensor[:, b: b + batch_size, :]
-                    target_batch = target_tensor[:, b: b + batch_size, :]
-
-                    # outputs tensor
+                    # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
 
-                    # initialize hidden state
+                    # Initialize hidden state for the encoder
                     encoder_hidden = self.encoder.init_hidden(batch_size)
 
-                    # zero the gradient
+                    # Zero the gradients
                     optimizer.zero_grad()
 
-                    # encoder outputs
+                    # Encoder forward pass
                     encoder_output, encoder_hidden = self.encoder(input_batch)
 
-                    # decoder with teacher forcing
-                    decoder_input = input_batch[-1, :, :]  # shape: (batch_size, input_size)
+                    # Decoder input for the current batch
+                    decoder_input = input_batch[-1, :, :]
                     decoder_hidden = encoder_hidden
 
                     if training_prediction == 'recursive':
-                        # predict recursively
+                        # Predict recursively
                         for t in range(target_len):
                             decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
                             outputs[t] = decoder_output
                             decoder_input = decoder_output
 
                     if training_prediction == 'teacher_forcing':
-                        # use teacher forcing
+                        # Use teacher forcing
                         if random.random() < teacher_forcing_ratio:
                             for t in range(target_len):
                                 decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
                                 outputs[t] = decoder_output
                                 decoder_input = target_batch[t, :, :]
 
-                        # predict recursively
+                        # Predict recursively
                         else:
                             for t in range(target_len):
                                 decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
@@ -199,36 +194,37 @@ class LSTM_seq2seq(nn.Module):
                                 decoder_input = decoder_output
 
                     if training_prediction == 'mixed_teacher_forcing':
-                        # predict using mixed teacher forcing
+                        # Predict using mixed teacher forcing
                         for t in range(target_len):
                             decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
                             outputs[t] = decoder_output
 
-                            # predict with teacher forcing
+                            # Predict with teacher forcing
                             if random.random() < teacher_forcing_ratio:
                                 decoder_input = target_batch[t, :, :]
 
-                            # predict recursively
+                            # Predict recursively
                             else:
                                 decoder_input = decoder_output
 
-                    # compute the loss
+                    # Compute the loss
                     loss = criterion(outputs, target_batch)
+                    loss.requires_grad = True
                     batch_loss += loss.item()
 
-                    # backpropagation
+                    # Backpropagation and weight update
                     loss.backward()
                     optimizer.step()
 
-                # loss for epoch
+                # Compute average loss for the epoch
                 batch_loss /= n_batches
-                losses[it] = batch_loss
+                losses[epoch] = batch_loss
 
-                # dynamic teacher forcing
+                # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio = teacher_forcing_ratio - 0.02
+                    teacher_forcing_ratio -= 0.02
 
-                    # progress bar
+                # Update progress bar with current loss
                 tr.set_postfix(loss="{0:.3f}".format(batch_loss))
 
         return losses
@@ -264,32 +260,36 @@ class LSTM_seq2seq(nn.Module):
 
 def windowed_dataset(y, input_window=5, output_window=1, stride=1, num_features=20):
     '''
-    create a windowed dataset
+    Create a windowed dataset
 
-    : param y:                time series feature (array)
-    : param input_window:     number of y samples to give model
-    : param output_window:    number of future y samples to predict
-    : param stide:            spacing between windows
-    : param num_features:     number of features (i.e., 1 for us, but we could have multiple features)
-    : return X, Y:            arrays with correct dimensions for LSTM
-    :                         (i.e., [input/output window size # examples, # features])
+    :param y:                Time series feature (array)
+    :param input_window:     Number of y samples to give the model
+    :param output_window:    Number of future y samples to predict
+    :param stride:           Spacing between windows
+    :param num_features:     Number of features
+    :return X, Y:            Arrays with correct dimensions for LSTM
+                             (i.e., [input/output window size # examples, # features])
     '''
 
-    L = y.shape[0]
-    num_samples = (L - input_window - output_window) // stride + 1
+    data_len = y.shape[1]
+    num_samples = (data_len - input_window - output_window) // stride + 1
+    print("num_samples: ", num_samples)
 
+    # Initialize X and Y arrays with zeros
     X = np.zeros([input_window, num_samples, num_features])
     Y = np.zeros([output_window, num_samples, num_features])
 
-    for ff in np.arange(num_features):
-        for ii in np.arange(num_samples):
-            start_x = stride * ii
+    for feature_idx in np.arange(num_features):
+        for sample_idx in np.arange(num_samples):
+            # Create input window
+            start_x = stride * sample_idx
             end_x = start_x + input_window
-            X[:, ii, ff] = y[start_x:end_x, ff]
+            X[:, sample_idx, feature_idx] = y[feature_idx, start_x:end_x]
 
-            start_y = stride * ii + input_window
+            # Create output window
+            start_y = stride * sample_idx + input_window
             end_y = start_y + output_window
-            Y[:, ii, ff] = y[start_y:end_y, ff]
+            Y[:, sample_idx, feature_idx] = y[feature_idx, start_y:end_y]
 
     return X, Y
 
@@ -298,10 +298,10 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
 
-    : param Xtrain:                           windowed training input data (input window size, # examples, # features); np.array
-    : param Ytrain:                           windowed training target data (output window size, # examples, # features); np.array
-    : param Xtest:                            windowed test input data (input window size, # examples, # features); np.array
-    : param Ytest:                            windowed test target data (output window size, # examples, # features); np.array
+    : param Xtrain:                    windowed training input data (input window size, # examples, # features)
+    : param Ytrain:                    windowed training target data (output window size, # examples, # features)
+    : param Xtest:                     windowed test input data (input window size, # examples, # features)
+    : param Ytest:                     windowed test target data (output window size, # examples, # features)
     : return X_train_torch, Y_train_torch,
     :        X_test_torch, Y_test_torch:      all input np.arrays converted to PyTorch tensors
 
