@@ -207,3 +207,13 @@ def matrix_decomposition(A):
     V = V[:, idx_sort]
 
     return w, U, V
+
+def calculate_percentage(value, percentage):
+    """
+    Calculate the value of a percentage from a given value.
+
+    :param value: The original value.
+    :param percentage: The percentage to calculate.
+    :return: The calculated value of the percentage.
+    """
+    return (value * percentage) / 100

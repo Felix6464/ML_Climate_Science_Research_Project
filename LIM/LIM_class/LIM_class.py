@@ -214,68 +214,28 @@ class LIM:
             np.random.seed(seed)
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
-        t_delta = min(t_decay) - 0.001
-        if seed == 99:
-            print("YESSS SIRRR")
-            t_delta_perc = ut.calculate_percentage(t_delta, 50)
-            t_delta -= t_delta_perc
+        t_delta = min(t_decay)
+        t_delta_perc = ut.calculate_percentage(t_delta, 50)
+        t_delta -= t_delta_perc
+        print(f"t_delta: {t_delta}")
+        t_delta_ = t_delta * 2
 
-        if seed == 999:
-            print("YESSS MAAAM")
-            t_delta_perc = 0.5
-            t_delta /= t_delta_perc
-
-        w = np.min(self.g_eigenvalues)
-
-        print("2 / nplog(tdelta) : {}".format(2 / np.log(w)))
-        if 2 <= 2 / np.log(w):
-            print("YESSS")
-            t_delta = 2
-
-        #t_delta = 2
-        print("t_delta: {}".format(t_delta))
         state_start = input_data
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
 
-        if seed != 9999:
+        for t in range(timesteps):
 
-            for t in range(timesteps):
+            deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_)
+            random_part = np.array(np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
+            stochastic_part = np.array(random_part * np.sqrt(t_delta_))
 
-                for i in range(2):
+            state_new = state_start + deterministic_part + stochastic_part
+            state_mid = (state_start + state_new) / 2
+            state_start = state_new
 
-                    deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
-                    random_part = np.array(np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
-                    stochastic_part = np.array(random_part * np.sqrt(t_delta))
-
-                    state_new = state_start + deterministic_part + stochastic_part
-                    state_mid = (state_start + state_new) / 2
-                    state_start = state_new
-
-                out_arr[t+1] = state_mid
-                times = np.arange(timesteps + 1) * t_delta
-
-        else:
-            print("We are in here")
-            t_delta_int = 2 * t_delta
-
-            for t in range(timesteps):
-
-
-                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_int)
-                random_part = np.array(
-                    np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
-                stochastic_part = np.array(random_part * np.sqrt(t_delta_int))
-
-                state_new = state_start + deterministic_part + stochastic_part
-                state_mid = (state_start + state_new) / 2
-                state_start = state_new
-
-                out_arr[t + 1] = state_mid
-                times = np.arange(timesteps + 1) * t_delta
-
-
-
+            out_arr[t+1] = state_mid
+            times = np.arange(timesteps + 1) * t_delta
 
         return out_arr, times
 
