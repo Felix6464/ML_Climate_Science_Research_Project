@@ -8,16 +8,17 @@ from torch.utils.data import DataLoader, Dataset
 
 # Custom dataset class for sequence prediction
 class MultivariateDataset(Dataset):
-    def __init__(self, data, sequence_length):
+    def __init__(self, data, sequence_length, target_length):
         self.data = data
         self.sequence_length = sequence_length
+        self.target_length = target_length
 
     def __len__(self):
         return len(self.data[0]) - self.sequence_length
 
     def __getitem__(self, idx):
         sequence = np.array([self.data[i][idx:idx + self.sequence_length] for i in range(len(self.data))])
-        target = np.array([self.data[i][idx + self.sequence_length] for i in range(len(self.data))])
+        target = np.array([self.data[i][idx + self.sequence_length + self.target_length] for i in range(len(self.data))])
         return sequence, target
 
 # Feedforward network for sequence prediction
@@ -38,14 +39,14 @@ class FeedforwardNetwork(nn.Module):
         return x
 
 # Create a DataLoader for sequence prediction
-def create_dataloader(data, batch_size, sequence_length, shuffle=False):
-    dataset = MultivariateDataset(data, sequence_length)
+def create_dataloader(data, batch_size, sequence_length, target_len, shuffle=False):
+    dataset = MultivariateDataset(data, sequence_length, target_len)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataloader
 
 
 # Function for training a model
-def train(model, dataloader, num_epochs, learning_rate, criterion=nn.MSELoss()):
+def train(model, dataloader, num_epochs, learning_rate, target_len=1, criterion=nn.MSELoss()):
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     losses = []
@@ -57,10 +58,17 @@ def train(model, dataloader, num_epochs, learning_rate, criterion=nn.MSELoss()):
         for inputs, targets in dataloader:
             optimizer.zero_grad()
             inputs = inputs.view(-1, 1).T
-            #print("Input : {} + shape : {} ".format(inputs, inputs.shape))
-            outputs = model(inputs)
-            #print("Output : {} + shape : {} + type : {} ".format(outputs, outputs.shape, type(outputs)))
-            #print("Target : {} + shape : {} + type : {} ".format(targets, targets.shape, type(targets)))
+
+            for t in range(target_len):
+                torch.autograd.set_detect_anomaly(True)
+                print("Input : {} + shape : {} ".format(inputs, inputs.shape))
+                outputs = model(inputs)
+                print("Output : {} + shape : {} + type : {} ".format(outputs, outputs.shape, type(outputs)))
+                #print("Target : {} + shape : {} + type : {} ".format(targets, targets.shape, type(targets)))
+                inputs[0, 0:20] = outputs[0, :]
+                print("Input : {} + shape : {} ".format(inputs, inputs.shape))
+
+
             loss = criterion(outputs, targets)
             #print("Loss : {} + type : {} ".format(loss, type(loss)))
             loss.backward()
