@@ -205,7 +205,6 @@ class LSTM_seq2seq(nn.Module):
 
                     # Compute the loss
                     loss = criterion(outputs, target_batch)
-                    loss.requires_grad = True
                     batch_loss += loss.item()
 
                     # Backpropagation and weight update

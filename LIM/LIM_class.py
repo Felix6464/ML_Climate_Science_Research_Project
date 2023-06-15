@@ -214,7 +214,19 @@ class LIM:
             np.random.seed(seed)
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
-        t_delta = min(t_decay) - 0.001
+        t_delta = min(t_decay)
+        t_delta = t_delta * 0.4
+
+        # if seed == 99:
+        #     t_delta = 0.1 * t_delta
+        # elif seed == 999:
+        #     t_delta = 0.2 * t_delta
+        # elif seed == 9999:
+        #     t_delta = 0.3 * t_delta
+        # elif seed == 99999:
+        #     t_delta = 0.4 * t_delta
+        # elif seed == 0:
+        #     t_delta = 0.5 * t_delta
 
         print("t_delta: {}".format(t_delta))
         state_start = input_data
