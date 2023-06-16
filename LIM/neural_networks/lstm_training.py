@@ -2,7 +2,7 @@ import itertools
 import json
 import xarray as xr
 import matplotlib.pyplot as plt
-from LIM import utils as ut
+import utils as ut
 from LSTM_enc_dec import *
 
 
