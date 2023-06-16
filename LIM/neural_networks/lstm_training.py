@@ -59,10 +59,10 @@ def main():
     hidden_size = 128
     num_layers = 2
     learning_rate = 0.001
-    num_epochs = 500
+    num_epochs = 2
     input_window = input_window
     output_window = output_window
-    batch_size = 32
+    batch_size = 128
     training_prediction = "mixed_teacher_forcing"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
