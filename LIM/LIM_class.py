@@ -214,8 +214,10 @@ class LIM:
             np.random.seed(seed)
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
+        min_g_eig = np.min(self.g_eigenvalues)
+        print(min_g_eig.real)
         t_delta = min(t_decay)
-        t_delta = t_delta * 0.4
+        t_delta = t_delta
 
         # if seed == 99:
         #     t_delta = 0.1 * t_delta
@@ -233,20 +235,39 @@ class LIM:
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
 
-        for t in range(timesteps):
+        if seed != 9999:
 
-            for i in range(2):
+            for t in range(timesteps):
 
-                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
-                random_part = np.array(np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
-                stochastic_part = np.array(random_part * np.sqrt(t_delta))
+                for i in range(2):
+                    deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta)
+                    random_part = np.array(
+                        np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
+                    stochastic_part = np.array(random_part * np.sqrt(t_delta))
+
+                    state_new = state_start + deterministic_part + stochastic_part
+                    state_mid = (state_start + state_new) / 2
+                    state_start = state_new
+
+                out_arr[t + 1] = state_mid
+                times = np.arange(timesteps + 1) * t_delta
+
+        else:
+            print("We are in here")
+            t_delta_int = 2 * t_delta
+
+            for t in range(timesteps):
+                deterministic_part = np.array((self.logarithmic_matrix @ state_start) * t_delta_int)
+                random_part = np.array(
+                    np.random.multivariate_normal([0 for n in range(num_comp)], self.noise_covariance))
+                stochastic_part = np.array(random_part * np.sqrt(t_delta_int))
 
                 state_new = state_start + deterministic_part + stochastic_part
                 state_mid = (state_start + state_new) / 2
                 state_start = state_new
 
-            out_arr[t+1] = state_mid
-            times = np.arange(timesteps + 1) * t_delta
+                out_arr[t + 1] = state_mid
+                times = np.arange(timesteps + 1) * t_delta
 
         return out_arr, times
 

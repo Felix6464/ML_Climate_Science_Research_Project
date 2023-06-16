@@ -44,7 +44,7 @@ def calculate_monthly_anomalies(data):
 
 def crop_xarray(input_data):
 
-    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, -70))
+    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-180, -70))
 
     return cropped_ds
 
