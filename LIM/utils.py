@@ -1,20 +1,7 @@
 import numpy as np
 import xarray as xr
 from sklearn.decomposition import PCA
-import mpmath
 
-
-def inverse_matrix(matrix):
-    # Convert the matrix to mpmath matrix type
-    mp_matrix = mpmath.matrix(matrix.tolist())
-
-    # Compute the inverse of the matrix
-    inverse = mp_matrix**-1
-
-    # Convert the inverse matrix back to a NumPy array
-    inverse_array = np.array(inverse.tolist(), dtype=np.float64)
-
-    return inverse_array
 
 def reshape_xarray(input_data):
     # Define the target latitude and longitude dimensions

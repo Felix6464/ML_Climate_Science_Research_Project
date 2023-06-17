@@ -1,13 +1,9 @@
 import numpy as np
 import random
-import os, errno
-import sys
 from tqdm import trange
-
 import torch
 import torch.nn as nn
 from torch import optim
-import torch.nn.functional as F
 
 
 class LSTM_Encoder(nn.Module):
