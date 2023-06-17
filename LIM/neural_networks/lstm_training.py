@@ -7,10 +7,10 @@ from LSTM_enc_dec import *
 
 
 def main():
-    data = xr.open_dataset("C:/Users/felix/PycharmProjects/ML_Climate_Science_Research_Project/LIM/data/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
+    data = xr.open_dataset("./data/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
     #data = xr.open_dataset("./data/zos_Amon_CESM2_piControl_r1i1p1f1.nc")["zos"]
     #data_old = xr.open_dataset("./data/ssta_1950_2021.nc")["ssta"]
-    mask = xr.open_dataset("C:/Users/felix/PycharmProjects/ML_Climate_Science_Research_Project/LIM/data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
+    mask = xr.open_dataset("./data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
 
     data = data[:, :, :]
     data = ut.apply_mask(mask, data)
@@ -59,7 +59,7 @@ def main():
     hidden_size = 128
     num_layers = 2
     learning_rate = 0.001
-    num_epochs = 2
+    num_epochs = 10
     input_window = input_window
     output_window = output_window
     batch_size = 128
