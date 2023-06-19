@@ -128,6 +128,12 @@ class LSTM_seq2seq(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print(device)
+        input_tensor = input_tensor.to(device)
+        target_tensor = target_tensor.to(device)
+
         # Initialize array to store losses for each epoch
         losses = np.full(n_epochs, np.nan)
 
@@ -149,6 +155,7 @@ class LSTM_seq2seq(nn.Module):
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
+                    outputs = outputs.to(device)
 
                     # Initialize hidden state for the encoder
                     encoder_hidden = self.encoder.init_hidden(batch_size)

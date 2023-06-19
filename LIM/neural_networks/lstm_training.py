@@ -77,6 +77,7 @@ def main():
 
     model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size)
     model.to(device)
+    print(device)
     loss = model.train_model(X_train, Y_train, n_epochs = num_epochs, target_len = output_window, batch_size = batch_size, training_prediction = training_prediction, teacher_forcing_ratio = teacher_forcing_ratio, learning_rate = learning_rate, dynamic_tf = dynamic_tf)
 
 
