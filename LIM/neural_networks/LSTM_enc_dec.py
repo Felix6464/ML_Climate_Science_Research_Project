@@ -303,7 +303,7 @@ class LSTM_seq2seq(nn.Module):
         return np_outputs
 
 
-def dataloader_seq2seq(y, input_window, output_window, stride=1, num_features=30, tensor_size=30):
+def dataloader_seq2seq(y, input_window, output_window, stride=1, num_features=30):
     '''
     Create a windowed dataset
 
