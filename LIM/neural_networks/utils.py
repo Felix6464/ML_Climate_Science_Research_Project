@@ -31,9 +31,54 @@ def calculate_monthly_anomalies(data):
 
 def crop_xarray(input_data):
 
-    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-180, -70))
+    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, -70))
 
     return cropped_ds
+
+def crop_xarray_lat(input_data):
+
+    cropped_ds = input_data.sel(lat=slice(-30, 30))
+
+    return cropped_ds
+
+
+def crop_xarray2(lon_start, lon_end, input_data):
+    if lon_start > lon_end:
+        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(0, 180))
+        #print(cropped_dataset_left["lon"])
+        cropped_dataset_left["lon"] = -1 * cropped_dataset_left["lon"]
+        print(cropped_dataset_left["lon"])
+        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, 0))
+        cropped_dataset_right["lon"] = -1 * cropped_dataset_right["lon"]
+        print(cropped_dataset_right["lon"])
+
+
+        cropped_dataset = xr.concat(
+            [
+                cropped_dataset_left,
+                cropped_dataset_right
+
+            ],
+            dim='lon'
+        ).sortby('lon')
+    else:
+        cropped_dataset = input_data.sel(lon=slice(lon_start, lon_end))
+
+    cropped_dataset_left = cropped_dataset.sel(lon=slice(-180, -130))
+    cropped_dataset_right = cropped_dataset.sel(lon=slice(70, 180))
+    #cropped_dataset_left["lon"] = -1 * cropped_dataset_left["lon"]
+    #cropped_dataset_right["lon"] = -1 * cropped_dataset_right["lon"]
+
+    cropped_dataset = xr.concat(
+        [
+            cropped_dataset_left,
+            cropped_dataset_right
+
+        ],
+        dim='lon'
+    ).sortby('lon')
+
+    return cropped_dataset
 
 def map2flatten(x_map: xr.Dataset) -> list:
     """Flatten dataset/dataarray and remove NaNs.

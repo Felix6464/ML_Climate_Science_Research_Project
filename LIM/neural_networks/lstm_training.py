@@ -46,7 +46,7 @@ def main():
     data_train = data[:, :index_train]
     data_test = data[:, index_train:]
 
-    input_window = 5
+    input_window = 6
     output_window = 12
 
     input_data, target_data = windowed_dataset(data_train, input_window=input_window, output_window=output_window)
@@ -56,13 +56,13 @@ def main():
 
     #Hyperparameters
 
-    hidden_size = 128
-    num_layers = 2
+    hidden_size = 256
+    num_layers = 3
     learning_rate = 0.001
-    num_epochs = 200
+    num_epochs = 50
     input_window = input_window
     output_window = output_window
-    batch_size = 128
+    batch_size = 32
     training_prediction = "mixed_teacher_forcing"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
@@ -82,7 +82,7 @@ def main():
 
 
     rand_identifier = np.random.randint(0, 10000000)
-    torch.save(model.state_dict(), f'./trained_models/model_{rand_identifier}.pt')
+    torch.save(model.state_dict(), f'./temp_models/model_{rand_identifier}.pt')
 
     # Save the model and hyperparameters to a file
     parameters = {
@@ -100,8 +100,8 @@ def main():
             "shuffle": shuffle,
         }
     }
-    print(f"./trained_models/model_{rand_identifier}_params.txt")
-    filename = f"./trained_models/model_{rand_identifier}_params.txt"
+    print(f"./temp_models/model_{rand_identifier}_params.txt")
+    filename = f"./temp_models/model_{rand_identifier}_params.txt"
     with open(filename, 'w') as f:
         json.dump(parameters, f)
 
