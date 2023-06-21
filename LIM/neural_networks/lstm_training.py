@@ -7,32 +7,15 @@ from LSTM_enc_dec import *
 
 
 def main():
-    #data = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/piControl/CESM2/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
-    data = xr.open_dataset("./data/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
-    #data = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/piControl/CESM2/zos_Amon_CESM2_piControl_r1i1p1f1.nc")["zos"]
-    #data_old = xr.open_dataset("./data/ssta_1950_2021.nc")["ssta"]
-    #mask = xr.open_dataset("/mnt/qb/goswami/data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
-    mask = xr.open_dataset("./data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
-
-
-    data = data[:, :, :]
-    data = ut.apply_mask(mask, data)
-    data_anomalies = ut.calculate_monthly_anomalies(data)
-    data_cropped = ut.crop_xarray2(130, -70, data_anomalies)
-
-
-    pca_10 = ut.SpatioTemporalPCA(data_cropped, n_components=20)
-    eof_10 = pca_10.eofs()
-    pc_10 = pca_10.principal_components()
-
 
     # Set random seed for reproducibility
     torch.manual_seed(42)
 
     # Create the DataLoader for first principal component
-    data = pc_10
-    data = np.array(data)
-    data = torch.from_numpy(data).type(torch.Tensor)
+    data = torch.load("data_piControl.pt")
+    #data = np.array(data)
+    #data = torch.from_numpy(data).type(torch.Tensor)
+    print("Data : {} and shape: {} and type : {}".format(data, data.shape, type(data)))
 
     # Reshape the data if necessary (assuming a 2D tensor)
     if len(data.shape) == 1:
@@ -52,8 +35,10 @@ def main():
     input_window = 6
     output_window = 12
 
-    input_data, target_data = dataloader_seq2seq_feat(data_train, input_window=input_window, output_window=output_window)
-    input_data_test, target_data_test = dataloader_seq2seq_feat(data_test, input_window=input_window, output_window=output_window)
+    input_data, target_data = dataloader_seq2seq(data_train, input_window=input_window, output_window=output_window, num_features=30)
+    input_data_test, target_data_test = dataloader_seq2seq(data_test, input_window=input_window, output_window=output_window, num_features=30)
+
+    #print("Input data : {} and shape: {} and type : {}".format(input_data, input_data.shape, type(input_data)))
 
     X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 

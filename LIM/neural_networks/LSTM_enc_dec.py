@@ -303,43 +303,7 @@ class LSTM_seq2seq(nn.Module):
         return np_outputs
 
 
-def dataloader_seq2seq(y, input_window=5, output_window=1, stride=1, num_features=1, tensor_size=10):
-    '''
-    Create a windowed dataset
-
-    :param y:                Time series feature (array)
-    :param input_window:     Number of y samples to give the model
-    :param output_window:    Number of future y samples to predict
-    :param stride:           Spacing between windows
-    :param num_features:     Number of features
-    :return X, Y:            Arrays with correct dimensions for LSTM
-                             (i.e., [input/output window size # examples, # features])
-    '''
-
-    data_len = y.shape[0]
-    num_samples = (data_len - input_window - output_window) // stride + 1
-    print("num_samples: ", num_samples)
-
-    # Initialize X and Y arrays with zeros
-    X = np.zeros([input_window, num_samples, tensor_size])
-    Y = np.zeros([output_window, num_samples, tensor_size])
-
-    for feature_idx in np.arange(num_features):
-        for sample_idx in np.arange(num_samples):
-            # Create input window
-            start_x = stride * sample_idx
-            end_x = start_x + input_window
-            X[:, sample_idx, :] = y[start_x:end_x]
-
-            # Create output window
-            start_y = stride * sample_idx + input_window
-            end_y = start_y + output_window
-            Y[:, sample_idx, :] = y[start_y:end_y]
-
-    return X, Y
-
-
-def dataloader_seq2seq_feat(y, input_window=5, output_window=1, stride=1, num_features=1, tensor_size=10):
+def dataloader_seq2seq(y, input_window, output_window, stride=1, num_features=30, tensor_size=30):
     '''
     Create a windowed dataset
 
