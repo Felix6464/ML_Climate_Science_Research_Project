@@ -5,7 +5,9 @@
       <excludeFolder url="file://$MODULE_DIR$/LIM/neural_networks/trained_models" />
       <excludeFolder url="file://$MODULE_DIR$/LIM/plots" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="R User Library" level="project" />
+    <orderEntry type="library" name="R Skeletons" level="application" />
   </component>
 </module>

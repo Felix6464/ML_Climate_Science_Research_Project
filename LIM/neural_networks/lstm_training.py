@@ -7,15 +7,18 @@ from LSTM_enc_dec import *
 
 
 def main():
-    data = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/piControl/CESM2/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
+    #data = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/piControl/CESM2/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
+    data = xr.open_dataset("./data/ts_Amon_CESM2_piControl_r1i1p1f1.nc")["ts"]
     #data = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/piControl/CESM2/zos_Amon_CESM2_piControl_r1i1p1f1.nc")["zos"]
     #data_old = xr.open_dataset("./data/ssta_1950_2021.nc")["ssta"]
-    mask = xr.open_dataset("/mnt/qb/goswami/data/cmip6/Amon/historical/CESM2/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
+    #mask = xr.open_dataset("/mnt/qb/goswami/data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
+    mask = xr.open_dataset("./data/sftlf_fx_CESM2_historical_r1i1p1f1.nc")["sftlf"]
+
 
     data = data[:, :, :]
     data = ut.apply_mask(mask, data)
     data_anomalies = ut.calculate_monthly_anomalies(data)
-    data_cropped =ut.crop_xarray2(130, -70, data_anomalies)
+    data_cropped = ut.crop_xarray2(130, -70, data_anomalies)
 
 
     pca_10 = ut.SpatioTemporalPCA(data_cropped, n_components=20)
@@ -49,8 +52,8 @@ def main():
     input_window = 6
     output_window = 12
 
-    input_data, target_data = dataloader_seq2seq(data_train, input_window=input_window, output_window=output_window)
-    input_data_test, target_data_test = dataloader_seq2seq(data_test, input_window=input_window, output_window=output_window)
+    input_data, target_data = dataloader_seq2seq_feat(data_train, input_window=input_window, output_window=output_window)
+    input_data_test, target_data_test = dataloader_seq2seq_feat(data_test, input_window=input_window, output_window=output_window)
 
     X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 
@@ -59,10 +62,10 @@ def main():
     hidden_size = 256
     num_layers = 3
     learning_rate = 0.001
-    num_epochs = 50
+    num_epochs = 100
     input_window = input_window
     output_window = output_window
-    batch_size = 32
+    batch_size = 8
     training_prediction = "mixed_teacher_forcing"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
@@ -79,7 +82,7 @@ def main():
     model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size)
     model.to(device)
     print(device)
-    loss, loss_test = model.train_model(X_train, Y_train, n_epochs = num_epochs, target_len = output_window, batch_size = batch_size, training_prediction = training_prediction, teacher_forcing_ratio = teacher_forcing_ratio, learning_rate = learning_rate, dynamic_tf = dynamic_tf)
+    loss, loss_test = model.train_model(X_train, Y_train, X_test, Y_test, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
 
 
     rand_identifier = np.random.randint(0, 10000000)

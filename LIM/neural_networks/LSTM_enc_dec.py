@@ -158,6 +158,9 @@ class LSTM_seq2seq(nn.Module):
         losses = np.full(n_epochs, np.nan)
         losses_test = np.full(n_epochs, np.nan)
 
+        # Initialize optimizer and criterion
+        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+
         # Calculate the number of batch iterations
         n_batches = input_tensor.shape[1] // batch_size
 
@@ -238,8 +241,6 @@ class LSTM_seq2seq(nn.Module):
                             else:
                                 decoder_input = decoder_output
 
-                    # Initialize optimizer and criterion
-                    optimizer = optim.Adam(self.parameters(), lr=learning_rate)
 
                     if loss_type == "MSE":
                         criterion = nn.MSELoss()
