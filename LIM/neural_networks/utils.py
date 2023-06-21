@@ -5,8 +5,8 @@ from sklearn.decomposition import PCA
 
 def reshape_xarray(input_data):
     # Define the target latitude and longitude dimensions
-    target_lat = xr.DataArray(np.arange(-90, 91, 0.94), dims='lat', coords={'lat': input_data['lat']})
-    target_lon = xr.DataArray(np.arange(-180, 180, 1.25), dims='lon', coords={'lon': input_data['lon']})
+    target_lat = xr.DataArray(np.linspace(-90, 90, 192), dims='lat')
+    target_lon = xr.DataArray(np.linspace(-180, 180, 360), dims='lon')
 
     # Reshape the input data using xr.interp()
     reshaped_data = input_data.interp(lat=target_lat, lon=target_lon, method='nearest')
@@ -45,11 +45,11 @@ def crop_xarray_lat(input_data):
 def crop_xarray2(lon_start, lon_end, input_data):
     if lon_start > lon_end:
         cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start, 180))
-        new_scale_left = np.linspace(-180, -120, 40)
+        new_scale_left = np.linspace(-180, -120, 50)
         cropped_dataset_left["lon"] = new_scale_left
 
         cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end))
-        new_scale_right = np.linspace(-120, -10, 89)
+        new_scale_right = np.linspace(-120, -10, 110)
         cropped_dataset_right["lon"] = new_scale_right
 
 

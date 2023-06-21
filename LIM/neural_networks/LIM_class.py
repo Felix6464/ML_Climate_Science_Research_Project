@@ -213,7 +213,6 @@ class LIM:
         if seed is not None:
             np.random.seed(seed)
 
-        #print("t_delta: {}".format(t_delta))
         state_start = input_data
         out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
         out_arr[0] = state_start
