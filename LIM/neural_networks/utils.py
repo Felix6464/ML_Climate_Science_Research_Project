@@ -44,13 +44,13 @@ def crop_xarray_lat(input_data):
 
 def crop_xarray2(lon_start, lon_end, input_data):
     if lon_start > lon_end:
-        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(0, 180))
-        #print(cropped_dataset_left["lon"])
-        cropped_dataset_left["lon"] = -1 * cropped_dataset_left["lon"]
-        print(cropped_dataset_left["lon"])
-        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, 0))
-        cropped_dataset_right["lon"] = -1 * cropped_dataset_right["lon"]
-        print(cropped_dataset_right["lon"])
+        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start, 180))
+        new_scale_left = np.linspace(-180, -120, 40)
+        cropped_dataset_left["lon"] = new_scale_left
+
+        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end))
+        new_scale_right = np.linspace(-120, -10, 89)
+        cropped_dataset_right["lon"] = new_scale_right
 
 
         cropped_dataset = xr.concat(
@@ -63,20 +63,6 @@ def crop_xarray2(lon_start, lon_end, input_data):
         ).sortby('lon')
     else:
         cropped_dataset = input_data.sel(lon=slice(lon_start, lon_end))
-
-    cropped_dataset_left = cropped_dataset.sel(lon=slice(-180, -130))
-    cropped_dataset_right = cropped_dataset.sel(lon=slice(70, 180))
-    #cropped_dataset_left["lon"] = -1 * cropped_dataset_left["lon"]
-    #cropped_dataset_right["lon"] = -1 * cropped_dataset_right["lon"]
-
-    cropped_dataset = xr.concat(
-        [
-            cropped_dataset_left,
-            cropped_dataset_right
-
-        ],
-        dim='lon'
-    ).sortby('lon')
 
     return cropped_dataset
 

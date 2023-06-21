@@ -15,7 +15,7 @@ def main():
     data = data[:, :, :]
     data = ut.apply_mask(mask, data)
     data_anomalies = ut.calculate_monthly_anomalies(data)
-    data_cropped =ut.crop_xarray(data_anomalies)
+    data_cropped =ut.crop_xarray2(130, -70, data_anomalies)
 
 
     pca_10 = ut.SpatioTemporalPCA(data_cropped, n_components=20)
