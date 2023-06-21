@@ -1,9 +1,24 @@
 import numpy as np
 import random
+import os, errno
+import sys
 from tqdm import trange
+from torch.utils.data.sampler import SubsetRandomSampler
 import torch
 import torch.nn as nn
 from torch import optim
+import torch.nn.functional as F
+
+
+class RMSELoss(torch.nn.Module):
+    def __init__(self):
+        super(RMSELoss, self).__init__()
+
+    def forward(self, x, y):
+        criterion = nn.MSELoss()
+        eps = 1e-6
+        loss = torch.sqrt(criterion(x, y) + eps)
+        return loss
 
 
 class LSTM_Encoder(nn.Module):
@@ -11,7 +26,7 @@ class LSTM_Encoder(nn.Module):
     Encodes time-series sequence
     """
 
-    def __init__(self, input_size, hidden_size, num_layers=2):
+    def __init__(self, input_size, hidden_size, num_layers=3):
         """
         : param input_size:     the number of features in the input_data
         : param hidden_size:    the number of features in the hidden state h
@@ -55,7 +70,7 @@ class LSTM_Decoder(nn.Module):
     Decodes hidden state output by encoder
     """
 
-    def __init__(self, input_size, hidden_size, num_layers=2):
+    def __init__(self, input_size, hidden_size, num_layers=3):
         """
         : param input_size:     the number of features in the input_data
         : param hidden_size:    the number of features in the hidden state h
@@ -106,11 +121,15 @@ class LSTM_seq2seq(nn.Module):
         self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size)
         self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size)
 
-    def train_model(self, input_tensor, target_tensor, n_epochs, target_len, batch_size,
-                    training_prediction='recursive', teacher_forcing_ratio=0.5, learning_rate=0.01, dynamic_tf=False):
+    def train_model(self, input_tensor, target_tensor, input_test, target_test, n_epochs, input_len, target_len,
+                    batch_size,
+                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type):
         """
         Train an LSTM encoder-decoder model.
 
+        :param input_len:
+        :param target_test:
+        :param input_test:
         :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
         :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
         :param n_epochs:                  Number of epochs
@@ -128,30 +147,43 @@ class LSTM_seq2seq(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(device)
         input_tensor = input_tensor.to(device)
         target_tensor = target_tensor.to(device)
+        input_test = input_test.to(device)
+        target_test = target_test.to(device)
 
         # Initialize array to store losses for each epoch
         losses = np.full(n_epochs, np.nan)
-
-        # Initialize optimizer and criterion
-        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-        criterion = nn.MSELoss()
+        losses_test = np.full(n_epochs, np.nan)
 
         # Calculate the number of batch iterations
         n_batches = input_tensor.shape[1] // batch_size
 
+        # indices = list(np.arange(n_batches))
+        # np.random.shuffle(indices)
+        # sampler = SubsetRandomSampler(indices)
+
         with trange(n_epochs) as tr:
             for epoch in tr:
                 batch_loss = 0.0
+                batch_loss_test = 0.0
 
                 for batch_idx in range(n_batches):
+
+                    # X_test_plt = input_test[:, input_len, :]
+                    # self.model.eval()
+                    # Y_test_pred = self.predict(X_test_plt, target_len=target_len)
+                    # Y_test_pred = Y_test_pred.to(device)
+                    # loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
+                    # batch_loss_test += loss_test.item()
+
                     # Select data for the current batch
                     input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                    # print("Input batch : {} + shape : {}".format(input_batch, input_batch.shape))
+                    # print("Target batch : {} + shape : {}".format(target_batch, target_batch.shape))
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
@@ -206,8 +238,19 @@ class LSTM_seq2seq(nn.Module):
                             else:
                                 decoder_input = decoder_output
 
-                    # Compute the loss
-                    loss = criterion(outputs, target_batch)
+                    # Initialize optimizer and criterion
+                    optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+
+                    if loss_type == "MSE":
+                        criterion = nn.MSELoss()
+                        loss = criterion(outputs, target_batch)
+                    elif loss_type == "RMSE":
+                        rmse = RMSELoss()
+                        loss = rmse.forward(outputs, target_batch)
+                    elif loss_type == "L1":
+                        criterion = nn.L1loss()
+                        loss = criterion(outputs, target_batch)
+
                     batch_loss += loss.item()
 
                     # Backpropagation and weight update
@@ -218,14 +261,17 @@ class LSTM_seq2seq(nn.Module):
                 batch_loss /= n_batches
                 losses[epoch] = batch_loss
 
+                # batch_loss_test /= n_batches
+                # losses_test[epoch] = batch_loss_test
+
                 # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio -= 0.02
+                    teacher_forcing_ratio -= 0.01
 
                 # Update progress bar with current loss
                 tr.set_postfix(loss="{0:.3f}".format(batch_loss))
 
-        return losses
+            return losses, losses_test
 
     def predict(self, input_tensor, target_len):
 
@@ -251,12 +297,48 @@ class LSTM_seq2seq(nn.Module):
             outputs[t] = decoder_output.squeeze(0)
             decoder_input = decoder_output
 
-        np_outputs = outputs.detach().numpy()
+        np_outputs = outputs.detach()
 
         return np_outputs
 
 
-def windowed_dataset(y, input_window=5, output_window=1, stride=1, num_features=20):
+def dataloader_seq2seq(y, input_window=5, output_window=1, stride=1, num_features=1, tensor_size=10):
+    '''
+    Create a windowed dataset
+
+    :param y:                Time series feature (array)
+    :param input_window:     Number of y samples to give the model
+    :param output_window:    Number of future y samples to predict
+    :param stride:           Spacing between windows
+    :param num_features:     Number of features
+    :return X, Y:            Arrays with correct dimensions for LSTM
+                             (i.e., [input/output window size # examples, # features])
+    '''
+
+    data_len = y.shape[0]
+    num_samples = (data_len - input_window - output_window) // stride + 1
+    print("num_samples: ", num_samples)
+
+    # Initialize X and Y arrays with zeros
+    X = np.zeros([input_window, num_samples, tensor_size])
+    Y = np.zeros([output_window, num_samples, tensor_size])
+
+    for feature_idx in np.arange(num_features):
+        for sample_idx in np.arange(num_samples):
+            # Create input window
+            start_x = stride * sample_idx
+            end_x = start_x + input_window
+            X[:, sample_idx, :] = y[start_x:end_x]
+
+            # Create output window
+            start_y = stride * sample_idx + input_window
+            end_y = start_y + output_window
+            Y[:, sample_idx, :] = y[start_y:end_y]
+
+    return X, Y
+
+
+def dataloader_seq2seq_feat(y, input_window=5, output_window=1, stride=1, num_features=1, tensor_size=10):
     '''
     Create a windowed dataset
 
@@ -271,7 +353,6 @@ def windowed_dataset(y, input_window=5, output_window=1, stride=1, num_features=
 
     data_len = y.shape[1]
     num_samples = (data_len - input_window - output_window) // stride + 1
-    print("num_samples: ", num_samples)
 
     # Initialize X and Y arrays with zeros
     X = np.zeros([input_window, num_samples, num_features])
