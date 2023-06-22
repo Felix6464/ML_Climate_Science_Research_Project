@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 
 
-def plot_train_test_results(lstm_model, Xtrain, Ytrain, Xtest, Ytest, rand, num_rows=10):
+def plot_train_test_results(lstm_model, Xtrain, Ytrain, Xtest, Ytest, rand, num_rows=5):
     '''
     plot examples of the lstm encoder-decoder evaluated on the training/test data
 

@@ -22,7 +22,7 @@ data_test = data[:, index_train:]
 input_window = 6
 output_window = 12
 hidden_size = 256
-num_layers = 2
+num_layers = 3
 
 #print("Data_train : {} + shape: {} + type: {}".format(data_train[0], data_train[0].shape, type(data_train)))
 input_data, target_data = dataloader_seq2seq(data_train, input_window=input_window, output_window=output_window, num_features=30)
@@ -33,11 +33,11 @@ X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input
 model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
 
 
-model_num = 8801462
+model_num = 5249424
 
 model.load_state_dict(torch.load(f"./temp_models/model_{model_num}.pt"))
 
-plot_train_test_results(model, X_train, Y_train, X_test, Y_test, model_num)
+plot_train_test_results(model, X_train, Y_train, X_test, Y_test, model_num, num_rows=4)
 
 
 

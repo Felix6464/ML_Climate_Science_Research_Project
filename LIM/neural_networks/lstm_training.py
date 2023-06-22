@@ -84,7 +84,6 @@ def main():
             "dynamic_tf": dynamic_tf,
             "loss_type": loss_type,
             "loss": loss.tolist(),
-            "loss_test": loss_test.tolist(),
             "shuffle": shuffle,
         }
     }
