@@ -46,7 +46,7 @@ def main():
 
     hidden_size = 256
     num_layers = 3
-    learning_rate = 0.001
+    learning_rate = 0.0001
     num_epochs = 100
     input_window = input_window
     output_window = output_window
