@@ -1,4 +1,4 @@
-from LIM.neural_networks import utils as ut
+from LIM.neural_networks import utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
 import matplotlib.pyplot as plt

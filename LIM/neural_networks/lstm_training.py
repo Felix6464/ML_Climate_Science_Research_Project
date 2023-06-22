@@ -2,7 +2,7 @@ import itertools
 import json
 import xarray as xr
 import matplotlib.pyplot as plt
-import utils as ut
+import utilities as ut
 from LSTM_enc_dec import *
 
 
@@ -13,9 +13,6 @@ def main():
 
     # Create the DataLoader for first principal component
     data = torch.load("data_piControl.pt")
-    #data = np.array(data)
-    #data = torch.from_numpy(data).type(torch.Tensor)
-    print("Data : {} and shape: {} and type : {}".format(data, data.shape, type(data)))
 
     # Reshape the data if necessary (assuming a 2D tensor)
     if len(data.shape) == 1:
@@ -44,9 +41,9 @@ def main():
 
     #Hyperparameters
 
-    hidden_size = 256
-    num_layers = 3
-    learning_rate = 0.0001
+    hidden_size = 128
+    num_layers = 2
+    learning_rate = 0.001
     num_epochs = 100
     input_window = input_window
     output_window = output_window
@@ -64,10 +61,10 @@ def main():
     # specify model parameters and train
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size)
+    model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
     model.to(device)
     print(device)
-    loss, loss_test = model.train_model(X_train, Y_train, X_test, Y_test, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
+    loss = model.train_model(X_train, Y_train, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
 
 
     rand_identifier = np.random.randint(0, 10000000)

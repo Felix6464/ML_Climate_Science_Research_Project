@@ -106,7 +106,7 @@ class LSTM_seq2seq(nn.Module):
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, num_layers=3):
 
         '''
         : param input_size:     the number of expected features in the input X
@@ -118,10 +118,10 @@ class LSTM_seq2seq(nn.Module):
         self.input_size = input_size
         self.hidden_size = hidden_size
 
-        self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size)
-        self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size)
+        self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
+        self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
-    def train_model(self, input_tensor, target_tensor, input_test, target_test, n_epochs, input_len, target_len,
+    def train_model(self, input_tensor, target_tensor, n_epochs, input_len, target_len,
                     batch_size,
                     training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type):
         """
@@ -151,8 +151,7 @@ class LSTM_seq2seq(nn.Module):
         print(device)
         input_tensor = input_tensor.to(device)
         target_tensor = target_tensor.to(device)
-        input_test = input_test.to(device)
-        target_test = target_test.to(device)
+
 
         # Initialize array to store losses for each epoch
         losses = np.full(n_epochs, np.nan)
@@ -171,22 +170,14 @@ class LSTM_seq2seq(nn.Module):
         with trange(n_epochs) as tr:
             for epoch in tr:
                 batch_loss = 0.0
-                batch_loss_test = 0.0
 
                 for batch_idx in range(n_batches):
-
-                    # X_test_plt = input_test[:, input_len, :]
-                    # self.model.eval()
-                    # Y_test_pred = self.predict(X_test_plt, target_len=target_len)
-                    # Y_test_pred = Y_test_pred.to(device)
-                    # loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
-                    # batch_loss_test += loss_test.item()
 
                     # Select data for the current batch
                     input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-                    # print("Input batch : {} + shape : {}".format(input_batch, input_batch.shape))
-                    # print("Target batch : {} + shape : {}".format(target_batch, target_batch.shape))
+                    #print("Input batch : {} + shape : {}".format(input_batch, input_batch.shape))
+                    #print("Target batch : {} + shape : {}".format(target_batch, target_batch.shape))
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
@@ -262,8 +253,6 @@ class LSTM_seq2seq(nn.Module):
                 batch_loss /= n_batches
                 losses[epoch] = batch_loss
 
-                # batch_loss_test /= n_batches
-                # losses_test[epoch] = batch_loss_test
 
                 # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
@@ -271,6 +260,84 @@ class LSTM_seq2seq(nn.Module):
 
                 # Update progress bar with current loss
                 tr.set_postfix(loss="{0:.3f}".format(batch_loss))
+
+            return losses
+
+
+    def evaluate_model(self, input_test, target_test, n_epochs, input_len, target_len,
+                        batch_size, loss_type):
+        """
+        Train an LSTM encoder-decoder model.
+
+        :param input_len:
+        :param target_test:
+        :param input_test:
+        :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
+        :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
+        :param n_epochs:                  Number of epochs
+        :param target_len:                Number of values to predict
+        :param batch_size:                Number of samples per gradient update
+        :param training_prediction:       Type of prediction to make during training ('recursive', 'teacher_forcing', or
+                                          'mixed_teacher_forcing'); default is 'recursive'
+        :param teacher_forcing_ratio:     Float [0, 1) indicating how much teacher forcing to use when
+                                          training_prediction = 'teacher_forcing.' For each batch in training, we generate a random
+                                          number. If the random number is less than teacher_forcing_ratio, we use teacher forcing.
+                                          Otherwise, we predict recursively. If teacher_forcing_ratio = 1, we train only using
+                                          teacher forcing.
+        :param learning_rate:             Float >= 0; learning rate
+        :param dynamic_tf:                dynamic teacher forcing reduces the amount of teacher forcing for each epoch
+        :return losses:                   Array of loss function for each epoch
+        """
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print(device)
+        input_test = input_test.to(device)
+        target_test = target_test.to(device)
+
+        # Initialize array to store losses for each epoch
+        losses = np.full(n_epochs, np.nan)
+        losses_test = np.full(n_epochs, np.nan)
+
+        # Initialize optimizer and criterion
+
+        # Calculate the number of batch iterations
+        n_batches = input_test.shape[1] // batch_size
+
+        # indices = list(np.arange(n_batches))
+        # np.random.shuffle(indices)
+        # sampler = SubsetRandomSampler(indices)
+
+        with trange(n_epochs) as tr:
+            for epoch in tr:
+                batch_loss = 0.0
+                batch_loss_test = 0.0
+
+                for batch_idx in range(n_batches):
+
+
+
+                    X_test_plt = input_test[:, input_len, :]
+                    self.eval()
+                    Y_test_pred = self.predict(X_test_plt, target_len=target_len)
+                    Y_test_pred = Y_test_pred.to(device)
+
+
+                    if loss_type == "MSE":
+                        criterion = nn.MSELoss()
+                        loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
+                    elif loss_type == "RMSE":
+                        rmse = RMSELoss()
+                        loss_test = rmse.forward(Y_test_pred, target_test[:, input_len, :])
+                    elif loss_type == "L1":
+                        criterion = nn.L1loss()
+                        loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
+
+                    batch_loss_test += loss_test.item()
+                    losses_test[epoch] = batch_loss_test
+
+
+                # Update progress bar with current loss
+                tr.set_postfix(loss="{0:.3f}".format(batch_loss_test))
 
             return losses, losses_test
 
