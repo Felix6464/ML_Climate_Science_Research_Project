@@ -48,7 +48,7 @@ def main():
     input_window = input_window
     output_window = output_window
     batch_size = 8
-    training_prediction = "mixed_teacher_forcing"
+    training_prediction = "recursive"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
     shuffle = False
