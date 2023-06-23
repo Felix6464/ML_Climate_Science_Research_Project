@@ -43,16 +43,16 @@ def main():
 
     hidden_size = 64
     num_layers = 2
-    learning_rate = 0.0001
-    num_epochs = 250
+    learning_rate = 0.001
+    num_epochs = 3
     input_window = input_window
     output_window = output_window
-    batch_size = 8
+    batch_size = 64
     training_prediction = "mixed_teacher_forcing"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
     shuffle = False
-    loss_type = "RMSE"
+    loss_type = "MSE"
 
 
 
@@ -64,7 +64,7 @@ def main():
     model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
     model.to(device)
     print(device)
-    loss, loss_test = model.train_model(X_train, Y_train, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
+    loss, loss_test = model.train_model(X_train, Y_train,X_test, Y_test, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
 
 
     rand_identifier = np.random.randint(0, 10000000)

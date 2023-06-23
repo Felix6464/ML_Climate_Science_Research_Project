@@ -21,8 +21,9 @@ data_test = data[:, index_train:]
 
 input_window = 6
 output_window = 12
-hidden_size = 256
-num_layers = 3
+hidden_size = 64
+num_layers = 2
+batch_size = 64
 
 #print("Data_train : {} + shape: {} + type: {}".format(data_train[0], data_train[0].shape, type(data_train)))
 input_data, target_data = dataloader_seq2seq(data_train, input_window=input_window, output_window=output_window, num_features=30)
@@ -31,9 +32,11 @@ input_data_test, target_data_test = dataloader_seq2seq(data_test, input_window=i
 # convert windowed data from np.array to PyTorch tensor
 X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
 
-model_num = 5249424
+model_num = 988644
 
 model.load_state_dict(torch.load(f"./temp_models/model_{model_num}.pt"))
 
