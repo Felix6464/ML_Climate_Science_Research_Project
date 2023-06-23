@@ -264,7 +264,7 @@ class LSTM_seq2seq(nn.Module):
             return losses
 
 
-    def evaluate_model(self, input_test, target_test, n_epochs, input_len, target_len,
+    def evaluate_model(self, input_test, target_test, input_len, target_len,
                         batch_size, loss_type):
         """
         Train an LSTM encoder-decoder model.
@@ -294,52 +294,46 @@ class LSTM_seq2seq(nn.Module):
         input_test = input_test.to(device)
         target_test = target_test.to(device)
 
-        # Initialize array to store losses for each epoch
-        losses = np.full(n_epochs, np.nan)
-        losses_test = np.full(n_epochs, np.nan)
-
-        # Initialize optimizer and criterion
-
         # Calculate the number of batch iterations
         n_batches = input_test.shape[1] // batch_size
 
-        # indices = list(np.arange(n_batches))
-        # np.random.shuffle(indices)
-        # sampler = SubsetRandomSampler(indices)
+        batch_loss_test = 0.0
 
-        with trange(n_epochs) as tr:
-            for epoch in tr:
-                batch_loss = 0.0
-                batch_loss_test = 0.0
+        for batch_idx in range(n_batches):
 
-                for batch_idx in range(n_batches):
+            with torch.no_grad():
+                self.eval()
 
+                # Select data for the current batch
+                input_test = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                target_test = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
 
+                X_test_plt = input_test[:, input_len, :]
+                Y_test_pred = self.predict(X_test_plt, target_len=target_len)
+                Y_test_pred = Y_test_pred.to(device)
 
-                    X_test_plt = input_test[:, input_len, :]
-                    self.eval()
-                    Y_test_pred = self.predict(X_test_plt, target_len=target_len)
-                    Y_test_pred = Y_test_pred.to(device)
-
-
-                    if loss_type == "MSE":
-                        criterion = nn.MSELoss()
-                        loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
-                    elif loss_type == "RMSE":
-                        rmse = RMSELoss()
-                        loss_test = rmse.forward(Y_test_pred, target_test[:, input_len, :])
-                    elif loss_type == "L1":
-                        criterion = nn.L1loss()
-                        loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
-
-                    batch_loss_test += loss_test.item()
-                    losses_test[epoch] = batch_loss_test
+            # Select data for the current batch
+            #input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+            #target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
 
 
-                # Update progress bar with current loss
-                tr.set_postfix(loss="{0:.3f}".format(batch_loss_test))
+            if loss_type == "MSE":
+                criterion = nn.MSELoss()
+                loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
+            elif loss_type == "RMSE":
+                rmse = RMSELoss()
+                loss_test = rmse.forward(Y_test_pred, target_test[:, input_len, :])
+            elif loss_type == "L1":
+                criterion = nn.L1loss()
+                loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
 
-            return losses, losses_test
+            batch_loss_test += loss_test.item()
+
+
+        batch_loss_test /= n_batches
+
+
+        return batch_loss_test
 
     def predict(self, input_tensor, target_len):
 

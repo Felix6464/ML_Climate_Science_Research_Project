@@ -41,14 +41,14 @@ def main():
 
     #Hyperparameters
 
-    hidden_size = 128
+    hidden_size = 64
     num_layers = 2
-    learning_rate = 0.001
-    num_epochs = 100
+    learning_rate = 0.0001
+    num_epochs = 250
     input_window = input_window
     output_window = output_window
     batch_size = 8
-    training_prediction = "recursive"
+    training_prediction = "mixed_teacher_forcing"
     teacher_forcing_ratio = 0.6
     dynamic_tf = True
     shuffle = False

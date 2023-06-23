@@ -22,14 +22,12 @@ def main():
     data = (data - mean) / std
 
     index_train = int(0.8 * len(data[0, :]))
-    data_train = data[:, :index_train]
     data_test = data[:, index_train:]
 
     input_window = 6
     output_window = 12
 
     input_data_test, target_data_test = dataloader_seq2seq(data_test, input_window=input_window, output_window=output_window, num_features=30)
-
 
     X_test = torch.from_numpy(input_data_test).type(torch.Tensor)
     Y_test = torch.from_numpy(target_data_test).type(torch.Tensor)
@@ -38,17 +36,12 @@ def main():
 
     hidden_size = 256
     num_layers = 3
-    num_epochs = 50
     input_window = input_window
     output_window = output_window
     batch_size = 8
-    training_prediction = "mixed_teacher_forcing"
-    teacher_forcing_ratio = 0.6
-    dynamic_tf = True
-    shuffle = False
     loss_type = "RMSE"
 
-    model_num = 2701751
+    model_num = 5462805
 
 
     print("Start evaluating the model")
@@ -58,10 +51,9 @@ def main():
     model = LSTM_seq2seq(input_size = X_test.shape[2], hidden_size = hidden_size, num_layers=num_layers)
     model.load_state_dict(torch.load(f"./temp_models/model_{model_num}.pt"))
     model.to(device)
-    print(device)
-    loss, loss_test = model.evaluate_model(X_test, Y_test, num_epochs, input_window, output_window, batch_size, loss_type)
+    loss_test = model.evaluate_model(X_test, Y_test, input_window, output_window, batch_size, loss_type)
 
-    ut.plot_loss(loss_test, "eval", model_num)
+    print("Loss test: {}".format(loss_test))
 
 if __name__ == "__main__":
     main()
