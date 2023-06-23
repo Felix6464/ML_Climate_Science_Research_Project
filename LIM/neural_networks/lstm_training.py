@@ -64,7 +64,7 @@ def main():
     model = LSTM_seq2seq(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
     model.to(device)
     print(device)
-    loss = model.train_model(X_train, Y_train, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
+    loss, loss_test = model.train_model(X_train, Y_train, num_epochs, input_window, output_window, batch_size, training_prediction, teacher_forcing_ratio,learning_rate, dynamic_tf, loss_type)
 
 
     rand_identifier = np.random.randint(0, 10000000)
@@ -84,6 +84,7 @@ def main():
             "dynamic_tf": dynamic_tf,
             "loss_type": loss_type,
             "loss": loss.tolist(),
+            "loss_test": loss_test.tolist(),
             "shuffle": shuffle,
         }
     }

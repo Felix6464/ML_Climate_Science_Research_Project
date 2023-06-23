@@ -121,9 +121,8 @@ class LSTM_seq2seq(nn.Module):
         self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
         self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
-    def train_model(self, input_tensor, target_tensor, n_epochs, input_len, target_len,
-                    batch_size,
-                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type):
+    def train_model(self, input_tensor, target_tensor, input_test, target_test, n_epochs, input_len, target_len, batch_size,
+                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf):
         """
         Train an LSTM encoder-decoder model.
 
@@ -151,6 +150,8 @@ class LSTM_seq2seq(nn.Module):
         print(device)
         input_tensor = input_tensor.to(device)
         target_tensor = target_tensor.to(device)
+        input_test = input_test.to(device)
+        target_test = target_test.to(device)
 
 
         # Initialize array to store losses for each epoch
@@ -159,25 +160,34 @@ class LSTM_seq2seq(nn.Module):
 
         # Initialize optimizer and criterion
         optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+        criterion = nn.MSELoss()
+        #criterion = nn.L1Loss()
+
+
+        #train_loader = DataLoader(dataset=list(zip(input_tensor, target_tensor)), batch_size=batch_size, shuffle=False)
+        #test_loader = DataLoader(dataset=list(zip(input_test, target_test)), batch_size=batch_size, shuffle=False)
 
         # Calculate the number of batch iterations
         n_batches = input_tensor.shape[1] // batch_size
 
-        # indices = list(np.arange(n_batches))
-        # np.random.shuffle(indices)
-        # sampler = SubsetRandomSampler(indices)
-
         with trange(n_epochs) as tr:
             for epoch in tr:
                 batch_loss = 0.0
+                batch_loss_test = 0.0
 
                 for batch_idx in range(n_batches):
+                    #for batch_idx, data in enumerate(train_loader):
+                    self.train()
+
+                    #input_batch, target_batch = data
+                    #input_batch = input_batch.to(device)
+                    #target_batch = target_batch.to(device)
+                    #print("Input batch : {} + shape : {} ".format(input_batch, input_batch.shape))
+                    #print("Target batch : {} + shape : {}".format(targets, targets.shape))
 
                     # Select data for the current batch
                     input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-                    #print("Input batch : {} + shape : {}".format(input_batch, input_batch.shape))
-                    #print("Target batch : {} + shape : {}".format(target_batch, target_batch.shape))
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
@@ -233,16 +243,7 @@ class LSTM_seq2seq(nn.Module):
                                 decoder_input = decoder_output
 
 
-                    if loss_type == "MSE":
-                        criterion = nn.MSELoss()
-                        loss = criterion(outputs, target_batch)
-                    elif loss_type == "RMSE":
-                        rmse = RMSELoss()
-                        loss = rmse.forward(outputs, target_batch)
-                    elif loss_type == "L1":
-                        criterion = nn.L1loss()
-                        loss = criterion(outputs, target_batch)
-
+                    loss = criterion(outputs, target_batch)
                     batch_loss += loss.item()
 
                     # Backpropagation and weight update
@@ -253,15 +254,35 @@ class LSTM_seq2seq(nn.Module):
                 batch_loss /= n_batches
                 losses[epoch] = batch_loss
 
-
                 # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
                     teacher_forcing_ratio -= 0.01
 
-                # Update progress bar with current loss
-                tr.set_postfix(loss="{0:.3f}".format(batch_loss))
+                #for batch_idx, data in enumerate(test_loader):
+                for batch_idx in range(n_batches):
+                    #input_test, target_test = data
+                    #input_test = input_test.to(device)
+                    #target_test = target_test.to(device)
 
-            return losses
+                    with torch.no_grad():
+                        self.eval()
+
+                        # Select data for the current batch
+                        input_test = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                        target_test = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+
+                        Y_test_pred = self.predict(input_test, target_len=target_len)
+                        Y_test_pred = Y_test_pred.to(device)
+                        loss_test = criterion(Y_test_pred, target_test)
+                        batch_loss_test += loss_test.item()
+
+                batch_loss_test /= n_batches
+                losses_test[epoch] = batch_loss_test
+
+                # Update progress bar with current loss
+                tr.set_postfix(loss_test="{0:.3f}", loss="{0:.3f}" .format(batch_loss_test, batch_loss))
+
+            return losses, losses_test
 
 
     def evaluate_model(self, input_test, target_test, input_len, target_len,
