@@ -3,6 +3,7 @@ import xarray as xr
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import json
+import torch
 
 
 def reshape_xarray(input_data):
@@ -255,3 +256,25 @@ def load_text_as_json(file_path):
         text = file.read()
         json_data = json.loads(text)
     return json_data
+
+
+def normalize_data(data):
+    """
+    Normalize the data using mean and standard deviation.
+
+    Args:
+        data (torch.Tensor): Input data to be normalized.
+
+    Returns:
+        torch.Tensor: Normalized data.
+
+    """
+
+    # Calculate the mean and standard deviation along the feature dimension
+    mean = torch.mean(data, dim=1, keepdim=True)
+    std = torch.std(data, dim=1, keepdim=True)
+
+    # Apply normalization using the mean and standard deviation
+    normalized_data = (data - mean) / std
+
+    return normalized_data

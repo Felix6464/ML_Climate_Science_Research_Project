@@ -1,13 +1,9 @@
 import numpy as np
 import random
-import os, errno
-import sys
 from tqdm import trange
-from torch.utils.data.sampler import SubsetRandomSampler
 import torch
 import torch.nn as nn
 from torch import optim
-import torch.nn.functional as F
 
 
 class RMSELoss(torch.nn.Module):
@@ -20,100 +16,20 @@ class RMSELoss(torch.nn.Module):
         loss = torch.sqrt(criterion(x, y) + eps)
         return loss
 
-
-class LSTM_Encoder(nn.Module):
-    """
-    Encodes time-series sequence
-    """
-
-    def __init__(self, input_size, hidden_size, num_layers=3):
-        """
-        : param input_size:     the number of features in the input_data
-        : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers
-        """
-
-        super(LSTM_Encoder, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-
-        # define LSTM layer
-        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
-
-    def forward(self, x_input):
-        """
-        : param x_input:               input of shape (seq_len, # in batch, input_size)
-        : return lstm_out, hidden:     lstm_out gives all the hidden states in the sequence;
-        :                              hidden gives the hidden state and cell state for the last
-        :                              element in the sequence
-        """
-
-        lstm_out, self.hidden = self.lstm(x_input.view(x_input.shape[0], x_input.shape[1], self.input_size))
-
-        return lstm_out, self.hidden
-
-    def init_hidden(self, batch_size):
-        """
-        initialize hidden state
-        : param batch_size:    x_input.shape[1]
-        : return:              zeroed hidden state and cell state
-        """
-
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size))
-
-
-class LSTM_Decoder(nn.Module):
-    """
-    Decodes hidden state output by encoder
-    """
-
-    def __init__(self, input_size, hidden_size, num_layers=3):
-        """
-        : param input_size:     the number of features in the input_data
-        : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers
-        """
-
-        super(LSTM_Decoder, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-
-        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
-        self.linear = nn.Linear(hidden_size, input_size)
-
-    def forward(self, x_input, encoder_hidden_states):
-        '''
-        : param x_input:                    should be 2D (batch_size, input_size)
-        : param encoder_hidden_states:      hidden states
-        : return output, hidden:            output gives all the hidden states in the sequence;
-        :                                   hidden gives the hidden state and cell state for the last
-        :                                   element in the sequence
-        '''
-
-        lstm_out, self.hidden = self.lstm(x_input.unsqueeze(0), encoder_hidden_states)
-        output = self.linear(lstm_out.squeeze(0))
-
-        return output, self.hidden
-
-
-class LSTM_seq2seq(nn.Module):
+class LSTM_Sequence_Prediction(nn.Module):
     """
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size, num_layers=3):
+    def __init__(self, input_size, hidden_size, num_layers):
 
         '''
         : param input_size:     the number of expected features in the input X
         : param hidden_size:    the number of features in the hidden state h
+        : param num_layers:     number of recurrent layers
         '''
 
-        super(LSTM_seq2seq, self).__init__()
+        super(LSTM_Sequence_Prediction, self).__init__()
 
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -122,7 +38,7 @@ class LSTM_seq2seq(nn.Module):
         self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
     def train_model(self, input_tensor, target_tensor, input_test, target_test, n_epochs, input_len, target_len, batch_size,
-                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type):
+                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer):
         """
         Train an LSTM encoder-decoder model.
 
@@ -159,9 +75,12 @@ class LSTM_seq2seq(nn.Module):
         losses_test = np.full(n_epochs, np.nan)
 
         # Initialize optimizer and criterion
-        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-        criterion = nn.MSELoss()
-        #criterion = nn.L1Loss()
+        if loss_type == 'MSE':
+            criterion = nn.MSELoss()
+        elif loss_type == 'L1':
+            criterion = nn.L1Loss()
+        elif loss_type == 'RMSE':
+            criterion = RMSELoss()
 
 
         #train_loader = DataLoader(dataset=list(zip(input_tensor, target_tensor)), batch_size=batch_size, shuffle=False)
@@ -297,81 +216,56 @@ class LSTM_seq2seq(nn.Module):
                 losses_test[epoch] = batch_loss_test
 
                 # Update progress bar with current loss
-                tr.set_postfix(loss_test="{0:.3f}", loss="{0:.3f}" .format(batch_loss_test, batch_loss))
+                tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
 
             return losses, losses_test
 
 
-    def evaluate_model(self, input_test, target_test, input_len, target_len,
-                        batch_size, loss_type):
-        """
-        Train an LSTM encoder-decoder model.
-
-        :param input_len:
-        :param target_test:
-        :param input_test:
-        :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
-        :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
-        :param n_epochs:                  Number of epochs
-        :param target_len:                Number of values to predict
-        :param batch_size:                Number of samples per gradient update
-        :param training_prediction:       Type of prediction to make during training ('recursive', 'teacher_forcing', or
-                                          'mixed_teacher_forcing'); default is 'recursive'
-        :param teacher_forcing_ratio:     Float [0, 1) indicating how much teacher forcing to use when
-                                          training_prediction = 'teacher_forcing.' For each batch in training, we generate a random
-                                          number. If the random number is less than teacher_forcing_ratio, we use teacher forcing.
-                                          Otherwise, we predict recursively. If teacher_forcing_ratio = 1, we train only using
-                                          teacher forcing.
-        :param learning_rate:             Float >= 0; learning rate
-        :param dynamic_tf:                dynamic teacher forcing reduces the amount of teacher forcing for each epoch
-        :return losses:                   Array of loss function for each epoch
-        """
+    def evaluate_model(self, input_test, target_test, target_len, batch_size, loss_type):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(device)
+
         input_test = input_test.to(device)
         target_test = target_test.to(device)
 
-        # Calculate the number of batch iterations
-        n_batches = input_test.shape[1] // batch_size
+        # Initialize optimizer and criterion
+        if loss_type == 'MSE':
+            criterion = nn.MSELoss()
+        elif loss_type == 'L1':
+            criterion = nn.L1Loss()
+        elif loss_type == 'RMSE':
+            criterion = RMSELoss()
 
+        # Calculate the number of batch iterations
+        n_batches_test = input_test.shape[1] // batch_size
+        num_batch_test = n_batches_test
+        n_batches_test = list(range(n_batches_test))
+
+        random.shuffle(n_batches_test)
         batch_loss_test = 0.0
 
-        for batch_idx in range(n_batches):
+        for batch_idx in n_batches_test:
 
             with torch.no_grad():
                 self.eval()
 
                 # Select data for the current batch
-                input_test = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-                target_test = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                input_test_batch = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                target_test_batch = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                input_test_batch = input_test_batch.to(device)
+                target_test_batch = target_test_batch.to(device)
 
-                X_test_plt = input_test[:, input_len, :]
-                Y_test_pred = self.predict(X_test_plt, target_len=target_len)
+                Y_test_pred = self.predict(input_test_batch, target_len=target_len)
                 Y_test_pred = Y_test_pred.to(device)
+                loss_test = criterion(Y_test_pred, target_test_batch)
+                batch_loss_test += loss_test.item()
 
-            # Select data for the current batch
-            #input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-            #target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-
-
-            if loss_type == "MSE":
-                criterion = nn.MSELoss()
-                loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
-            elif loss_type == "RMSE":
-                rmse = RMSELoss()
-                loss_test = rmse.forward(Y_test_pred, target_test[:, input_len, :])
-            elif loss_type == "L1":
-                criterion = nn.L1loss()
-                loss_test = criterion(Y_test_pred, target_test[:, input_len, :])
-
-            batch_loss_test += loss_test.item()
-
-
-        batch_loss_test /= n_batches
+        batch_loss_test /= num_batch_test
 
 
         return batch_loss_test
+
 
     def predict(self, input_tensor, target_len, prediction_type='test'):
 
@@ -410,8 +304,90 @@ class LSTM_seq2seq(nn.Module):
 
         return outputs
 
+class LSTM_Encoder(nn.Module):
+    """
+    Encodes time-series sequence
+    """
 
-def dataloader_seq2seq(y, input_window, output_window, stride=1, num_features=30):
+    def __init__(self, input_size, hidden_size, num_layers=3):
+        """
+        : param input_size:     the number of features in the input_data
+        : param hidden_size:    the number of features in the hidden state h
+        : param num_layers:     number of recurrent layers
+        """
+
+        super(LSTM_Encoder, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+
+        # define LSTM layer
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
+                            num_layers=num_layers)
+
+    def forward(self, x_input):
+        """
+        : param x_input:               input of shape (seq_len, # in batch, input_size)
+        : return lstm_out, hidden:     lstm_out gives all the hidden states in the sequence;
+        :                              hidden gives the hidden state and cell state for the last
+        :                              element in the sequence
+        """
+
+        lstm_out, self.hidden = self.lstm(x_input.view(x_input.shape[0], x_input.shape[1], self.input_size))
+
+        return lstm_out, self.hidden
+
+    def init_hidden(self, batch_size):
+        """
+        initialize hidden state
+        : param batch_size:    x_input.shape[1]
+        : return:              zeroed hidden state and cell state
+        """
+
+        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
+                torch.zeros(self.num_layers, batch_size, self.hidden_size))
+
+
+class LSTM_Decoder(nn.Module):
+    """
+    Decodes hidden state output by encoder
+    """
+
+    def __init__(self, input_size, hidden_size, num_layers=3):
+        """
+        : param input_size:     the number of features in the input_data
+        : param hidden_size:    the number of features in the hidden state h
+        : param num_layers:     number of recurrent layers
+        """
+
+        super(LSTM_Decoder, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
+                            num_layers=num_layers)
+        self.linear = nn.Linear(hidden_size, input_size)
+
+    def forward(self, x_input, encoder_hidden_states):
+        '''
+        : param x_input:                    should be 2D (batch_size, input_size)
+        : param encoder_hidden_states:      hidden states
+        : return output, hidden:            output gives all the hidden states in the sequence;
+        :                                   hidden gives the hidden state and cell state for the last
+        :                                   element in the sequence
+        '''
+
+        lstm_out, self.hidden = self.lstm(x_input.unsqueeze(0), encoder_hidden_states)
+        output = self.linear(lstm_out.squeeze(0))
+
+        return output, self.hidden
+
+
+
+
+
+def dataloader_seq2seq_feat(y, input_window, output_window, stride, num_features):
     '''
     Create a windowed dataset
 
