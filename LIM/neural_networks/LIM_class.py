@@ -1,3 +1,5 @@
+import torch
+
 from LIM.neural_networks import utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
@@ -213,20 +215,20 @@ class LIM:
         if seed is not None:
             np.random.seed(seed)
 
-        state_start = input_data
-        out_arr = np.zeros((timesteps + 1, input_data.shape[0]))
+        state_start = np.array(input_data)
+        print("state_start: {} and type : {}".format(state_start.shape[0], type(state_start)))
+        out_arr = np.zeros((timesteps + 1, state_start.shape[0]))
+
+
         out_arr[0] = state_start
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
-        min_g_eig = np.min(self.g_eigenvalues)
-        t_delta = min(t_decay) - 1e-5
+        t_decay = min(t_decay) -1e-5
 
-        threshold = 1 / -np.log(min_g_eig)
-        if (t_delta * 2) < threshold.real:
-            t_delta_int = 2 * t_delta
-        else:
-            print("t_delta is too big : {} -> threshold: {}!".format(t_delta, threshold.real))
+        if 2 < t_decay:
             t_delta_int = 1
+        else:
+            t_delta_int = t_decay
 
         print("t_delta: {}".format(t_delta_int))
 
@@ -242,7 +244,7 @@ class LIM:
             state_start = state_new
 
             out_arr[t + 1] = state_mid
-            times = np.arange(timesteps + 1) * t_delta
+            times = np.arange(timesteps + 1) * t_decay
 
         return out_arr, times
 

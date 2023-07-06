@@ -86,6 +86,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         #train_loader = DataLoader(dataset=list(zip(input_tensor, target_tensor)), batch_size=batch_size, shuffle=False)
         #test_loader = DataLoader(dataset=list(zip(input_test, target_test)), batch_size=batch_size, shuffle=False)
 
+
         # Calculate the number of batch iterations
         n_batches = input_tensor.shape[1] // batch_size
         n_batches_test = input_test.shape[1] // batch_size

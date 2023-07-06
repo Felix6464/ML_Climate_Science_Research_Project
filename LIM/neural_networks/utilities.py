@@ -32,12 +32,6 @@ def calculate_monthly_anomalies(data):
 
     return anomalies
 
-def crop_xarray(input_data):
-
-    cropped_ds = input_data.sel(lat=slice(-30, 30), lon=slice(-130, -70))
-
-    return cropped_ds
-
 def crop_xarray_lat(input_data):
 
     cropped_ds = input_data.sel(lat=slice(-30, 30))
@@ -45,14 +39,14 @@ def crop_xarray_lat(input_data):
     return cropped_ds
 
 
-def crop_xarray2(lon_start, lon_end, input_data):
+def crop_xarray(lon_start, lon_end, input_data):
     if lon_start > lon_end:
-        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start, 180))
-        new_scale_left = np.linspace(-180, -120, 50)
+        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start-2, 180))
+        new_scale_left = np.linspace(-180, -119, 52)
         cropped_dataset_left["lon"] = new_scale_left
 
-        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end))
-        new_scale_right = np.linspace(-120, -10, 110)
+        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end+2))
+        new_scale_right = np.linspace(-121, -10, 112)
         cropped_dataset_right["lon"] = new_scale_right
 
 
