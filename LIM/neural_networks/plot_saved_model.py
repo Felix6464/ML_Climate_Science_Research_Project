@@ -7,7 +7,7 @@ from plots import *
 
 # Create the DataLoader for first principal component
 data = torch.load("./data/data_piControl.pt")
-model_num = 6694719
+model_num = 3575326
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)

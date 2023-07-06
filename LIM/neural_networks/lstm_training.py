@@ -8,7 +8,8 @@ def main():
     torch.manual_seed(42)
 
     # Create the DataLoader for first principal component
-    data = torch.load("./data/data_piControl.pt")
+    #data = torch.load("./data/data_piControl.pt")
+    data = torch.load("./synthetic_data/lim_integration_100k[-1].pt")
     print("Data shape : {}".format(data.shape))
 
     # Reshape the data if necessary (assuming a 2D tensor)
@@ -45,14 +46,14 @@ def main():
 
 
     # Setting hyperparameters for training
-    hidden_size = 256
+    hidden_size = 64
     num_layers = 2
     learning_rate = 0.001
     num_epochs = 100
     input_window = input_window
     output_window = output_window
     batch_size = 64
-    training_prediction = "mixed_teacher_forcing"
+    training_prediction = "recursive"
     teacher_forcing_ratio = 0.5
     dynamic_tf = True
     shuffle = True
