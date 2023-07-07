@@ -9,7 +9,7 @@ def main():
 
     # Create the DataLoader for first principal component
     #data = torch.load("./data/data_piControl.pt")
-    data = torch.load("./synthetic_data/lim_integration_100k[-1].pt")
+    data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
     data = data[:, :25000]
     print("Data shape : {}".format(data.shape))
 
@@ -65,7 +65,7 @@ def main():
 
     # Specify the device to be used for training
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+    print(data_train.shape[2])
     model = LSTM_Sequence_Prediction(input_size = data_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
     model.to(device)
 

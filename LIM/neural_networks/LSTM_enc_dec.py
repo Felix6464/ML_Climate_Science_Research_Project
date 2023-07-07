@@ -118,7 +118,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                     # Select data for the current batch
                     input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-
+                    print(input_batch.shape)
                     # Initialize outputs tensor
                     outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
                     outputs = outputs.to(device)
@@ -422,6 +422,7 @@ def dataloader_seq2seq_feat(y, input_window, output_window, stride, num_features
             Y[:, sample_idx, feature_idx] = y[feature_idx, start_y:end_y]
 
     return X, Y
+
 
 
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):

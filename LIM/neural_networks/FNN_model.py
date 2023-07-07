@@ -7,19 +7,44 @@ from torch.utils.data import DataLoader, Dataset
 
 
 # Custom dataset class for sequence prediction
-class MultivariateDataset(Dataset):
-    def __init__(self, data, sequence_length, target_length):
-        self.data = data
-        self.sequence_length = sequence_length
-        self.target_length = target_length
+
+
+class TimeSeries(Dataset):
+    def __init__(self, xarr, input_window, one_hot_month=False):
+        self.input_window = input_window
+        self.xarr = xarr
 
     def __len__(self):
-        return len(self.data[0]) - self.sequence_length
+        return len(self.xarr['time']) - self.input_window
+
 
     def __getitem__(self, idx):
-        sequence = np.array([self.data[i][idx:idx + self.sequence_length] for i in range(len(self.data))])
-        target = np.array([self.data[i][idx + self.sequence_length + self.target_length] for i in range(len(self.data))])
-        return sequence, target
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        input = self.xarr.isel(time=slice(idx, idx+self.input_window))
+        target = self.xarr.isel(time=idx+self.input_window)
+
+        # One hot encoding of month
+        idx_month = input.isel(time=-1).time.dt.month.astype(int) - 1
+        one_hot_month = np.zeros(12)
+        one_hot_month[idx_month] = 1
+        one_hot_month = torch.from_numpy(one_hot_month).float()
+
+        input = torch.from_numpy(input.data).float()
+
+        if one_hot_month:
+            target = torch.from_numpy(target.data[np.newaxis]).float()
+        else:
+            target = torch.from_numpy(target.data).float()
+
+        label = {
+            'idx_input': torch.arange(idx, idx+self.input_window),
+            'idx_target': idx+self.input_window,
+            'month': one_hot_month
+        }
+
+        return input, target, label
 
 # Feedforward network for sequence prediction
 class FeedforwardNetwork(nn.Module):
@@ -38,11 +63,40 @@ class FeedforwardNetwork(nn.Module):
         x = self.fc3(x)
         return x
 
-# Create a DataLoader for sequence prediction
-def create_dataloader(data, batch_size, sequence_length, target_len, shuffle=False):
-    dataset = MultivariateDataset(data, sequence_length, target_len)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
-    return dataloader
+
+class MLP(nn.Module):
+    """Auto encoder.
+
+    Args:
+        z_dim (int): Dimension of latent space.
+        encoder ([type]): Encoder NN.
+        decoder ([type]): Decoder NN.
+    """
+
+    def __init__(self, input_dim, output_dim, hidden_dim, condition_dim):
+        super().__init__()
+        self.input_dim, self.output_dim, self.hidden_dim, self.condition_dim = input_dim, output_dim, hidden_dim, condition_dim
+
+        self.mlp = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, output_dim)
+        )
+
+        self.film = nn.Sequential(
+            nn.Linear(condition_dim, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1 * 2)
+        )
+
+    def forward(self, x, month):
+        x_hat = self.mlp(x)
+        temp = self.film(month)
+        gamma, beta = temp.chunk(chunks=2, axis=-1)
+        x_hat = gamma * x_hat + beta
+        return x_hat
 
 
 # Function for training a model

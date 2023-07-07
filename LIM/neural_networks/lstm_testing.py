@@ -5,7 +5,8 @@ from plots import *
 
 def main():
 
-    data = torch.load("./data/data_piControl.pt")
+    data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+    print("Data shape : {}".format(data.shape))
 
     # Reshape the data if necessary (assuming a 2D tensor)
     if len(data.shape) == 1:
@@ -13,6 +14,9 @@ def main():
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
+
+    index_train = int(0.8 * len(data[0, :]))
+    data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
     model_num = "5940702"
@@ -24,14 +28,12 @@ def main():
     hidden_size = params["hidden_size"]
     num_layers = params["num_layers"]
     input_window = params["input_window"]
-    output_window = params["output_window"]
     batch_size = params["batch_size"]
     loss_type = params["loss_type"]
 
     input_window = 6
-    output_window = 12
 
-    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     loss_list = []
 
     for output_window in x:
@@ -67,9 +69,6 @@ def main():
         print(f"Test loss: {loss}")
 
 
-        # Evaluate the model one time over whole test data
-        #loss_test = model.evaluate_model(X_test, Y_test, output_window, batch_size, loss_type)
-        #print(f"Test loss: {loss_test}")
     print(f"Test loss: {loss_list}")
     plot_loss_horizon(loss_list, model_num, loss_type)
 

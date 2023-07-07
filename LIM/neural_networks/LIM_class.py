@@ -230,7 +230,7 @@ class LIM:
         if 2 < t_decay:
             t_delta_int = 1
         else:
-            t_delta_int = 1
+            t_delta_int = t_decay
 
         print("t_delta: {}".format(t_delta_int))
 
