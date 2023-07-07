@@ -10,6 +10,7 @@ def main():
     # Create the DataLoader for first principal component
     #data = torch.load("./data/data_piControl.pt")
     data = torch.load("./synthetic_data/lim_integration_100k[-1].pt")
+    data = data[:, :25000]
     print("Data shape : {}".format(data.shape))
 
     # Reshape the data if necessary (assuming a 2D tensor)

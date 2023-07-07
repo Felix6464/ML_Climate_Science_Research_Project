@@ -257,9 +257,9 @@ class LSTM_Sequence_Prediction(nn.Module):
                 input_test_batch = input_test_batch.to(device)
                 target_test_batch = target_test_batch.to(device)
 
-                Y_test_pred = self.predict(input_test_batch, target_len=target_len)
+                Y_test_pred = self.predict(input_test_batch.float(), target_len=target_len)
                 Y_test_pred = Y_test_pred.to(device)
-                loss_test = criterion(Y_test_pred, target_test_batch)
+                loss_test = criterion(Y_test_pred, target_test_batch.float())
                 batch_loss_test += loss_test.item()
 
         batch_loss_test /= num_batch_test
@@ -283,6 +283,7 @@ class LSTM_Sequence_Prediction(nn.Module):
             input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
         encoder_output, encoder_hidden = self.encoder(input_tensor)
 
+        #print("Input tensor shape : {}".format(input_tensor.shape))
         # initialize tensor for predictions
         outputs = torch.zeros(target_len, input_tensor.shape[1], input_tensor.shape[2])
         outputs = outputs.to(device)

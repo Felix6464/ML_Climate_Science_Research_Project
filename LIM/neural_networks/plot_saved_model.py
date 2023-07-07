@@ -7,7 +7,7 @@ from plots import *
 
 # Create the DataLoader for first principal component
 data = torch.load("./data/data_piControl.pt")
-model_num = 3575326
+model_num = 1551949
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
@@ -58,7 +58,8 @@ optimizer.load_state_dict(saved_model['optimizer_state_dict'])
 
 #model.load_state_dict(torch.load(f"./trained_models/model_{model_num}.pt"))
 
-plot_model_forecast(model, X_train, Y_train, X_test, Y_test, model_num)
+#plot_model_forecast(model, X_train, Y_train, X_test, Y_test, model_num)
+plot_model_forecast_PC(model, X_train, Y_train, X_test, Y_test, model_num)
 
 
 print("Hyperparameters Model : {}".format(params))
