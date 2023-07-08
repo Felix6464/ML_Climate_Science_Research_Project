@@ -1,4 +1,4 @@
-from models.LSTM_enc_dec import *
+from models.LSTM_enc_dec_new import *
 import xarray as xr
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, Dataset
@@ -6,14 +6,15 @@ from torch.utils.data import DataLoader, Dataset
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+data = data[:, :10000]
 
 dt = "np"
 input_window = 6
 output_window = 12
-batch_size = 32
+batch_size = 64
 one_hot_month = False
 
-print(data, type(data), data.shape)
+#print(data, type(data), data.shape)
 
 
 if dt == "xr":
@@ -60,7 +61,7 @@ else:
 # Setting hyperparameters for training
 num_features = 30
 hidden_size = 64
-num_layers = 2
+num_layers = 1
 learning_rate = 0.001
 num_epochs = 25
 input_window = input_window
@@ -72,13 +73,14 @@ dynamic_tf = True
 shuffle = True
 loss_type = "L1"
 wind_farm = "britain_time_lag_corr_"
+without_input = False
 
 print("Start training")
 
 # Specify the device to be used for training
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
+model = LSTM_Sequence_Prediction_New(input_size = num_features, hidden_size = hidden_size)
 model.to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -94,7 +96,8 @@ loss, loss_test = model.train_model(train_dataloader,
                                     learning_rate,
                                     dynamic_tf,
                                     loss_type,
-                                    optimizer, num_features)
+                                    optimizer,
+                                    num_features)
 
 
 rand_identifier = str(np.random.randint(0, 10000000)) + dt

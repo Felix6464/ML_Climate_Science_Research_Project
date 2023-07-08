@@ -67,39 +67,26 @@ class TimeSeriesLSTMnp(Dataset):
         return input, target, label
 
 
-
-
-class LSTM_Encoder(nn.Module):
-    """
-    Encodes time-series sequence
-    """
-
-    def __init__(self, input_size, hidden_size, num_layers=3):
-        """
-        : param input_size:     the number of features in the input_data
-        : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers
-        """
-
-        super(LSTM_Encoder, self).__init__()
-        self.input_size = input_size
+class LSTMEncoder(nn.Module):
+    def __init__(self,input_size, hidden_size):
+        super(LSTMEncoder, self).__init__()
         self.hidden_size = hidden_size
-        self.num_layers = num_layers
+        self.input_size = input_size
+        # lstm1, lstm2, linear are all layers in the network
+        self.lstm1 = LSTMCell(self.input_size, self.hidden_size)
+        self.lstm2 = LSTMCell(self.hidden_size, self.hidden_size)
+        self.linear = nn.Linear(self.hidden_size, self.input_size)
 
-        # define LSTM layer
-        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
+    def forward(self, input_x, hidden_state):
 
-    def forward(self, x_input):
-        """
-        : param x_input:               input of shape (seq_len, # in batch, input_size)
-        : return lstm_out, hidden:     lstm_out gives all the hidden states in the sequence;
-        :                              hidden gives the hidden state and cell state for the last
-        :                              element in the sequence
-        """
+        outputs, num_samples = [], input_x.size(0)
+        #print("input shape: ", input_x.shape)
 
-        lstm_out, self.hidden = self.lstm(x_input.view(x_input.shape[2], x_input.shape[0] , self.input_size ))
-        return lstm_out, self.hidden
+        h_t, c_t = self.lstm1(input_x, hidden_state[0], hidden_state[1]) # initial hidden and cell states
+        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t) # new hidden and cell states
+        output = self.linear(h_t2) # output from the last FC layer
+
+        return output, (h_t2, c_t2)
 
     def init_hidden(self, batch_size):
         """
@@ -108,30 +95,19 @@ class LSTM_Encoder(nn.Module):
         : return:              zeroed hidden state and cell state
         """
 
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size))
+        return (torch.zeros(batch_size, self.hidden_size),
+                torch.zeros(batch_size, self.hidden_size))
 
 
-class LSTM_Decoder(nn.Module):
-    """
-    Decodes hidden state output by encoder
-    """
-
-    def __init__(self, input_size, hidden_size, num_layers=3):
-        """
-        : param input_size:     the number of features in the input_data
-        : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers
-        """
-
-        super(LSTM_Decoder, self).__init__()
-        self.input_size = input_size
+class LSTMDecoder(nn.Module):
+    def __init__(self,input_size, hidden_size):
+        super(LSTMDecoder, self).__init__()
         self.hidden_size = hidden_size
-        self.num_layers = num_layers
-
-        self.lstm = nn.LSTM(input_size=hidden_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
-        self.linear = nn.Linear(hidden_size, input_size)
+        self.input_size = input_size
+        # lstm1, lstm2, linear are all layers in the network
+        self.lstm1 = LSTMCell(self.input_size, self.hidden_size)
+        self.lstm2 = LSTMCell(self.hidden_size, self.hidden_size)
+        self.linear = nn.Linear(self.hidden_size, self.input_size)
 
     def forward(self, decoder_input, decoder_hidden, outputs=None, target_batch=None, training_prediction=None, target_len=None, teacher_forcing_ratio=None, prediction_type=None):
         '''
@@ -142,163 +118,104 @@ class LSTM_Decoder(nn.Module):
         :                                   element in the sequence
         '''
 
-        # without_input = True if self.input_size == self.hidden_size else False
-        #
-        # if without_input is True:
-        #     decoder_input = decoder_hidden[0][0, :, :]
-        # else:
-        #     decoder_input = decoder_input
-        #
-        #
-        # if prediction_type == "test" or prediction_type == "forecast":
-        #     for t in range(target_len):
-        #         lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-        #         decoder_output = self.linear(lstm_out.squeeze(0))
-        #         outputs[t] = decoder_output
-        #         decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-        # else:
-        #
-        #     if training_prediction == 'recursive':
-        #         # Predict recursively
-        #         for t in range(target_len):
-        #             lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-        #             decoder_output = self.linear(lstm_out.squeeze(0))
-        #             outputs[t] = decoder_output
-        #             decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-        #
-        #     if training_prediction == 'teacher_forcing':
-        #         # Use teacher forcing
-        #         if random.random() < teacher_forcing_ratio:
-        #             for t in range(target_len):
-        #                 lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-        #                 decoder_output = self.linear(lstm_out.squeeze(0))
-        #                 outputs[t] = decoder_output
-        #                 decoder_input = decoder_hidden[0][0, :, :] if without_input is True else target_batch[t, :, :]
-        #
-        #         # Predict recursively
-        #         else:
-        #             for t in range(target_len):
-        #                 lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-        #                 decoder_output = self.linear(lstm_out.squeeze(0))
-        #                 outputs[t] = decoder_output
-        #                 decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-        #
-        #     if training_prediction == 'mixed_teacher_forcing':
-        #         # Predict using mixed teacher forcing
-        #         for t in range(target_len):
-        #             lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-        #             decoder_output = self.linear(lstm_out.squeeze(0))
-        #             outputs[t] = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-        #
-        #             # Predict with teacher forcing
-        #             if random.random() < teacher_forcing_ratio:
-        #                 decoder_input = decoder_hidden[0][0, :, :] if without_input is True else target_batch[t, :, :]
-        #
-        #             # Predict recursively
-        #             else:
-        #                 decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-
-        without_input = True if self.input_size == self.hidden_size else False
-        without_input = True
-
-        if without_input is True:
-            decoder_input = decoder_hidden[0][0, :, :]
-        else:
-            decoder_input = decoder_input
-
+        h_t, c_t = decoder_hidden[0], decoder_hidden[1]
+        decoder_input = None
 
         if prediction_type == "test" or prediction_type == "forecast":
             for t in range(target_len):
-                lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0))
-                decoder_output = self.linear(decoder_hidden[0].squeeze(0))
-                outputs[t] = decoder_output
-                decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-                #decoder_input = decoder_output
+                h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
+                h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                output = self.linear(h_t2)
+                outputs[t] = output
+                h_t, c_t = h_t2, c_t2
+                decoder_input = output
         else:
 
             if training_prediction == 'recursive':
                 # Predict recursively
                 for t in range(target_len):
-                    #print(decoder_input.unsqueeze(0).shape)
-                    lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0))
-                    #print(lstm_out.shape)
-                    #print(decoder_hidden[0].shape)
-                    decoder_output = self.linear(decoder_hidden[0].squeeze(0))
-                    #print(decoder_output.shape)
-                    outputs[t] = decoder_output
-                    #decoder_input = decoder_output
-                    decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
-                    #print(decoder_input.shape)
+                    h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
+                    h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                    output = self.linear(h_t2)
+                    outputs[t] = output
+                    h_t, c_t = h_t2, c_t2
+                    decoder_input = output
 
             if training_prediction == 'teacher_forcing':
                 # Use teacher forcing
                 if random.random() < teacher_forcing_ratio:
                     for t in range(target_len):
-                        lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-                        decoder_output = self.linear(lstm_out.squeeze(0))
-                        outputs[t] = decoder_output
-                        decoder_input = decoder_hidden[0][0, :, :] if without_input is True else target_batch[t, :, :]
+                        h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
+                        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                        output = self.linear(h_t2)
+                        outputs[t] = output
+                        h_t, c_t = h_t2, c_t2
+                        decoder_input = target_batch[t, :, :]
 
                 # Predict recursively
                 else:
                     for t in range(target_len):
-                        lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-                        decoder_output = self.linear(lstm_out.squeeze(0))
-                        outputs[t] = decoder_output
-                        decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
+                        h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
+                        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                        output = self.linear(h_t2)
+                        outputs[t] = output
+                        h_t, c_t = h_t2, c_t2
+                        decoder_input = output
 
             if training_prediction == 'mixed_teacher_forcing':
                 # Predict using mixed teacher forcing
                 for t in range(target_len):
-                    lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
-                    decoder_output = self.linear(lstm_out.squeeze(0))
-                    outputs[t] = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
+                    h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
+                    h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                    output = self.linear(h_t2)
+                    outputs[t] = output
+                    h_t, c_t = h_t2, c_t2
 
                     # Predict with teacher forcing
                     if random.random() < teacher_forcing_ratio:
-                        decoder_input = decoder_hidden[0][0, :, :] if without_input is True else target_batch[t, :, :]
+                        decoder_input = target_batch[t, :, :]
 
                     # Predict recursively
                     else:
-                        decoder_input = decoder_hidden[0][0, :, :] if without_input is True else decoder_output
+                        decoder_input = output
 
         return outputs, decoder_hidden
 
-class LSTM_Decoder_WO(nn.Module):
-    """
-    Decodes hidden state output by encoder
-    """
-
-    def __init__(self, input_size, hidden_size, num_layers=3):
+class LSTMCell(nn.Module):
+    '''LSTMCell for 1d inputs.'''
+    def __init__(self,
+                 input_dim: int,
+                 hidden_dim: int,
+                 ):
         """
-        : param input_size:     the number of features in the input_data
-        : param hidden_size:    the number of features in the hidden state h
-        : param num_layers:     number of recurrent layers
+        Args:
+            input_dim (int): Input dimensions
+            hidden_dim (int): Hidden dimensions
         """
+        super().__init__()
+        self.linear = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim * 4),
+            nn.GroupNorm(num_channels=4*hidden_dim, num_groups=4)
+        )
 
-        super(LSTM_Decoder_WO, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
-        self.linear = nn.Linear(hidden_size, input_size)
-
-    def forward(self, x_input, encoder_hidden_states):
+    def forward(self, x: torch.Tensor, h: torch.Tensor, c: torch.Tensor):
+        '''LSTM forward pass
+        Args:
+            x (torch.Tensor): Input
+            h (torch.Tensor): Hidden state
+            c (torch.Tensor): Cell state
         '''
-        : param x_input:                    should be 2D (batch_size, input_size)
-        : param encoder_hidden_states:      hidden states
-        : return output, hidden:            output gives all the hidden states in the sequence;
-        :                                   hidden gives the hidden state and cell state for the last
-        :                                   element in the sequence
-        '''
+        print(x.shape)
+        print(h.shape)
+        #z = torch.cat((x, h), dim = 1) if x is not None else h
+        #z = x.view(x.shape[2], x.shape[0], x.shape[1]) if x is not None else h
+        z = x if x is not None else h
+        z = self.linear(z)
 
-        lstm_out, self.hidden = self.lstm(x_input.unsqueeze(0), encoder_hidden_states)
-        output = self.linear(lstm_out.squeeze(0))
-
-        return output, self.hidden
-
-
+        i, f, o, g = z.chunk(chunks = 4, axis = 1)
+        c = torch.sigmoid(f) * c + torch.sigmoid(i) * torch.tanh(g)
+        h = torch.sigmoid(o) * torch.tanh(c)
+        return h, c
 
 
 class RMSELoss(torch.nn.Module):
@@ -311,12 +228,12 @@ class RMSELoss(torch.nn.Module):
         loss = torch.sqrt(criterion(x, y) + eps)
         return loss
 
-class LSTM_Sequence_Prediction(nn.Module):
+class LSTM_Sequence_Prediction_New(nn.Module):
     """
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size, num_layers):
+    def __init__(self, input_size, hidden_size):
 
         '''
         : param input_size:     the number of expected features in the input X
@@ -324,13 +241,14 @@ class LSTM_Sequence_Prediction(nn.Module):
         : param num_layers:     number of recurrent layers
         '''
 
-        super(LSTM_Sequence_Prediction, self).__init__()
+        super(LSTM_Sequence_Prediction_New, self).__init__()
 
         self.input_size = input_size
         self.hidden_size = hidden_size
 
-        self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
-        self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
+        self.encoder = LSTMEncoder(input_size=input_size, hidden_size=hidden_size)
+        self.decoder = LSTMDecoder(input_size=input_size, hidden_size=hidden_size)
+
 
     def train_model(self, train_dataloader, eval_dataloader, n_epochs, input_len, target_len, batch_size,
                     training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer, num_features):
@@ -395,12 +313,13 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     # Initialize hidden state for the encoder
                     encoder_hidden = self.encoder.init_hidden(batch_size)
+                    encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
 
                     # Zero the gradients
                     optimizer.zero_grad()
 
                     # Encoder forward pass
-                    encoder_output, encoder_hidden = self.encoder(input_batch)
+                    encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
 
                     # Decoder input for the current batch
                     decoder_input = input_batch[:, :, -1]
@@ -525,4 +444,3 @@ class LSTM_Sequence_Prediction(nn.Module):
 
 
         return outputs
-
