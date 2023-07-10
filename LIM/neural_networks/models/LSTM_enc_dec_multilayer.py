@@ -86,20 +86,25 @@ class LSTM_Encoder(nn.Module):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.lstms = nn.ModuleList()
 
-        # define LSTM layer
-        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
+        for i in range(num_layers):
+            input_size = input_size if i == 0 else hidden_size
+            self.lstms.append(nn.LSTM(input_size, hidden_size))
 
-    def forward(self, x_input):
+
+    def forward(self, x_input, encoder_hidden_):
         """
         : param x_input:               input of shape (seq_len, # in batch, input_size)
         : return lstm_out, hidden:     lstm_out gives all the hidden states in the sequence;
         :                              hidden gives the hidden state and cell state for the last
         :                              element in the sequence
         """
-        lstm_out, self.hidden = self.lstm(x_input)
-        return lstm_out, self.hidden
+        for i in range(self.num_layers):
+            lstm_out, hidden = self.lstms[i](x_input)
+            x_input = hidden[0]
+            encoder_hidden_[i, :, :] = hidden[0]
+        return lstm_out, encoder_hidden_
 
     def init_hidden(self, batch_size):
         """
@@ -129,8 +134,10 @@ class LSTM_Decoder(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
-        self.lstm = nn.LSTM(input_size=hidden_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
+        self.lstms = nn.ModuleList()
+
+        for i in range(num_layers):
+            self.lstms.append(nn.LSTM(self.hidden_size, self.hidden_size))
 
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
@@ -144,23 +151,35 @@ class LSTM_Decoder(nn.Module):
         :                                   element in the sequence
         '''
 
-        #print("decoder_input.shape", decoder_input[0].shape)
+        hidden_list = []
+        for n in range(self.num_layers):
+            hidden = decoder_hidden_[n, :, :].unsqueeze(0)
+            hidden_list.append(hidden)
+
 
         if prediction_type == "test" or prediction_type == "forecast":
             for t in range(target_len):
-                lstm_out, decoder_hidden = self.lstm(decoder_input[0])
+                for i in range(len(hidden_list)):
+                    lstm_out, decoder_hidden = self.lstms[i](hidden_list[i])
+                    decoder_hid = decoder_hidden[0]
+                    hidden_list[i] = decoder_hid
+
                 decoder_output = self.linear(lstm_out.squeeze(0))
                 outputs[t] = decoder_output
-                decoder_input = decoder_hidden
         else:
 
             if training_prediction == 'recursive':
                 # Predict recursively
                 for t in range(target_len):
-                    lstm_out, decoder_hidden = self.lstm(decoder_input[0])
+                    for i in range(len(hidden_list)):
+                        lstm_out, decoder_hidden = self.lstms[i](hidden_list[i])
+                        decoder_hid = decoder_hidden[0]
+                        hidden_list[i] = decoder_hid
+                        #decoder_hidden_[i, :, :] = decoder_hid
+
                     decoder_output = self.linear(lstm_out.squeeze(0))
                     outputs[t] = decoder_output
-                    decoder_input = decoder_hidden
+                    #decoder_input = decoder_hidden_
 
 
         return outputs, decoder_hidden_
@@ -261,8 +280,8 @@ class LSTM_Sequence_Prediction(nn.Module):
                     outputs = outputs.to(device)
 
                     # Initialize hidden state for the encoder
-                    #encoder_hidden = self.encoder.init_hidden(batch_size)
-                    #encoder_hidden = encoder_hidden[0].to(device)
+                    encoder_hidden = self.encoder.init_hidden(batch_size)
+                    encoder_hidden = encoder_hidden[0].to(device)
 
                     # Zero the gradients
                     optimizer.zero_grad()
@@ -271,13 +290,13 @@ class LSTM_Sequence_Prediction(nn.Module):
                     # Encoder forward pass
                     #print("input_batch shape : {}".format(input_batch.shape))
                     input_batch = input_batch.view(input_batch.shape[2], input_batch.shape[0] , input_batch.shape[1] )
-                    encoder_output, encoder_hidden = self.encoder(input_batch)
+                    encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
 
                     # Decoder input for the current batch
                     decoder_input = input_batch[-1, :, :]
 
                     decoder_hidden = encoder_hidden
-                    decoder_hidden_ = torch.zeros_like(decoder_hidden[0])
+                    decoder_hidden_ = torch.zeros_like(decoder_hidden)
                     decoder_hidden_ = decoder_hidden_.to(device)
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
@@ -384,7 +403,10 @@ class LSTM_Sequence_Prediction(nn.Module):
         # encode input_tensor
         if prediction_type == 'forecast':
             input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
-        encoder_output, encoder_hidden = self.encoder(input_tensor)
+
+        encoder_hidden = self.encoder.init_hidden(input_tensor.shape[1])
+        encoder_hidden = encoder_hidden[0].to(device)
+        encoder_output, encoder_hidden = self.encoder(input_tensor, encoder_hidden)
 
 
         # Initialize outputs tensor
@@ -395,8 +417,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         decoder_input = input_tensor[-1, :, :]
         decoder_hidden = encoder_hidden
 
-        decoder_hidden = encoder_hidden
-        decoder_hidden_ = torch.zeros_like(decoder_hidden[0])
+        decoder_hidden_ = torch.zeros_like(decoder_hidden)
         decoder_hidden_ = decoder_hidden_.to(device)
 
         outputs, decoder_hidden = self.decoder(decoder_input,

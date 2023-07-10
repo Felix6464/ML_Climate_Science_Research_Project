@@ -22,7 +22,7 @@ class TimeSeriesLSTM(Dataset):
             idx = idx.tolist()
 
         input = self.xarr.isel(time=slice(idx, idx+self.input_window))
-        target = self.xarr.isel(time=slice(idx+self.input_window+1, idx+self.input_window  + self.output_window+1))
+        target = self.xarr.isel(time=slice(idx+self.input_window, idx+self.input_window  + self.output_window))
 
         # One hot encoding of month
         idx_month = input.isel(time=-1).time.dt.month.astype(int) - 1
@@ -60,7 +60,7 @@ class TimeSeriesLSTMnp(Dataset):
             idx = idx.tolist()
 
         input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window+1:idx+self.input_window  + self.output_window+1].float()
+        target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
 
         label = "not set"
 
@@ -68,24 +68,27 @@ class TimeSeriesLSTMnp(Dataset):
 
 
 class LSTMEncoder(nn.Module):
-    def __init__(self,input_size, hidden_size):
+    def __init__(self,input_size, hidden_size, seq_len):
         super(LSTMEncoder, self).__init__()
         self.hidden_size = hidden_size
         self.input_size = input_size
         # lstm1, lstm2, linear are all layers in the network
-        self.lstm1 = LSTMCell(self.input_size, self.hidden_size)
-        self.lstm2 = LSTMCell(self.hidden_size, self.hidden_size)
+        self.lstm1 = LSTMCell(self.input_size, self.hidden_size, seq_len)
+        self.lstm2 = LSTMCell2(self.hidden_size, self.hidden_size)
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
     def forward(self, input_x, hidden_state):
 
-        outputs, num_samples = [], input_x.size(0)
+        h_t, c_t = hidden_state[0], hidden_state[1]
+        h_t2, c_t2 = hidden_state[0], hidden_state[1]
+
+        input_x = input_x.view(input_x.shape[2], input_x.shape[0] , self.input_size)
         #print("input shape: ", input_x.shape)
-
-        h_t, c_t = self.lstm1(input_x, hidden_state[0], hidden_state[1]) # initial hidden and cell states
-        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t) # new hidden and cell states
+        h_t, c_t = self.lstm1(input_x, h_t, c_t) # initial hidden and cell states
+        #print("h_t : ", h_t)
+        h_t2, c_t2 = self.lstm2(h_t, h_t2, c_t2) # new hidden and cell states
         output = self.linear(h_t2) # output from the last FC layer
-
+        #print("output shape: ", output.shape)
         return output, (h_t2, c_t2)
 
     def init_hidden(self, batch_size):
@@ -95,8 +98,8 @@ class LSTMEncoder(nn.Module):
         : return:              zeroed hidden state and cell state
         """
 
-        return (torch.zeros(batch_size, self.hidden_size),
-                torch.zeros(batch_size, self.hidden_size))
+        return (torch.randn(batch_size, self.hidden_size),
+                torch.randn(batch_size, self.hidden_size))
 
 
 class LSTMDecoder(nn.Module):
@@ -105,8 +108,8 @@ class LSTMDecoder(nn.Module):
         self.hidden_size = hidden_size
         self.input_size = input_size
         # lstm1, lstm2, linear are all layers in the network
-        self.lstm1 = LSTMCell(self.input_size, self.hidden_size)
-        self.lstm2 = LSTMCell(self.hidden_size, self.hidden_size)
+        self.lstm1 = LSTMCell2(self.input_size, self.hidden_size)
+        self.lstm2 = LSTMCell2(self.hidden_size, self.hidden_size)
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
     def forward(self, decoder_input, decoder_hidden, outputs=None, target_batch=None, training_prediction=None, target_len=None, teacher_forcing_ratio=None, prediction_type=None):
@@ -117,59 +120,55 @@ class LSTMDecoder(nn.Module):
         :                                   hidden gives the hidden state and cell state for the last
         :                                   element in the sequence
         '''
-
+        #print("decoder input shape: ", decoder_input.shape)
         h_t, c_t = decoder_hidden[0], decoder_hidden[1]
+        h_t2, c_t2 = decoder_hidden[0], decoder_hidden[1]
         decoder_input = None
 
         if prediction_type == "test" or prediction_type == "forecast":
             for t in range(target_len):
                 h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
-                h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                h_t2, c_t2 = self.lstm2(decoder_input, h_t2, c_t2)
                 output = self.linear(h_t2)
                 outputs[t] = output
-                h_t, c_t = h_t2, c_t2
-                decoder_input = output
+                #decoder_input = output
         else:
 
             if training_prediction == 'recursive':
                 # Predict recursively
                 for t in range(target_len):
                     h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
-                    h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
+                    h_t2, c_t2 = self.lstm2(decoder_input, h_t2, c_t2)
                     output = self.linear(h_t2)
                     outputs[t] = output
-                    h_t, c_t = h_t2, c_t2
-                    decoder_input = output
+                    #decoder_input = output
 
             if training_prediction == 'teacher_forcing':
                 # Use teacher forcing
                 if random.random() < teacher_forcing_ratio:
                     for t in range(target_len):
                         h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
-                        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
-                        output = self.linear(h_t2)
+                        h_t, c_t = self.lstm2(h_t, h_t, c_t)
+                        output = self.linear(h_t)
                         outputs[t] = output
-                        h_t, c_t = h_t2, c_t2
                         decoder_input = target_batch[t, :, :]
 
                 # Predict recursively
                 else:
                     for t in range(target_len):
                         h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
-                        h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
-                        output = self.linear(h_t2)
+                        h_t, c_t = self.lstm2(h_t, h_t, c_t)
+                        output = self.linear(h_t)
                         outputs[t] = output
-                        h_t, c_t = h_t2, c_t2
                         decoder_input = output
 
             if training_prediction == 'mixed_teacher_forcing':
                 # Predict using mixed teacher forcing
                 for t in range(target_len):
                     h_t, c_t = self.lstm1(decoder_input, h_t, c_t)
-                    h_t2, c_t2 = self.lstm2(h_t, h_t, c_t)
-                    output = self.linear(h_t2)
+                    h_t, c_t = self.lstm2(h_t, h_t, c_t)
+                    output = self.linear(h_t)
                     outputs[t] = output
-                    h_t, c_t = h_t2, c_t2
 
                     # Predict with teacher forcing
                     if random.random() < teacher_forcing_ratio:
@@ -186,35 +185,95 @@ class LSTMCell(nn.Module):
     def __init__(self,
                  input_dim: int,
                  hidden_dim: int,
+                 seq_len: int
                  ):
         """
         Args:
             input_dim (int): Input dimensions
             hidden_dim (int): Hidden dimensions
         """
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.seq_len = seq_len
+
         super().__init__()
         self.linear = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim * 4),
-            nn.GroupNorm(num_channels=4*hidden_dim, num_groups=4)
+            nn.Linear(self.input_dim * self.seq_len + self.hidden_dim, self.hidden_dim * 4),
+            nn.GroupNorm(num_channels=4*self.hidden_dim, num_groups=4)
         )
 
-    def forward(self, x: torch.Tensor, h: torch.Tensor, c: torch.Tensor):
+
+    def forward(self, x: torch.Tensor, h: torch.Tensor, c: torch.Tensor) -> torch.Tensor:
         '''LSTM forward pass
         Args:
-            x (torch.Tensor): Input
+            x (torch.Tensor): Input of shape [sequence_length, batch_size, input_dim]
             h (torch.Tensor): Hidden state
             c (torch.Tensor): Cell state
         '''
-        print(x.shape)
-        print(h.shape)
-        #z = torch.cat((x, h), dim = 1) if x is not None else h
-        #z = x.view(x.shape[2], x.shape[0], x.shape[1]) if x is not None else h
-        z = x if x is not None else h
-        z = self.linear(z)
 
-        i, f, o, g = z.chunk(chunks = 4, axis = 1)
+        seq_len, batch_size, input_dim = x.shape
+        print("x.shape: ", x.shape)
+        #x = x.view(batch_size, seq_len * input_dim)
+        x = x.view(batch_size, input_dim, seq_len)
+
+        z = torch.cat((x, h), dim=1)
+
+        #print("h.shape: ", h.shape)
+        print("z.shape: ", z.shape)
+
+        # Concatenate input and hidden state along the sequence length dimension
+        z = self.linear(z)
+        #print("z.shape: ", z.shape)
+        # Remove the extra dimension for sequence length
+        i, f, o, g = z.chunk(chunks=4, dim=1)  # Split the tensor along the feature dimension
+
         c = torch.sigmoid(f) * c + torch.sigmoid(i) * torch.tanh(g)
         h = torch.sigmoid(o) * torch.tanh(c)
+
+        h = h.squeeze(0)  # Remove the extra dimension for sequence length
+        c = c.squeeze(0)  # Remove the extra dimension for sequence length
+
+        return h, c
+
+class LSTMCell2(nn.Module):
+    '''LSTMCell for 1d inputs.'''
+    def __init__(self,
+                 input_dim: int,
+                 hidden_dim: int
+                 ):
+        """
+        Args:
+            input_dim (int): Input dimensions
+            hidden_dim (int): Hidden dimensions
+        """
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+
+        super().__init__()
+        self.linear = nn.Sequential(
+            nn.Linear(self.hidden_dim, self.hidden_dim * 4),
+            nn.GroupNorm(num_channels=4*self.hidden_dim, num_groups=4)
+        )
+
+    def forward(self, x: torch.Tensor, h: torch.Tensor, c: torch.Tensor) -> torch.Tensor:
+        '''LSTM forward pass
+        Args:
+            x (torch.Tensor): Input of shape [sequence_length, batch_size, input_dim]
+            h (torch.Tensor): Hidden state
+            c (torch.Tensor): Cell state
+        '''
+
+        # Concatenate input and hidden state along the sequence length dimension
+        z = self.linear(h)
+        # Remove the extra dimension for sequence length
+        i, f, o, g = z.chunk(chunks=4, axis=1)  # Split the tensor along the feature dimension
+
+        c = torch.sigmoid(f) * c + torch.sigmoid(i) * torch.tanh(g)
+        h = torch.sigmoid(o) * torch.tanh(c)
+
+        h = h.squeeze(0)  # Remove the extra dimension for sequence length
+        c = c.squeeze(0)  # Remove the extra dimension for sequence length
+
         return h, c
 
 
@@ -233,7 +292,7 @@ class LSTM_Sequence_Prediction_New(nn.Module):
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, seq_len):
 
         '''
         : param input_size:     the number of expected features in the input X
@@ -245,8 +304,9 @@ class LSTM_Sequence_Prediction_New(nn.Module):
 
         self.input_size = input_size
         self.hidden_size = hidden_size
+        self.seq_len = seq_len
 
-        self.encoder = LSTMEncoder(input_size=input_size, hidden_size=hidden_size)
+        self.encoder = LSTMEncoder(input_size=input_size, hidden_size=hidden_size, seq_len=seq_len)
         self.decoder = LSTMDecoder(input_size=input_size, hidden_size=hidden_size)
 
 
@@ -334,15 +394,16 @@ class LSTM_Sequence_Prediction_New(nn.Module):
                                                            teacher_forcing_ratio)
 
                     target_batch = target_batch.view(target_batch.shape[2], target_batch.shape[0] , target_batch.shape[1])
+
                     loss = criterion(outputs, target_batch)
                     batch_loss += loss.item()
-
                     # Backpropagation and weight update
                     loss.backward()
                     optimizer.step()
 
                 # Compute average loss for the epoch
                 batch_loss = batch_loss / len(train_dataloader)
+                print("batch_loss : {}".format(batch_loss))
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
@@ -422,7 +483,10 @@ class LSTM_Sequence_Prediction_New(nn.Module):
         # encode input_tensor
         if prediction_type == 'forecast':
             input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
-        encoder_output, encoder_hidden = self.encoder(input_tensor)
+
+        encoder_hidden = self.encoder.init_hidden(input_tensor.shape[0])
+        encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
+        encoder_output, encoder_hidden = self.encoder(input_tensor, encoder_hidden)
 
         #print("Input tensor shape : {}".format(input_tensor.shape))
         # initialize tensor for predictions

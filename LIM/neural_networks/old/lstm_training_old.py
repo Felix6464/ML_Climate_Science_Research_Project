@@ -1,5 +1,4 @@
 from LSTM_enc_dec_old import *
-from utilities import *
 
 
 def main():
@@ -10,7 +9,7 @@ def main():
     # Create the DataLoader for first principal component
     #data = torch.load("./data/data_piControl.pt")
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    data = data[:, :25000]
+    data = data[:, :10000]
     print("Data shape : {}".format(data.shape))
 
     # Reshape the data if necessary (assuming a 2D tensor)
@@ -18,7 +17,7 @@ def main():
         data = data.unsqueeze(1)
 
     # Calculate the mean and standard deviation along the feature dimension
-    data = normalize_data(data)
+    #data = normalize_data(data)
 
     index_train = int(0.8 * len(data[0, :]))
     data_train = data[:, :index_train]

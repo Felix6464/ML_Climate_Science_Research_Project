@@ -181,6 +181,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                 # Compute average loss for the epoch
                 batch_loss /= num_batch
+                print("Epoch {} - Loss : {}".format(epoch, batch_loss))
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
@@ -378,8 +379,8 @@ class LSTM_Decoder(nn.Module):
         :                                   hidden gives the hidden state and cell state for the last
         :                                   element in the sequence
         '''
-        print(x_input.shape)
-        print(x_input.unsqueeze(0).shape)
+        #print(x_input.shape)
+        #print(x_input.unsqueeze(0).shape)
         lstm_out, self.hidden = self.lstm(x_input.unsqueeze(0), encoder_hidden_states)
         output = self.linear(lstm_out.squeeze(0))
 
