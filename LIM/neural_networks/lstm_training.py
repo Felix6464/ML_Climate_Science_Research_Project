@@ -1,6 +1,7 @@
 #from LIM.neural_networks.models.LSTM_enc_dec_input import *
-from models.LSTM_enc_dec_multilayer import *
-#from models.LSTM_enc_dec import *
+#from models.LSTM_enc_dec_multilayer import *
+from models.LSTM_enc_dec import *
+#from models.LSTM_enc_dec_try import *
 from torch.utils.data import DataLoader
 from utilities import *
 import torch.utils.data as datat
@@ -80,10 +81,10 @@ print("Data shape : {}".format(train_data.shape))
 
 # Setting hyperparameters for training
 num_features = 30
-hidden_size = 64
-num_layers = 2
-learning_rate = 0.0001
-num_epochs = 25
+hidden_size = 128
+num_layers = 1
+learning_rate = 0.001
+num_epochs = 100
 input_window = input_window
 output_window = output_window
 batch_size = batch_size
@@ -92,8 +93,6 @@ teacher_forcing_ratio = 0.4
 dynamic_tf = True
 shuffle = True
 loss_type = "L1"
-wind_farm = "britain_time_lag_corr_"
-without_input = False
 
 print("Start training")
 
@@ -141,7 +140,6 @@ parameters = {
     "loss_test": loss_test.tolist(),
     "loss_type": loss_type,
     "shuffle": shuffle,
-    "wind_farm": wind_farm,
 }
 
 torch.save({'hyperparameters': parameters,
