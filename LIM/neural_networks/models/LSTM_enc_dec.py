@@ -248,11 +248,11 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for batch_idx, train_data in train_dataloader:
+                for input, target in train_dataloader:
                     train_len += 1
                     self.train()
 
-                    input_batch, target_batch = batch_idx, train_data
+                    input_batch, target_batch = input, target
                     input_batch = input_batch.to(device)
                     target_batch = target_batch.to(device)
 
@@ -314,11 +314,10 @@ class LSTM_Sequence_Prediction(nn.Module):
                     teacher_forcing_ratio -= 0.01
 
 
-                for batch_idx, val_data in eval_dataloader:
+                for input, target in eval_dataloader:
                     eval_len += 1
 
-                    input_eval = batch_idx
-                    target_eval = val_data
+                    input_eval, target_eval = input, target
                     input_eval = input_eval.view(input_eval.shape[2], input_eval.shape[0] , input_eval.shape[1] )
                     input_eval = input_eval.to(device)
                     target_eval = target_eval.to(device)
@@ -342,10 +341,13 @@ class LSTM_Sequence_Prediction(nn.Module):
             return losses, losses_test
 
 
-    def evaluate_model(self, test_dataloader, target_len, batch_size, loss_type):
+    def evaluate_model(self, input_test, target_test, target_len, batch_size, loss_type):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(device)
+
+        input_test = input_test.to(device)
+        target_test = target_test.to(device)
 
         # Initialize optimizer and criterion
         if loss_type == 'MSE':
@@ -355,23 +357,31 @@ class LSTM_Sequence_Prediction(nn.Module):
         elif loss_type == 'RMSE':
             criterion = RMSELoss()
 
+        # Calculate the number of batch iterations
+        n_batches_test = input_test.shape[1] // batch_size
+        num_batch_test = n_batches_test
+        n_batches_test = list(range(n_batches_test))
+
+        random.shuffle(n_batches_test)
         batch_loss_test = 0.0
 
-        for batch_idx, data in enumerate(test_dataloader):
-            input_eval, target_eval, label = data
-            input_eval = input_eval.to(device)
-            target_eval = target_eval.to(device)
+        for batch_idx in n_batches_test:
 
             with torch.no_grad():
                 self.eval()
 
-                Y_test_pred = self.predict(input_eval, target_len=target_len)
+                # Select data for the current batch
+                input_test_batch = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                target_test_batch = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                input_test_batch = input_test_batch.to(device)
+                target_test_batch = target_test_batch.to(device)
+
+                Y_test_pred = self.predict(input_test_batch.float(), target_len=target_len)
                 Y_test_pred = Y_test_pred.to(device)
-                loss_test = criterion(Y_test_pred, target_eval)
+                loss_test = criterion(Y_test_pred, target_test_batch.float())
                 batch_loss_test += loss_test.item()
 
-        batch_loss_test = batch_loss_test / len(test_dataloader)
-
+        batch_loss_test /= num_batch_test
 
 
         return batch_loss_test

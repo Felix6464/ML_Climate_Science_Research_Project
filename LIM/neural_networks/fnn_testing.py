@@ -1,5 +1,5 @@
 import utilities as ut
-from models.LSTM_enc_dec_input import *
+from models.FNN_model import *
 from plots import *
 from utilities import *
 
@@ -7,6 +7,7 @@ from utilities import *
 def main():
 
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+    data = data[:, :6000]
     print("Data shape : {}".format(data.shape))
 
     # Reshape the data if necessary (assuming a 2D tensor)
@@ -15,21 +16,18 @@ def main():
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
-    #data = data[:, :5000]
 
     index_train = int(0.8 * len(data[0, :]))
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
-    model_num = "5931219np"
-    saved_model = torch.load(f"./trained_models/model_{model_num}.pt")
+    model_num = "6719657fnp"
+    saved_model = torch.load(f"./trained_models/ffn/model_{model_num}.pt")
 
     # Load the hyperparameters of the model
     params = saved_model["hyperparameters"]
 
     hidden_size = params["hidden_size"]
-    num_layers = params["num_layers"]
-    input_window = params["input_window"]
     batch_size = params["batch_size"]
     loss_type = params["loss_type"]
 
@@ -39,6 +37,8 @@ def main():
     loss_list = []
 
     for output_window in x:
+
+
 
         # Specify the number of features and the stride for generating timeseries data
         num_features = 30
@@ -59,7 +59,7 @@ def main():
         Y_test = torch.from_numpy(target_data_test)
 
         # Initialize the model and load the saved state dict
-        model = LSTM_Sequence_Prediction(input_size = X_test.shape[2], hidden_size = hidden_size, num_layers=num_layers)
+        model = FeedforwardNetwork(input_size = num_features, hidden_size = hidden_size, output_size=num_features, input_window=input_window)
         model.load_state_dict(saved_model["model_state_dict"])
         model.to(device)
 

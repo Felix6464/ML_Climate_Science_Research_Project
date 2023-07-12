@@ -4,11 +4,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
+from tqdm import trange
+import random
 
 
 # Custom dataset class for sequence prediction
-
-
 class TimeSeries(Dataset):
     def __init__(self, xarr, input_window, one_hot_month=False):
         self.input_window = input_window
@@ -103,11 +103,21 @@ class MLP(nn.Module):
         x_hat = gamma * x_hat + beta
         return x_hat
 
+
+class RMSELoss(torch.nn.Module):
+    def __init__(self):
+        super(RMSELoss, self).__init__()
+
+    def forward(self, x, y):
+        criterion = nn.MSELoss()
+        eps = 1e-6
+        loss = torch.sqrt(criterion(x, y) + eps)
+        return loss
 # Feedforward network for sequence prediction
 class FeedforwardNetwork(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, input_size, hidden_size, output_size, input_window):
         super(FeedforwardNetwork, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc1 = nn.Linear(input_size * input_window, hidden_size)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, output_size)
@@ -121,69 +131,126 @@ class FeedforwardNetwork(nn.Module):
         return x
 
 # Function for training a model
-    def train_model(self, train_loader, val_loader, num_epochs, learning_rate):
+    def train_model(self, train_dataloader, eval_dataloader, num_epochs, learning_rate, loss_type, optimizer):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(device)
 
+        losses = np.full(num_epochs, np.nan)
+        losses_test = np.full(num_epochs, np.nan)
 
-        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-        losses = []
-        criterion = nn.L1Loss()
-
-        for epoch in range(num_epochs):
-            self.train()
-
-            train_loss = 0.0
-            for i, data in enumerate(train_loader):
-                # Set gradients to zero in the beginning of each batch
-                optimizer.zero_grad()
-
-                input, target, l = data
-
-                # Forward pass
-                pred = self.forward(input.to(device))
-
-                # loss function
-                loss = criterion(target.to(device), pred)
-
-                # backward prop and optimization
-                loss.backward()
-                optimizer.step()
-
-                train_loss += loss.item()
+        # Initialize optimizer and criterion
+        if loss_type == 'MSE':
+            criterion = nn.MSELoss()
+        elif loss_type == 'L1':
+            criterion = nn.L1Loss()
+        elif loss_type == 'RMSE':
+            criterion = RMSELoss()
 
 
+        with trange(num_epochs) as tr:
+            for epoch in tr:
+                batch_loss = 0.0
+                batch_loss_test = 0.0
+                train_len = 0
+                eval_len = 0
 
-            val_loss = 0.0
-            self.eval()
-            # For validation no gradients are computed
-            with torch.no_grad():
-                for i, data in enumerate(val_loader):
-                    input, target, l = data
-
+                for input, target in train_dataloader:
+                    train_len += 1
+                    self.train()
+                    # Set gradients to zero in the beginning of each batch
+                    optimizer.zero_grad()
+                    input = input.view(input.shape[0], input.shape[2] * input.shape[1])
+                    target = target.view(target.shape[2], target.shape[0] , target.shape[1] )
                     # Forward pass
+                    #print(input.shape)
                     pred = self.forward(input.to(device))
 
                     # loss function
                     loss = criterion(target.to(device), pred)
-                    val_loss += loss.item()
 
-            mean_val_loss = val_loss / len(val_loader)
+                    # backward prop and optimization
+                    loss.backward()
+                    optimizer.step()
+                    batch_loss += loss.item()
 
-            mean_train_loss = train_loss / len(train_loader)
+                # Compute average loss for the epoch
+                batch_loss /= train_len
+                losses[epoch] = batch_loss
 
-            return mean_train_loss, mean_val_loss
+                self.eval()
+                # For validation no gradients are computed
+                with torch.no_grad():
+                    for input, target in eval_dataloader:
+                            eval_len += 1
+
+                            target = target.view(target.shape[2], target.shape[0] , target.shape[1] )
+                            input = input.view(input.shape[0], input.shape[2] * input.shape[1])
+                             # Forward pass
+                            pred = self.forward(input.to(device))
+
+                            # loss function
+                            loss = criterion(target.to(device), pred)
+                            batch_loss_test += loss.item()
+
+                    batch_loss_test /= eval_len
+                    losses_test[epoch] = batch_loss_test
+                    print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
+
+        return losses, losses_test
 
 
 
-def plot_loss_evolution(losses, num_epochs, learning_rate, hidden_size):
-    epochs = range(1, num_epochs + 1)
-    plt.plot(epochs, losses, label='Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title(f'Loss Evolution over Epochs: {num_epochs}\nLearning Rate: {learning_rate}\n, Hidden Size: {hidden_size}')
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    def evaluate_model(self, X_test, Y_test, target_len, batch_size, loss_type):
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print(device)
+
+        input_test = X_test.to(device)
+        target_test = Y_test.to(device)
+
+        # Initialize optimizer and criterion
+        if loss_type == 'MSE':
+            criterion = nn.MSELoss()
+        elif loss_type == 'L1':
+            criterion = nn.L1Loss()
+        elif loss_type == 'RMSE':
+            criterion = RMSELoss()
+
+        # Calculate the number of batch iterations
+        n_batches_test = input_test.shape[1] // batch_size
+        num_batch_test = n_batches_test
+        n_batches_test = list(range(n_batches_test))
+
+        random.shuffle(n_batches_test)
+        batch_loss_test = 0.0
+
+        for batch_idx in n_batches_test:
+
+            with torch.no_grad():
+                self.eval()
+
+                input = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                target = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
+                input = input.reshape(input.shape[1], input.shape[0] * input.shape[2])
+
+                for i in range(target_len):
+
+                    input = input.to(device)
+                    target = target.to(device)
+
+                    Y_test_pred = self.forward(input.float())
+                    Y_test_pred = Y_test_pred.to(device)
+
+                    input = torch.cat((input, Y_test_pred), dim=1)
+                    input = input[:, 30:]
+
+
+
+            loss_test = criterion(Y_test_pred, target.float())
+            batch_loss_test += loss_test.item()
+
+        batch_loss_test /= num_batch_test
+
+
+        return batch_loss_test
