@@ -186,6 +186,7 @@ class LSTM_Decoder(nn.Module):
             if training_prediction == 'mixed_teacher_forcing':
                 # Predict using mixed teacher forcing
                 for t in range(target_len):
+                    #print("Decoder input: ", decoder_input.shape)
                     lstm_out, decoder_hidden = self.lstm(decoder_input.unsqueeze(0), decoder_hidden)
                     decoder_output = self.linear(lstm_out.squeeze(0))
                     outputs[t] = decoder_output
@@ -281,11 +282,14 @@ class LSTM_Sequence_Prediction(nn.Module):
             for epoch in tr:
                 batch_loss = 0.0
                 batch_loss_test = 0.0
+                train_len = 0
+                eval_len = 0
 
-                for batch_idx, train_data in train_dataloader:
+                for train_data, target_data in train_dataloader:
+                    train_len += 1
                     self.train()
 
-                    input_batch, target_batch = batch_idx, train_data
+                    input_batch, target_batch = train_data, target_data
                     input_batch = input_batch.to(device)
                     target_batch = target_batch.to(device)
 
@@ -306,10 +310,12 @@ class LSTM_Sequence_Prediction(nn.Module):
                     #print("input_batch shape : {}".format(input_batch.shape))
 
                     input_batch = input_batch.view(input_batch.shape[2], input_batch.shape[0] , input_batch.shape[1] )
+                    target_batch = target_batch.view(target_batch.shape[2], target_batch.shape[0] , target_batch.shape[1])
                     encoder_output, encoder_hidden = self.encoder(input_batch)
 
                     # Decoder input for the current batch
                     decoder_input = input_batch[-1, :, :]
+                    #print("decoder_input shape : {}".format(decoder_input.shape))
 
                     decoder_hidden = encoder_hidden
 
@@ -322,7 +328,6 @@ class LSTM_Sequence_Prediction(nn.Module):
                                                           target_len,
                                                           teacher_forcing_ratio)
 
-                    target_batch = target_batch.view(target_batch.shape[2], target_batch.shape[0] , target_batch.shape[1])
                     #print("outputs shape : {}".format(outputs.shape))
                     #print("target_batch shape : {}".format(target_batch.shape))
                     loss = criterion(outputs, target_batch)
@@ -333,16 +338,18 @@ class LSTM_Sequence_Prediction(nn.Module):
                     optimizer.step()
 
                 # Compute average loss for the epoch
+                batch_loss /= train_len
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio -= 0.01
+                    teacher_forcing_ratio -= 0.02
 
-                for batch_idx, val_data in eval_dataloader:
+                for val_data, val_data_target in eval_dataloader:
+                    eval_len += 1
 
-                    input_eval = batch_idx
-                    target_eval = val_data
+                    input_eval = val_data
+                    target_eval = val_data_target
                     input_eval = input_eval.view(input_eval.shape[2], input_eval.shape[0] , input_eval.shape[1] )
                     input_eval = input_eval.to(device)
                     target_eval = target_eval.to(device)
@@ -356,6 +363,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                         loss_test = criterion(Y_test_pred, target_eval)
                         batch_loss_test += loss_test.item()
 
+                batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
 

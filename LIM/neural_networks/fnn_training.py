@@ -2,15 +2,20 @@ from models.FNN_model import *
 import xarray as xr
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, Dataset
+from utilities import *
 
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+#data = torch.load("./data/data_piControl.pt")
 
-dt = "np"
+print(data.shape)
+data = normalize_data(data)
+
+dt = "fnp"
 input_window = 6
 output_window = 1
-batch_size = 32
+batch_size = 64
 one_hot_month = False
 
 print(data, type(data), data.shape)
@@ -72,7 +77,6 @@ teacher_forcing_ratio = 0.4
 dynamic_tf = True
 shuffle = True
 loss_type = "L1"
-wind_farm = "britain_time_lag_corr_"
 
 print("Start training")
 
@@ -109,7 +113,6 @@ parameters = {
     "loss_test": loss_test.tolist(),
     "loss_type": loss_type,
     "shuffle": shuffle,
-    "wind_farm": wind_farm,
 }
 
 torch.save({'hyperparameters': parameters,

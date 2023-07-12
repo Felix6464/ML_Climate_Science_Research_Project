@@ -1,14 +1,15 @@
-from LIM.neural_networks.old.LSTM_enc_dec_old import *
+from models.LSTM_enc_dec_input import *
 from utilities import *
 from plots import *
 
 
 # Create the DataLoader for first principal component
-data = torch.load("./data/data_piControl.pt")
-model_num = 1551949
+data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+model_num = "5931219np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
+#data = data[:, :10000]
 
 
 saved_model = torch.load(f"./trained_models/model_{model_num}.pt")
@@ -26,7 +27,6 @@ teacher_forcing_ratio = params["teacher_forcing_ratio"]
 dynamic_tf = params["dynamic_tf"]
 shuffle = params["shuffle"]
 loss_type = params["loss_type"]
-wind_farm = params["wind_farm"]
 loss = params["loss"]
 loss_test = params["loss_test"]
 
@@ -46,7 +46,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # convert windowed data from np.array to PyTorch tensor
 X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
-model = LSTM_Sequence_Prediction(input_size = X_train.shape[2], hidden_size = hidden_size, num_layers=num_layers)
+model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
 
 model.load_state_dict(saved_model["model_state_dict"])
 model.to(device)
@@ -61,5 +61,4 @@ plot_model_forecast_PC(model, X_train, Y_train, X_test, Y_test, model_num)
 
 
 print("Hyperparameters Model : {}".format(params))
-plot_loss(loss, model_num, "Training Loss")
-plot_loss(loss_test, model_num, "Test Loss")
+plot_loss(loss, loss_test, model_num, "Training Loss")

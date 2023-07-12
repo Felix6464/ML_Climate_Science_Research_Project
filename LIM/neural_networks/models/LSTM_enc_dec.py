@@ -245,8 +245,11 @@ class LSTM_Sequence_Prediction(nn.Module):
             for epoch in tr:
                 batch_loss = 0.0
                 batch_loss_test = 0.0
+                train_len = 0
+                eval_len = 0
 
                 for batch_idx, train_data in train_dataloader:
+                    train_len += 1
                     self.train()
 
                     input_batch, target_batch = batch_idx, train_data
@@ -303,13 +306,16 @@ class LSTM_Sequence_Prediction(nn.Module):
                     optimizer.step()
 
                 # Compute average loss for the epoch
+                batch_loss /= train_len
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
                 if dynamic_tf and teacher_forcing_ratio > 0:
                     teacher_forcing_ratio -= 0.01
 
+
                 for batch_idx, val_data in eval_dataloader:
+                    eval_len += 1
 
                     input_eval = batch_idx
                     target_eval = val_data
@@ -326,11 +332,12 @@ class LSTM_Sequence_Prediction(nn.Module):
                         loss_test = criterion(Y_test_pred, target_eval)
                         batch_loss_test += loss_test.item()
 
+                batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
 
                 # Update progress bar with current loss
-                tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
+                #tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
 
             return losses, losses_test
 

@@ -75,7 +75,7 @@ def plot_model_forecast(lstm_model, train_data, target_data, test_data, test_tar
             ax[row, 1].legend(bbox_to_anchor=(1, 1))
             ax[row, 1].set_title('Prediction on Test Data')
 
-    plt.suptitle('LSTM Encoder-Decoder Predictions', x=0.445, y=1.)
+    plt.suptitle('LSTM Encoder-Decoder Predictions', x=0.445, y=1., fontsize=20)
     plt.tight_layout()
     plt.subplots_adjust(top=0.95)
     plt.savefig(f'trained_models/predictions_{rand}.png')
@@ -102,9 +102,13 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     """
 
     train_data = train_data.detach().cpu()
+    train_data = train_data.view(train_data.shape[2], train_data.shape[0], train_data.shape[1])
     target_data = target_data.detach().cpu()
+    target_data = target_data.view(target_data.shape[2], target_data.shape[0], target_data.shape[1])
     test_data = test_data.detach().cpu()
+    test_data = test_data.view(test_data.shape[2], test_data.shape[0], test_data.shape[1])
     test_target = test_target.detach().cpu()
+    test_target = test_target.view(test_target.shape[2], test_target.shape[0], test_target.shape[1])
 
     print("Xtrain.shape: ", train_data.shape)
     print("Ytrain.shape: ", test_target.shape)
@@ -132,8 +136,8 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
                         np.concatenate([[train_data[-1, 0, row]], y_train_pred[:, 0, row]]),
                         color="red", linewidth=2, label='Prediction')
         ax[row, 0].set_xlim([0, input_window + output_window - 1])
-        ax[row, 0].set_xlabel('$Timestep$')
-        ax[row, 0].set_ylabel('$Prediction Value$')
+        ax[row, 0].set_xlabel('$Timestep$', fontsize=15)
+        ax[row, 0].set_ylabel('$Prediction Value$', fontsize=15)
 
         # Test set
         x_test = test_data[:, row, :]
@@ -146,13 +150,13 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
                         np.concatenate([[test_data[-1, 0, row]], y_test_pred[:, 0, row]]),
                         color="red", linewidth=2, label='Prediction')
         ax[row, 1].set_xlim([0, input_window + output_window - 1])
-        ax[row, 1].set_xlabel('$Timestep$')
-        ax[row, 1].set_ylabel('$Prediction Values$')
+        ax[row, 1].set_xlabel('$Timestep$', fontsize=15)
+        ax[row, 1].set_ylabel('$Prediction Values$', fontsize=15)
 
         if row == 0:
-            ax[row, 0].set_title('Prediction on Train Data')
+            ax[row, 0].set_title('Prediction on Train Data', fontsize=15)
             ax[row, 1].legend(bbox_to_anchor=(1, 1))
-            ax[row, 1].set_title('Prediction on Test Data')
+            ax[row, 1].set_title('Prediction on Test Data', fontsize=15)
 
     plt.suptitle('LSTM Encoder-Decoder Predictions', x=0.445, y=1.)
     plt.tight_layout()
@@ -165,7 +169,7 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
 
 
 
-def plot_loss(loss_values, identifier, loss_type):
+def plot_loss(loss_train, loss_eval, identifier, loss_type):
     """
     Plot the loss values over epochs.
 
@@ -177,13 +181,18 @@ def plot_loss(loss_values, identifier, loss_type):
     Returns:
         None
     """
-    epochs = range(1, len(loss_values) + 1)
-    plt.plot(epochs, loss_values, 'b', label='Loss')
-    plt.title(f'{loss_type} per Epoch')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.savefig(f'trained_models/loss_{loss_type}_{identifier}.png')
+    epochs = range(1, len(loss_train) + 1)
+    plt.plot(epochs, loss_train, 'b-', marker='o', markersize=5, linewidth=1, label='Loss-Train')
+    plt.plot(epochs, loss_eval, color="r", marker='o', markersize=5, linewidth=1, label='Loss-Eval')
+    plt.title(f'{loss_type} per Epoch', fontsize=16, fontweight='bold')
+    plt.xlabel('Epochs', fontsize=12)
+    plt.ylabel('Loss', fontsize=12)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.legend(fontsize=12)
+    plt.tight_layout()  # Adjust spacing and margins
+    plt.savefig(f'trained_models/loss_{loss_type}_combined_{identifier}.png', dpi=300)
     plt.show()
 
 import matplotlib.pyplot as plt

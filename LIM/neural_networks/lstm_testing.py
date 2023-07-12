@@ -19,7 +19,7 @@ def main():
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
-    model_num = "5940702"
+    model_num = "5931219np"
     saved_model = torch.load(f"./trained_models/model_{model_num}.pt")
 
     # Load the hyperparameters of the model
