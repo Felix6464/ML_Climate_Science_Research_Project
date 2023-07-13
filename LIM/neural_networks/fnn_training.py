@@ -4,15 +4,17 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, Dataset
 from utilities import *
 import torch.utils.data as datat
+import os
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-data = data[:, :10000]
+#data = data[:, :10000]
 data = normalize_data(data)
+print("Data shape", data.shape)
 
-print("Input data shape", data.shape)
 
+training_info_pth = "trained_models/training_info_ffn.txt"
 dt = "fnp"
 input_window = 6
 output_window = 1
@@ -77,17 +79,17 @@ else:
 
 
 
-#lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
+lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
 lr = [0.0001]
 
 for l in lr:
 
     # Setting hyperparameters for training
     num_features = 30
-    hidden_size = 64
-    num_layers = 2
+    hidden_size = 128
+    num_layers = 1
     learning_rate = l
-    num_epochs = 25
+    num_epochs = 30
     input_window = input_window
     output_window = output_window
     batch_size = batch_size
@@ -115,16 +117,11 @@ for l in lr:
                                         optimizer)
 
 
-    if True:
-        print('Number weights:', (input_window*hidden_size + hidden_size + hidden_size*output_window + output_window))
-
-        print("Number of trainable parameters of our model:",
-              sum(p.numel() for p in model.parameters() if p.requires_grad))
-
-    rand_identifier = str(np.random.randint(0, 10000000)) + dt
-    print(f"Model saved as model_{rand_identifier}.pt")
+    num_of_weigths = (input_window*hidden_size + hidden_size + hidden_size*output_window + output_window)
+    num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     # Save the model and hyperparameters to a file
+    rand_identifier = str(np.random.randint(0, 10000000)) + dt
     parameters = {
         'hidden_size': hidden_size,
         "num_layers": num_layers,
@@ -140,9 +137,32 @@ for l in lr:
         "loss_test": loss_test.tolist(),
         "loss_type": loss_type,
         "shuffle": shuffle,
+        "num_of_weigths": num_of_weigths,
+        "num_of_params": num_of_params
     }
 
     torch.save({'hyperparameters': parameters,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./trained_models/ffn/model_{rand_identifier}.pt')
+               f'./trained_models/model_{rand_identifier}.pt')
+    print(f"Model saved as model_{rand_identifier}.pt")
+
+    model_dict = {"training_params": [hidden_size,
+                                      num_layers,
+                                      num_epochs,
+                                      input_window,
+                                      output_window,
+                                      batch_size,
+                                      training_prediction,
+                                      teacher_forcing_ratio,
+                                      dynamic_tf,
+                                      loss_type],
+                  "models": (rand_identifier, lr)}
+
+    if os.path.exists(training_info_pth):
+        # Load the existing dictionary from the file
+        temp = [load_dictionary(training_info_pth)]
+        temp.append(model_dict)
+        save_dictionary(str(temp), training_info_pth)
+    else:
+        save_dictionary(str(model_dict), training_info_pth)

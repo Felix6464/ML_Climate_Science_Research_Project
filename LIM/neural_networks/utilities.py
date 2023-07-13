@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import json
 import torch
+import pickle
 
 
 def reshape_xarray(input_data):
@@ -335,3 +336,13 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     Y_test = Y_test.view(Y_test.shape[1], Y_test.shape[2], Y_test.shape[0])
 
     return X_train, Y_train, X_test, Y_test
+
+
+
+def save_dictionary(dictionary, filename):
+    with open(filename, 'w') as file:
+        json.dump(dictionary, file)
+
+def load_dictionary(filename):
+    with open(filename, 'r') as file:
+        return eval(json.load(file))

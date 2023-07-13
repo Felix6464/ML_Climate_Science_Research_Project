@@ -1,10 +1,11 @@
-from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
 #from models.LSTM_enc_dec_multilayer import *
 #from models.LSTM_enc_dec import *
 #from models.LSTM_enc_dec_try import *
 from torch.utils.data import DataLoader
 from utilities import *
 import torch.utils.data as datat
+import os
 
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
@@ -15,6 +16,7 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 print(data.shape)
 data = normalize_data(data)
 
+training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 num_features = 30
 input_window = 6
@@ -77,6 +79,7 @@ else:
         datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=True, drop_last=True)
 
 
+
 lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
 
 for l in lr:
@@ -97,14 +100,15 @@ for l in lr:
     shuffle = True
     loss_type = "L1"
 
+
     print("Start training")
+
 
     # Specify the device to be used for training
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     #model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, seq_len=input_window)
     model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
-
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -123,11 +127,11 @@ for l in lr:
                                         optimizer,
                                         num_features)
 
-
-    rand_identifier = str(np.random.randint(0, 10000000)) + dt
-    print(f"Model saved as model_{rand_identifier}.pt")
+    num_of_weigths = (input_window*hidden_size + hidden_size + hidden_size*output_window + output_window)
+    num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     # Save the model and hyperparameters to a file
+    rand_identifier = str(np.random.randint(0, 10000000)) + dt
     parameters = {
         'hidden_size': hidden_size,
         "num_layers": num_layers,
@@ -143,9 +147,32 @@ for l in lr:
         "loss_test": loss_test.tolist(),
         "loss_type": loss_type,
         "shuffle": shuffle,
+        "num_of_weigths": num_of_weigths,
+        "num_of_params": num_of_params
     }
 
     torch.save({'hyperparameters': parameters,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./trained_models/model_{rand_identifier}.pt')
+               f'./trained_models/lstm/model_{rand_identifier}.pt')
+    print(f"Model saved as model_{rand_identifier}.pt")
+
+    model_dict = {"training_params": [hidden_size,
+                                      num_layers,
+                                      num_epochs,
+                                      input_window,
+                                      output_window,
+                                      batch_size,
+                                      training_prediction,
+                                      teacher_forcing_ratio,
+                                      dynamic_tf,
+                                      loss_type],
+                  "models": (rand_identifier, lr)}
+
+    if os.path.exists(training_info_pth):
+        # Load the existing dictionary from the file
+        temp = [load_dictionary(training_info_pth)]
+        temp.append(model_dict)
+        save_dictionary(str(temp), training_info_pth)
+    else:
+        save_dictionary(str(model_dict), training_info_pth)

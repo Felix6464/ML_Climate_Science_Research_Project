@@ -10,10 +10,6 @@ def main():
     data = data[:, :6000]
     print("Data shape : {}".format(data.shape))
 
-    # Reshape the data if necessary (assuming a 2D tensor)
-    if len(data.shape) == 1:
-        data = data.unsqueeze(1)
-
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
 
@@ -24,25 +20,22 @@ def main():
     model_num = "6719657fnp"
     saved_model = torch.load(f"./trained_models/ffn/model_{model_num}.pt")
 
+    # Specify the number of features and the stride for generating timeseries data
+    num_features = 30
+    stride = 1
+    input_window = 6
+
     # Load the hyperparameters of the model
     params = saved_model["hyperparameters"]
-
     hidden_size = params["hidden_size"]
     batch_size = params["batch_size"]
     loss_type = params["loss_type"]
-
-    input_window = 6
 
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     loss_list = []
 
     for output_window in x:
 
-
-
-        # Specify the number of features and the stride for generating timeseries data
-        num_features = 30
-        stride = 1
 
         input_data_test, target_data_test = dataloader_seq2seq_feat(data,
                                                                     input_window=input_window,

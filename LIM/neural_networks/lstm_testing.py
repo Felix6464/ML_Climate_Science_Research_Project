@@ -17,7 +17,7 @@ def main():
     data = ut.normalize_data(data)
     #data = data[:, :5000]
 
-    index_train = int(0.8 * len(data[0, :]))
+    index_train = int(0.9 * len(data[0, :]))
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested

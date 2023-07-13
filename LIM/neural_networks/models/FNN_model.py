@@ -134,7 +134,7 @@ class FeedforwardNetwork(nn.Module):
     def train_model(self, train_dataloader, eval_dataloader, num_epochs, learning_rate, loss_type, optimizer):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(device)
+        #print(device)
 
         losses = np.full(num_epochs, np.nan)
         losses_test = np.full(num_epochs, np.nan)
@@ -204,7 +204,7 @@ class FeedforwardNetwork(nn.Module):
     def evaluate_model(self, X_test, Y_test, target_len, batch_size, loss_type):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(device)
+        #print(device)
 
         input_test = X_test.to(device)
         target_test = Y_test.to(device)

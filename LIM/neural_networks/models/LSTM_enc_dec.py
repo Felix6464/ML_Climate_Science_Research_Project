@@ -225,7 +225,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         """
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(device)
+        #print(device)
 
         # Initialize array to store losses for each epoch
         losses = np.full(n_epochs, np.nan)
@@ -344,7 +344,7 @@ class LSTM_Sequence_Prediction(nn.Module):
     def evaluate_model(self, input_test, target_test, target_len, batch_size, loss_type):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(device)
+        #print(device)
 
         input_test = input_test.to(device)
         target_test = target_test.to(device)
