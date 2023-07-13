@@ -17,11 +17,12 @@ def main():
     data = data[:, index_train:]
 
     model_num = ["3910395fnp"]
+    id = "FNN"
 
     loss_list = []
 
     for m in model_num:
-        saved_model = torch.load(f"./trained_models/model_{m}.pt")
+        saved_model = torch.load(f"./trained_models/ffn/model_{m}.pt")
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
@@ -68,8 +69,8 @@ def main():
             print(f"Test loss: {loss}")
 
         loss_list.append((losses, model_num))
-        print(f"Test loss: {loss_list}")
-        plot_loss_horizon(loss_list, loss_type, "FNN")
+    print(f"Test loss: {loss_list}")
+    plot_loss_horizon(loss_list, loss_type, id)
 
 
 

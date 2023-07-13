@@ -1,5 +1,6 @@
 import utilities as ut
-from models.LSTM_enc_dec_input import *
+#from models.LSTM_enc_dec_input import *
+from models.LSTM_enc_dec import *
 from plots import *
 from utilities import *
 
@@ -17,12 +18,13 @@ def main():
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
-    model_num = ["5931219np"]
+    model_num = ["7277874np", "8318371np"]
+    id = ["-130k", "-65k"]
 
     loss_list = []
 
-    for m in model_num:
-        saved_model = torch.load(f"./trained_models/model_{m}.pt")
+    for m in range(len(model_num)):
+        saved_model = torch.load(f"./trained_models/lstm/model_{model_num[m]}.pt")
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
@@ -67,10 +69,10 @@ def main():
             loss = model.evaluate_model(X_test, Y_test, output_window, batch_size, loss_type)
             losses.append(loss)
             print(f"Test loss: {loss}")
+        loss_list.append((losses, model_num[m]))
 
-        loss_list.append((losses, model_num))
-        print(f"Test loss: {loss_list}")
-        plot_loss_horizon(loss_list, loss_type, "LSTM")
+    print(f"Test loss: {loss_list}")
+    plot_loss_horizon(loss_list, loss_type, id)
 
 
 

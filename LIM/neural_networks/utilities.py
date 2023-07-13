@@ -309,7 +309,67 @@ def dataloader_seq2seq_feat(y, input_window, output_window, stride, num_features
 
     return X, Y
 
+def dataloader_seq2seq_feat2(y, input_window, output_window, num_features):
+    '''
+    Create a windowed dataset
 
+    :param y:                Time series feature (array)
+    :param input_window:     Number of y samples to give the model
+    :param output_window:    Number of future y samples to predict
+    :param stride:           Spacing between windows
+    :param num_features:     Number of features
+    :return X, Y:            Arrays with correct dimensions for LSTM
+                             (i.e., [input/output window size # examples, # features])
+    '''
+    print("y-shape",y.shape)
+    data_len = y.shape[1]
+    num_samples = data_len - input_window - output_window * 2
+
+    # Initialize X and Y arrays with zeros
+    X = np.zeros([num_samples, num_features, input_window])
+    Y = np.zeros([num_samples, num_features, output_window])
+
+
+    for sample_idx in np.arange(num_samples):
+        # Create input window
+        start_x = sample_idx
+        end_x = start_x + input_window
+        X[sample_idx, :, :] = y[:, start_x:end_x]
+
+        # Create output window
+        start_y = sample_idx + input_window
+        end_y = start_y + output_window
+        Y[sample_idx, :, :] = y[:, start_y:end_y]
+
+    return X, Y
+
+
+
+def numpy_to_torch2(Xtrain, Ytrain, Xtest, Ytest):
+    '''
+    convert numpy array to PyTorch tensor
+    : param Xtrain:                    windowed training input data (input window size, # examples, # features)
+    : param Ytrain:                    windowed training target data (output window size, # examples, # features)
+    : param Xtest:                     windowed test input data (input window size, # examples, # features)
+    : param Ytest:                     windowed test target data (output window size, # examples, # features)
+    : return X_train_torch, Y_train_torch,
+    :        X_test_torch, Y_test_torch:      all input np.arrays converted to PyTorch tensors
+
+    '''
+
+    X_train = torch.from_numpy(Xtrain).type(torch.Tensor)
+    Y_train = torch.from_numpy(Ytrain).type(torch.Tensor)
+
+    X_test = torch.from_numpy(Xtest).type(torch.Tensor)
+    Y_test = torch.from_numpy(Ytest).type(torch.Tensor)
+
+    #X_train = X_train.view(X_train.shape[1], X_train.shape[2], X_train.shape[0])
+    #Y_train = Y_train.view(Y_train.shape[1], Y_train.shape[2], Y_train.shape[0])
+
+    #X_test = X_test.view(X_test.shape[1], X_test.shape[2], X_test.shape[0])
+    #Y_test = Y_test.view(Y_test.shape[1], Y_test.shape[2], Y_test.shape[0])
+
+    return X_train, Y_train, X_test, Y_test
 
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
@@ -336,7 +396,6 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     Y_test = Y_test.view(Y_test.shape[1], Y_test.shape[2], Y_test.shape[0])
 
     return X_train, Y_train, X_test, Y_test
-
 
 
 def save_dictionary(dictionary, filename):

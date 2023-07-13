@@ -11,7 +11,7 @@ import os
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-#data = data[:, :65000]
+data = data[:, :20000]
 
 print(data.shape)
 data = normalize_data(data)
@@ -81,6 +81,7 @@ else:
 
 
 lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
+lr = [0.0001]
 
 for l in lr:
     print("Data shape : {}".format(train_data.shape))
@@ -90,7 +91,7 @@ for l in lr:
     hidden_size = 256
     num_layers = 1
     learning_rate = l
-    num_epochs = 30
+    num_epochs = 600
     input_window = input_window
     output_window = output_window
     batch_size = batch_size

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import seaborn as sns
+from numpy import random
 
 
 def plot_model_forecast(lstm_model, train_data, target_data, test_data, test_target, rand, num_rows=5):
@@ -195,8 +196,6 @@ def plot_loss(loss_train, loss_eval, identifier, loss_type):
     plt.savefig(f'trained_models/loss_{loss_type}_combined_{identifier}.png', dpi=300)
     plt.show()
 
-import matplotlib.pyplot as plt
-
 def plot_loss_horizon_combined(loss_values_lstm, loss_values_lstm_inp, loss_values_ffn, identifier, loss_type):
     """
     Plot the loss values over epochs.
@@ -237,10 +236,10 @@ def plot_loss_horizon(loss_values, loss_type, id):
         None
     """
     epochs = range(1, len(loss_values[0][0]) + 1)
-    for m in loss_values:
-        loss = m[0]
-        identifier = m[1]
-        plt.plot(epochs, loss, 'b-', marker='o', markersize=5, linewidth=1, label=f'Loss{identifier}')
+    for m in range(len(loss_values)):
+        loss = loss_values[m][0]
+        identifier = loss_values[m][1]
+        plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss{id[m]}')
     plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
     plt.xlabel('Prediction Horizon', fontsize=12)
     plt.ylabel('Test Loss', fontsize=12)

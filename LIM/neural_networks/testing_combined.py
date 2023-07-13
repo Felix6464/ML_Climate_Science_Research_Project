@@ -26,10 +26,11 @@ def main():
     model_num_lstm = "7416032np"
     model_num_lstm_input = "8619050np"
     model_num_fnn = "3910395fnp"
+    #id = [""]
 
-    saved_model_lstm = torch.load(f"./trained_models/model_{model_num_lstm}.pt")
-    saved_model_lstm_input = torch.load(f"./trained_models/model_{model_num_lstm_input}.pt")
-    saved_model_fnn = torch.load(f"./trained_models/model_{model_num_fnn}.pt")
+    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{model_num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{model_num_lstm_input}.pt")
+    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{model_num_fnn}.pt")
 
     # Load the hyperparameters of the lstm_model
     params = saved_model_lstm["hyperparameters"]
@@ -81,23 +82,23 @@ def main():
 
         # Initialize the model and load the saved state dict
         model_lstm = lstm.LSTM_Sequence_Prediction(input_size=num_features,
-                                              hidden_size=hidden_size_l,
-                                              num_layers=num_layers_l)
+                                                   hidden_size=hidden_size_l,
+                                                   num_layers=num_layers_l)
         model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
         model_lstm.to(device)
 
         # Initialize the model and load the saved state dict
         model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=num_features,
-                                                   hidden_size=hidden_size_l,
-                                                   num_layers=num_layers_l)
+                                                             hidden_size=hidden_size_l,
+                                                             num_layers=num_layers_l)
         model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
         model_lstm_inp.to(device)
 
         # Initialize the model and load the saved state dict
         model_ffn = ffn.FeedforwardNetwork(input_size=num_features,
-                                       hidden_size=hidden_size_f,
-                                       output_size=num_features,
-                                       input_window=input_window)
+                                           hidden_size=hidden_size_f,
+                                           output_size=num_features,
+                                           input_window=input_window)
         model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
         model_ffn.to(device)
 
