@@ -114,7 +114,7 @@ def main():
         print(f"Test loss FFN: {loss_ffn}")
 
     model_nums = str([model_num_lstm, model_num_lstm_input, model_num_fnn])
-    plot_loss_horizon_combined(loss_lstm_list, loss_ffn_list, loss_lstm_inp_list, model_nums, loss_type_l)
+    plot_loss_horizon_combined(loss_lstm_list, loss_lstm_inp_list, loss_ffn_list, model_nums, loss_type_l)
 
 
 

@@ -224,7 +224,7 @@ def plot_loss_horizon_combined(loss_values_lstm, loss_values_lstm_inp, loss_valu
     plt.savefig(f'trained_models/loss_{loss_type}_horizon_combined_{identifier}.png', dpi=300)
     plt.show()
 
-def plot_loss_horizon(loss_values, identifier, loss_type):
+def plot_loss_horizon(loss_values, loss_type, id):
     """
     Plot the loss values over epochs.
 
@@ -236,8 +236,11 @@ def plot_loss_horizon(loss_values, identifier, loss_type):
     Returns:
         None
     """
-    epochs = range(1, len(loss_values) + 1)
-    plt.plot(epochs, loss_values, 'b-', marker='o', markersize=5, linewidth=1, label='Loss')
+    epochs = range(1, len(loss_values[0][0]) + 1)
+    for m in loss_values:
+        loss = m[0]
+        identifier = m[1]
+        plt.plot(epochs, loss, 'b-', marker='o', markersize=5, linewidth=1, label=f'Loss{identifier}')
     plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
     plt.xlabel('Prediction Horizon', fontsize=12)
     plt.ylabel('Test Loss', fontsize=12)
@@ -246,7 +249,7 @@ def plot_loss_horizon(loss_values, identifier, loss_type):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=12)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'trained_models/loss_{loss_type}_horizon_{identifier}.png', dpi=300)
+    plt.savefig(f'trained_models/loss_{loss_type}_horizon_{id}.png', dpi=300)
     plt.show()
 
 
