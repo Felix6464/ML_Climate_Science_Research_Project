@@ -11,21 +11,28 @@ import os
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-data = data[:, :20000]
 
-print(data.shape)
+
 data = normalize_data(data)
-
+data = data[:, :30000]
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
+
 num_features = 30
 input_window = 6
 output_window = 6
+hidden_size = 128
+num_layers = 1
+num_epochs = 50
 batch_size = 64
-stride = 1
+training_prediction = "recursive"
+teacher_forcing_ratio = 0.6
+dynamic_tf = True
+shuffle = True
+loss_type = "MSE"
 one_hot_month = False
+shuffle = True
 
-#print(data, type(data), data.shape)
 
 
 if dt == "xr":
@@ -44,10 +51,10 @@ if dt == "xr":
 
     train_dataset = TimeSeriesLSTM(train_data, input_window, output_window)
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        train_dataset, batch_size=batch_size, shuffle=shuffle, drop_last=True)
     val_dataset = TimeSeriesLSTM(val_data, input_window, output_window)
     val_dataloader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        val_dataset, batch_size=batch_size, shuffle=shuffle, drop_last=True)
 
 else:
 
@@ -61,18 +68,15 @@ else:
     input_data, target_data = dataloader_seq2seq_feat(train_data,
                                                       input_window=input_window,
                                                       output_window=output_window,
-                                                      stride=stride,
                                                       num_features=num_features)
 
     input_data_val, target_data_val = dataloader_seq2seq_feat(val_data,
                                                                 input_window=input_window,
                                                                 output_window=output_window,
-                                                                stride=stride,
                                                                 num_features=num_features)
 
     # convert windowed data from np.array to PyTorch tensor
     train_data, target_data, val_data, val_target = numpy_to_torch(input_data, target_data, input_data_val, target_data_val)
-    print(train_data.shape, target_data.shape, val_data.shape, val_target.shape)
     train_dataloader = DataLoader(
         datat.TensorDataset(train_data, target_data), batch_size=batch_size, shuffle=True, drop_last=True)
     val_dataloader = DataLoader(
@@ -86,20 +90,7 @@ lr = [0.0001]
 for l in lr:
     print("Data shape : {}".format(train_data.shape))
 
-    # Setting hyperparameters for training
-    hidden_size = 256
-    num_layers = 1
     learning_rate = l
-    num_epochs = 600
-    input_window = input_window
-    output_window = output_window
-    batch_size = batch_size
-    training_prediction = "recursive"
-    teacher_forcing_ratio = 0.6
-    dynamic_tf = True
-    shuffle = True
-    loss_type = "L1"
-
 
     print("Start training")
 
@@ -108,7 +99,7 @@ for l in lr:
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     #model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, seq_len=input_window)
-    model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
+    model = LSTM_Sequence_Prediction(input_size=num_features, hidden_size=hidden_size, num_layers=num_layers)
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -169,10 +160,10 @@ for l in lr:
                                       loss_type],
                   "models": (rand_identifier, learning_rate)}
 
-    if os.path.exists(training_info_pth):
-        # Load the existing dictionary from the file
-        temp = [load_dictionary(training_info_pth)]
-        temp.append(model_dict)
-        save_dictionary(str(temp), training_info_pth)
-    else:
-        save_dictionary(str(model_dict), training_info_pth)
+    # if os.path.exists(training_info_pth):
+    #     # Load the existing dictionary from the file
+    #     temp = [load_dictionary(training_info_pth)]
+    #     temp.append(model_dict)
+    #     save_dictionary(str(temp), training_info_pth)
+    # else:
+    #     save_dictionary(str(model_dict), training_info_pth)

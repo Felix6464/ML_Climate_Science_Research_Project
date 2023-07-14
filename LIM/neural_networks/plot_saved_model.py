@@ -38,8 +38,8 @@ data_test = data[:, index_train:]
 num_features = 30
 stride = 1
 
-input_data, target_data = dataloader_seq2seq_feat(data_train, input_window=input_window, output_window=output_window, stride=stride, num_features=num_features)
-input_data_test, target_data_test = dataloader_seq2seq_feat(data_test, input_window=input_window, output_window=output_window, stride=stride, num_features=num_features)
+input_data, target_data = dataloader_seq2seq_feat(data_train, input_window=input_window, output_window=output_window, num_features=num_features)
+input_data_test, target_data_test = dataloader_seq2seq_feat(data_test, input_window=input_window, output_window=output_window, num_features=num_features)
 print("Data loaded")
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
