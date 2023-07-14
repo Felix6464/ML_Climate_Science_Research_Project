@@ -324,22 +324,29 @@ def dataloader_seq2seq_feat2(y, input_window, output_window, num_features):
     print("y-shape",y.shape)
     data_len = y.shape[1]
     num_samples = data_len - input_window - output_window * 2
+    print("num_samples",num_samples)
 
     # Initialize X and Y arrays with zeros
-    X = np.zeros([num_samples, num_features, input_window])
-    Y = np.zeros([num_samples, num_features, output_window])
+    X = np.zeros([num_samples, input_window, num_features])
+    Y = np.zeros([num_samples, output_window, num_features])
 
+    for feature_idx in np.arange(num_features):
+        for sample_idx in np.arange(num_samples):
+            # Create input window
+            start_x = sample_idx
+            end_x = start_x + input_window
+            #print("start_x",start_x)
+            #print("end_x",end_x)
+            #print("y-shape",y[feature_idx, start_x:end_x] * 100)
+            X[sample_idx, :, feature_idx] = y[feature_idx, start_x:end_x]
 
-    for sample_idx in np.arange(num_samples):
-        # Create input window
-        start_x = sample_idx
-        end_x = start_x + input_window
-        X[sample_idx, :, :] = y[:, start_x:end_x]
-
-        # Create output window
-        start_y = sample_idx + input_window
-        end_y = start_y + output_window
-        Y[sample_idx, :, :] = y[:, start_y:end_y]
+            # Create output window
+            start_y = sample_idx + input_window
+            end_y = start_y + output_window
+            #print("start_y",start_y)
+            #print("end_y",end_y)
+            #print("y-shape",y[feature_idx, start_y:end_y] * 100)
+            Y[sample_idx, :, feature_idx] = y[feature_idx, start_y:end_y]
 
     return X, Y
 

@@ -12,14 +12,14 @@ def main():
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
-    data = data[:, :5000]
+    data = data[:, :30000]
 
     index_train = int(0.9 * len(data[0, :]))
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
-    model_num = ["7277874np", "8318371np"]
-    id = ["-130k", "-65k"]
+    model_num = ["4586347np"]
+    id = ["new"]
 
     loss_list = []
 
@@ -34,6 +34,7 @@ def main():
         input_window = params["input_window"]
         batch_size = params["batch_size"]
         loss_type = params["loss_type"]
+
 
         # Specify the number of features and the stride for generating timeseries data
         num_features = 30

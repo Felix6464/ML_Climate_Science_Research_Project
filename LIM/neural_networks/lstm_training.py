@@ -87,7 +87,6 @@ for l in lr:
     print("Data shape : {}".format(train_data.shape))
 
     # Setting hyperparameters for training
-    num_features = 30
     hidden_size = 256
     num_layers = 1
     learning_rate = l
@@ -168,7 +167,7 @@ for l in lr:
                                       teacher_forcing_ratio,
                                       dynamic_tf,
                                       loss_type],
-                  "models": (rand_identifier, lr)}
+                  "models": (rand_identifier, learning_rate)}
 
     if os.path.exists(training_info_pth):
         # Load the existing dictionary from the file
