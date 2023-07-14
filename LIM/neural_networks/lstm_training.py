@@ -1,7 +1,5 @@
-from LIM.neural_networks.models.LSTM_enc_dec import *
-#from models.LSTM_enc_dec_multilayer import *
-#from models.LSTM_enc_dec import *
-#from models.LSTM_enc_dec_try import *
+#from LIM.neural_networks.models.LSTM_enc_dec import *
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
 from torch.utils.data import DataLoader
 from utilities import *
 import torch.utils.data as datat
@@ -14,7 +12,7 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 
 
 data = normalize_data(data)
-data = data[:, :30000]
+data = data[:, :20000]
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
