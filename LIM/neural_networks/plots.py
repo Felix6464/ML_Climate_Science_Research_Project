@@ -103,13 +103,9 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     """
 
     train_data = train_data.detach().cpu()
-    train_data = train_data.view(train_data.shape[2], train_data.shape[0], train_data.shape[1])
     target_data = target_data.detach().cpu()
-    target_data = target_data.view(target_data.shape[2], target_data.shape[0], target_data.shape[1])
     test_data = test_data.detach().cpu()
-    test_data = test_data.view(test_data.shape[2], test_data.shape[0], test_data.shape[1])
     test_target = test_target.detach().cpu()
-    test_target = test_target.view(test_target.shape[2], test_target.shape[0], test_target.shape[1])
 
     print("Xtrain.shape: ", train_data.shape)
     print("Ytrain.shape: ", test_target.shape)
@@ -126,7 +122,7 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     # Plot training/test predictions
     for row in range(num_rows):
         # Train set
-        x_train = train_data[:, row, :]
+        x_train = train_data[:, :, row]
         y_train_pred = lstm_model.predict(x_train, target_len=output_window, prediction_type="forecast").cpu()
 
         ax[row, 0].plot(np.arange(0, input_window), train_data[:, 0, row].cpu(), 'k', linewidth=2, label='Input')

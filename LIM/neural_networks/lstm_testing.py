@@ -21,7 +21,7 @@ def main():
     data = data[:, index_train:]
 
     # Specify the model number of the model to be tested
-    model_num = ["8982062np"]
+    model_num = ["2906070np"]
     id = ["neww"]
 
     loss_list = []

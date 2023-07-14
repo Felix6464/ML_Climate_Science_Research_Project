@@ -1,5 +1,6 @@
-#from LIM.neural_networks.models.LSTM_enc_dec import *
-from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+#from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
 import torch.utils.data as datat
@@ -8,7 +9,6 @@ import os
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data = torch.load("./data/data_piControl.pt")
 
 
 data = normalize_data(data)
@@ -31,6 +31,8 @@ loss_type = "MSE"
 one_hot_month = False
 shuffle = True
 
+lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
+lr = [0.0001]
 
 
 if dt == "xr":
@@ -81,9 +83,6 @@ else:
         datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=True, drop_last=True)
 
 
-
-lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
-lr = [0.0001]
 
 for l in lr:
     print("Data shape : {}".format(train_data.shape))

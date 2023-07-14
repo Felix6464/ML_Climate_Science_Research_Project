@@ -290,7 +290,6 @@ def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
     '''
     data_len = y.shape[1]
     num_samples = data_len - input_window - output_window * 2
-    print("num_samples",num_samples)
 
     # Initialize X and Y arrays with zeros
     X = np.zeros([num_samples, input_window, num_features])
