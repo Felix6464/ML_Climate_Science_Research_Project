@@ -135,11 +135,8 @@ class LSTM_Decoder(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
-        self.lstms = nn.ModuleList()
-
-        for i in range(num_layers):
-            input_size = input_size if i == 0 else hidden_size
-            self.lstms.append(nn.LSTM(input_size, hidden_size, batch_first=True))
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
+                            num_layers=num_layers)
 
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
@@ -152,73 +149,55 @@ class LSTM_Decoder(nn.Module):
         :                                   element in the sequence
         '''
 
-        decoder_input = decoder_input.view(decoder_input.shape[0], 1, decoder_input.shape[1])
 
-        if prediction_type == "test" or prediction_type == "forecast":
+        if training_prediction == 'recursive':
+            # Predict recursively
+            for t in range(target_len):
+                lstm_out, decoder_hidden = self.lstm(decoder_input, decoder_hidden)
+                decoder_output = self.linear(lstm_out.squeeze(0))
+                outputs[:, t, :] = decoder_output[:, 0, :]
+                decoder_input = decoder_output
+
+        if training_prediction == 'teacher_forcing':
+            # Use teacher forcing
+            if random.random() < teacher_forcing_ratio:
+                for t in range(target_len):
+                    for i in range(self.num_layers):
+                        lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
+                        decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
+
+                    decoder_output = self.linear(lstm_out.squeeze(0))
+                    outputs[:, t, :] = decoder_output[:, 0, :]
+                    decoder_input = target_batch[:, t, :]
+
+            # Predict recursively
+            else:
+                for t in range(target_len):
+                    for i in range(self.num_layers):
+                        lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
+                        decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
+
+                    decoder_output = self.linear(lstm_out.squeeze(0))
+                    outputs[:, t, :] = decoder_output
+                    decoder_input = decoder_output
+
+        if training_prediction == 'mixed_teacher_forcing':
+            # Predict using mixed teacher forcing
             for t in range(target_len):
                 for i in range(self.num_layers):
-                    #print("decoder_input.shape", decoder_input.shape)
-                    #print("decoder_hidden[0].shape", decoder_hidden[0].shape)
                     lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
                     decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
 
                 decoder_output = self.linear(lstm_out.squeeze(0))
                 outputs[:, t, :] = decoder_output[:, 0, :]
-                decoder_input = decoder_output.view(decoder_output.shape[0], 1, decoder_output.shape[2])
-        else:
 
-            if training_prediction == 'recursive':
-                # Predict recursively
-                for t in range(target_len):
-                    for i in range(self.num_layers):
-                        lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
-                        decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
-
-                    decoder_output = self.linear(lstm_out.squeeze(0))
-                    outputs[:, t, :] = decoder_output[:, 0, :]
-                    decoder_input = decoder_output.view(decoder_output.shape[0], 1, decoder_output.shape[2])
-
-            if training_prediction == 'teacher_forcing':
-                # Use teacher forcing
+                # Predict with teacher forcing
                 if random.random() < teacher_forcing_ratio:
-                    for t in range(target_len):
-                        for i in range(self.num_layers):
-                            lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
-                            decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
-
-                        decoder_output = self.linear(lstm_out.squeeze(0))
-                        outputs[:, t, :] = decoder_output[:, 0, :]
-                        decoder_input = target_batch[:, t, :]
+                    decoder_input = target_batch[:, t, :]
 
                 # Predict recursively
                 else:
-                    for t in range(target_len):
-                        for i in range(self.num_layers):
-                            lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
-                            decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
-
-                        decoder_output = self.linear(lstm_out.squeeze(0))
-                        outputs[t] = decoder_output
-                        decoder_input = decoder_output.view(decoder_output.shape[0], 1, decoder_output.shape[2])
-
-            if training_prediction == 'mixed_teacher_forcing':
-                # Predict using mixed teacher forcing
-                for t in range(target_len):
-                    for i in range(self.num_layers):
-                        lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
-                        decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
-
-                    decoder_output = self.linear(lstm_out.squeeze(0))
-                    outputs[:, t, :] = decoder_output[:, 0, :]
-                    decoder_input = decoder_output.view(decoder_output.shape[0], 1, decoder_output.shape[2])
-
-                    # Predict with teacher forcing
-                    if random.random() < teacher_forcing_ratio:
-                        decoder_input = target_batch[:, t, :]
-
-                    # Predict recursively
-                    else:
-                        decoder_input = decoder_output.view(decoder_output.shape[0], 1, decoder_output.shape[2])
+                    decoder_input = decoder_output
 
 
         return outputs, decoder_hidden
@@ -335,6 +314,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(batch_size, target_len, num_features)
+                    outputs = torch.tensor(outputs, requires_grad=True)
                     outputs = outputs.to(device)
 
                     # Zero the gradients
@@ -346,6 +326,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     # Decoder input for the current batch
                     decoder_input = input_batch[:, -1, :]
+                    decoder_input = decoder_input.view(batch_size, 1, self.input_size)
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
 
@@ -440,6 +421,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
         # decode input_tensor
         decoder_input = input_tensor[:, -1, :]
+        decoder_input = decoder_input.view(decoder_input.shape[0], 1, self.input_size)
 
         outputs, decoder_hidden = self.decoder(decoder_input,
                                                encoder_hidden,

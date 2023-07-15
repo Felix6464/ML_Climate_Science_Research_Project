@@ -217,6 +217,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     # Initialize outputs tensor
                     outputs = torch.zeros(batch_size, target_len, num_features)
+                    outputs = torch.tensor(outputs, requires_grad=True)
                     outputs = outputs.to(device)
 
                     # Zero the gradients
