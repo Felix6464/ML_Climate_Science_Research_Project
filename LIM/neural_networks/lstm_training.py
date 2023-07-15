@@ -1,5 +1,5 @@
 from LIM.neural_networks.models.LSTM_enc_dec import *
-from LIM.neural_networks.models.LSTM_enc_dec_input import *
+#from LIM.neural_networks.models.LSTM_enc_dec_input import *
 #from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
@@ -81,9 +81,9 @@ for window in windows:
         # convert windowed data from np.array to PyTorch tensor
         train_data, target_data, val_data, val_target = numpy_to_torch(input_data, target_data, input_data_val, target_data_val)
         train_dataloader = DataLoader(
-            datat.TensorDataset(train_data, target_data), batch_size=batch_size, shuffle=True, drop_last=True)
+            datat.TensorDataset(train_data, target_data), batch_size=batch_size, shuffle=shuffle, drop_last=True)
         val_dataloader = DataLoader(
-            datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=True, drop_last=True)
+            datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=shuffle, drop_last=True)
 
 
 

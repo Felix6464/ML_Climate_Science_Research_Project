@@ -116,7 +116,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         if prediction_type == "test" or prediction_type == "forecast":
             for t in range(target_len):
                 for i in range(self.num_layers):
-                    print("input shape: ", input.shape)
+                    #print("input shape: ", input.shape)
                     lstm_out, hidden = self.lstms[i](input, hidden)
                     input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
 

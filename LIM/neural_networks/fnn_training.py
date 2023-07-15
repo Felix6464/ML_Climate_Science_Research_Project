@@ -9,19 +9,25 @@ import os
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-#data = data[:, :10000]
+data = data[:, :10000]
 data = normalize_data(data)
-print("Data shape", data.shape)
 
 
 training_info_pth = "trained_models/training_info_ffn.txt"
 dt = "fnp"
+
+num_features = 30
+hidden_size = 128
+num_layers = 1
+num_epochs = 30
 input_window = 6
 output_window = 1
 batch_size = 64
-stride = 1
-num_features = 30
-one_hot_month = False
+training_prediction = "recursive"
+teacher_forcing_ratio = 0.4
+dynamic_tf = True
+shuffle = True
+loss_type = "MSE"
 
 
 if dt == "xr":
@@ -57,13 +63,11 @@ else:
     input_data, target_data = dataloader_seq2seq_feat(train_data,
                                                       input_window=input_window,
                                                       output_window=output_window,
-                                                      stride=stride,
                                                       num_features=num_features)
 
     input_data_val, target_data_val = dataloader_seq2seq_feat(val_data,
                                                           input_window=input_window,
                                                           output_window=output_window,
-                                                          stride=stride,
                                                           num_features=num_features)
 
 
@@ -72,9 +76,9 @@ else:
     train_data, target_data, val_data, val_target = numpy_to_torch(input_data, target_data, input_data_val, target_data_val)
     print(train_data.shape, target_data.shape, val_data.shape, val_target.shape)
     train_dataloader = DataLoader(
-        datat.TensorDataset(train_data, target_data), batch_size=batch_size, shuffle=True, drop_last=True)
+        datat.TensorDataset(train_data, target_data), batch_size=batch_size, shuffle=shuffle, drop_last=True)
     val_dataloader = DataLoader(
-        datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=True, drop_last=True)
+        datat.TensorDataset(val_data, val_target), batch_size=batch_size, shuffle=shuffle, drop_last=True)
 
 
 
@@ -85,19 +89,7 @@ lr = [0.0001]
 for l in lr:
 
     # Setting hyperparameters for training
-    num_features = 30
-    hidden_size = 128
-    num_layers = 1
     learning_rate = l
-    num_epochs = 30
-    input_window = input_window
-    output_window = output_window
-    batch_size = batch_size
-    training_prediction = "recursive"
-    teacher_forcing_ratio = 0.4
-    dynamic_tf = True
-    shuffle = True
-    loss_type = "L1"
 
     print("Start training")
 
@@ -112,8 +104,6 @@ for l in lr:
     loss, loss_test = model.train_model(train_dataloader,
                                         val_dataloader,
                                         num_epochs,
-                                        learning_rate,
-                                        loss_type,
                                         optimizer)
 
 
@@ -157,12 +147,12 @@ for l in lr:
                                       teacher_forcing_ratio,
                                       dynamic_tf,
                                       loss_type],
-                  "models": (rand_identifier, lr)}
+                  "models": (rand_identifier, learning_rate)}
 
-    if os.path.exists(training_info_pth):
-        # Load the existing dictionary from the file
-        temp = [load_dictionary(training_info_pth)]
-        temp.append(model_dict)
-        save_dictionary(str(temp), training_info_pth)
-    else:
-        save_dictionary(str(model_dict), training_info_pth)
+    # if os.path.exists(training_info_pth):
+    #     # Load the existing dictionary from the file
+    #     temp = [load_dictionary(training_info_pth)]
+    #     temp.append(model_dict)
+    #     save_dictionary(str(temp), training_info_pth)
+    # else:
+    #     save_dictionary(str(model_dict), training_info_pth)

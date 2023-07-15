@@ -121,6 +121,7 @@ class FeedforwardNetwork(nn.Module):
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, output_size)
+        self.tanh = nn.Tanh()
 
     def forward(self, x):
         x = self.fc1(x)
@@ -128,10 +129,11 @@ class FeedforwardNetwork(nn.Module):
         x = self.fc2(x)
         x = self.relu(x)
         x = self.fc3(x)
+        x = self.tanh(x)
         return x
 
 # Function for training a model
-    def train_model(self, train_dataloader, eval_dataloader, num_epochs, learning_rate, loss_type, optimizer):
+    def train_model(self, train_dataloader, eval_dataloader, num_epochs, optimizer):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
@@ -140,12 +142,7 @@ class FeedforwardNetwork(nn.Module):
         losses_test = np.full(num_epochs, np.nan)
 
         # Initialize optimizer and criterion
-        if loss_type == 'MSE':
-            criterion = nn.MSELoss()
-        elif loss_type == 'L1':
-            criterion = nn.L1Loss()
-        elif loss_type == 'RMSE':
-            criterion = RMSELoss()
+        criterion = nn.MSELoss()
 
 
         with trange(num_epochs) as tr:
@@ -155,19 +152,40 @@ class FeedforwardNetwork(nn.Module):
                 train_len = 0
                 eval_len = 0
 
+                self.eval()
+                # For validation no gradients are computed
+                with torch.no_grad():
+                    for input, target in eval_dataloader:
+                        eval_len += 1
+
+                        target = target[:, 0, :]
+                        input = input.view(input.shape[0], input.shape[2] * input.shape[1])
+
+                        # Forward pass
+                        pred = self.forward(input.to(device))
+
+                        # loss function
+                        loss = criterion(pred, target.to(device))
+                        batch_loss_test += loss.item()
+
+                    batch_loss_test /= eval_len
+                    losses_test[epoch] = batch_loss_test
+
+                self.train()
                 for input, target in train_dataloader:
                     train_len += 1
-                    self.train()
                     # Set gradients to zero in the beginning of each batch
-                    optimizer.zero_grad()
+
                     input = input.view(input.shape[0], input.shape[2] * input.shape[1])
-                    target = target.view(target.shape[2], target.shape[0] , target.shape[1] )
+                    target = target[:, 0, :]
+
+                    optimizer.zero_grad()
                     # Forward pass
                     #print(input.shape)
                     pred = self.forward(input.to(device))
 
                     # loss function
-                    loss = criterion(target.to(device), pred)
+                    loss = criterion(pred, target.to(device))
 
                     # backward prop and optimization
                     loss.backward()
@@ -178,36 +196,17 @@ class FeedforwardNetwork(nn.Module):
                 batch_loss /= train_len
                 losses[epoch] = batch_loss
 
-                self.eval()
-                # For validation no gradients are computed
-                with torch.no_grad():
-                    for input, target in eval_dataloader:
-                            eval_len += 1
-
-                            target = target.view(target.shape[2], target.shape[0] , target.shape[1] )
-                            input = input.view(input.shape[0], input.shape[2] * input.shape[1])
-                             # Forward pass
-                            pred = self.forward(input.to(device))
-
-                            # loss function
-                            loss = criterion(target.to(device), pred)
-                            batch_loss_test += loss.item()
-
-                    batch_loss_test /= eval_len
-                    losses_test[epoch] = batch_loss_test
-                    print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
+                print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
 
         return losses, losses_test
 
 
 
-    def evaluate_model(self, X_test, Y_test, target_len, batch_size, loss_type):
+    def evaluate_model(self, test_dataloader, target_len, batch_size, loss_type):
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
 
-        input_test = X_test.to(device)
-        target_test = Y_test.to(device)
 
         # Initialize optimizer and criterion
         if loss_type == 'MSE':
@@ -217,27 +216,20 @@ class FeedforwardNetwork(nn.Module):
         elif loss_type == 'RMSE':
             criterion = RMSELoss()
 
-        # Calculate the number of batch iterations
-        n_batches_test = input_test.shape[1] // batch_size
-        num_batch_test = n_batches_test
-        n_batches_test = list(range(n_batches_test))
-
-        random.shuffle(n_batches_test)
+        eval_len = 0
         batch_loss_test = 0.0
 
-        for batch_idx in n_batches_test:
+        for input, target in test_dataloader:
+            eval_len += 1
+            self.eval()
+
+            input_batch, target_batch = input, target
+            input = input_batch.to(device)
+            target = target_batch.to(device)
 
             with torch.no_grad():
-                self.eval()
-
-                input = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-                target = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
-                input = input.reshape(input.shape[1], input.shape[0] * input.shape[2])
 
                 for i in range(target_len):
-
-                    input = input.to(device)
-                    target = target.to(device)
 
                     Y_test_pred = self.forward(input.float())
                     Y_test_pred = Y_test_pred.to(device)
@@ -250,7 +242,7 @@ class FeedforwardNetwork(nn.Module):
             loss_test = criterion(Y_test_pred, target.float())
             batch_loss_test += loss_test.item()
 
-        batch_loss_test /= num_batch_test
+        batch_loss_test /= eval_len
 
 
         return batch_loss_test

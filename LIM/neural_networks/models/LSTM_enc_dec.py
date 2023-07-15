@@ -357,7 +357,6 @@ class LSTM_Sequence_Prediction(nn.Module):
             target_batch = target_batch.to(device)
 
             with torch.no_grad():
-                self.eval()
 
                 Y_test_pred = self.predict(input_batch.float(), target_len)
                 Y_test_pred = Y_test_pred.to(device)

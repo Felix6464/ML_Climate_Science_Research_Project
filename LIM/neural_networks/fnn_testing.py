@@ -2,6 +2,9 @@ import utilities as ut
 from models.FNN_model import *
 from plots import *
 from utilities import *
+import torch.utils.data as datat
+from torch.utils.data import DataLoader
+
 
 
 def main():
@@ -17,7 +20,7 @@ def main():
     data = data[:, index_train:]
 
     model_num = ["3910395fnp"]
-    id = "FNN"
+    id = ["FNN"]
 
     loss_list = []
 
@@ -47,16 +50,14 @@ def main():
             input_data_test, target_data_test = dataloader_seq2seq_feat(data,
                                                                         input_window=input_window,
                                                                         output_window=output_window,
-                                                                        stride=stride,
                                                                         num_features=num_features)
 
 
             # Specify the device to be used for testing
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-            # convert windowed data from np.array to PyTorch tensor
-            X_test = torch.from_numpy(input_data_test)
-            Y_test = torch.from_numpy(target_data_test)
+            test_dataloader = DataLoader(
+                datat.TensorDataset(input_data_test, target_data_test), batch_size=batch_size, shuffle=True, drop_last=True)
 
             # Initialize the model and load the saved state dict
             model = FeedforwardNetwork(input_size = num_features, hidden_size = hidden_size, output_size=num_features, input_window=input_window)
@@ -64,7 +65,7 @@ def main():
             model.to(device)
 
 
-            loss = model.evaluate_model(X_test, Y_test, output_window, batch_size, loss_type)
+            loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
             losses.append(loss)
             print(f"Test loss: {loss}")
 
