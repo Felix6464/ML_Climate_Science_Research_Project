@@ -9,7 +9,7 @@ import os
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-data = data[:, :10000]
+data = data[:, :80000]
 data = normalize_data(data)
 
 
@@ -19,7 +19,7 @@ dt = "fnp"
 num_features = 30
 hidden_size = 128
 num_layers = 1
-num_epochs = 30
+num_epochs = 75
 input_window = 6
 output_window = 1
 batch_size = 64
@@ -134,7 +134,7 @@ for l in lr:
     torch.save({'hyperparameters': parameters,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./trained_models/model_{rand_identifier}.pt')
+               f'./trained_models/ffn/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
     model_dict = {"training_params": [hidden_size,

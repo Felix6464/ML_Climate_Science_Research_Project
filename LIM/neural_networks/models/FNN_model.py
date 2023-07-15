@@ -226,6 +226,8 @@ class FeedforwardNetwork(nn.Module):
             input_batch, target_batch = input, target
             input = input_batch.to(device)
             target = target_batch.to(device)
+            target = target[:, 0, :]
+            input = input.view(input.shape[0], input.shape[2] * input.shape[1])
 
             with torch.no_grad():
 
@@ -234,6 +236,8 @@ class FeedforwardNetwork(nn.Module):
                     Y_test_pred = self.forward(input.float())
                     Y_test_pred = Y_test_pred.to(device)
 
+                    #print(Y_test_pred.shape)
+                    #print(input.shape)
                     input = torch.cat((input, Y_test_pred), dim=1)
                     input = input[:, 30:]
 
