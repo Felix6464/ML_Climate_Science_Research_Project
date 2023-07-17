@@ -149,15 +149,8 @@ class LSTM_Decoder(nn.Module):
         :                                   element in the sequence
         '''
 
+        decoder_input = decoder_input[:, 0, :].unsqueeze(1)
 
-
-        if training_prediction == 'recursive':
-            # Predict recursively
-            for t in range(target_len):
-                lstm_out, decoder_hidden = self.lstm(decoder_input, decoder_hidden)
-                decoder_output = self.linear(lstm_out.squeeze(0))
-                outputs[:, t, :] = decoder_output[:, 0, :]
-                decoder_input = decoder_output
 
         if training_prediction == 'teacher_forcing':
             # Use teacher forcing
@@ -182,7 +175,7 @@ class LSTM_Decoder(nn.Module):
                     outputs[:, t, :] = decoder_output
                     decoder_input = decoder_output
 
-        if training_prediction == 'mixed_teacher_forcing':
+        elif training_prediction == 'mixed_teacher_forcing':
             # Predict using mixed teacher forcing
             for t in range(target_len):
                 for i in range(self.num_layers):
@@ -199,6 +192,17 @@ class LSTM_Decoder(nn.Module):
                 # Predict recursively
                 else:
                     decoder_input = decoder_output
+
+        else:
+            # Predict recursively
+            for t in range(target_len):
+                #print(decoder_input[:, 0, :].unsqueeze(1).shape)
+                lstm_out, decoder_hidden = self.lstm(decoder_input, decoder_hidden)
+                #print(lstm_out.shape)
+                decoder_output = self.linear(lstm_out.squeeze(0))
+                #print(decoder_output.shape)
+                outputs[:, t, :] = decoder_output[:, 0, :]
+                decoder_input = decoder_output
 
 
         return outputs, decoder_hidden
@@ -285,19 +289,17 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test = 0.0
                 train_len = 0
                 eval_len = 0
-                print('Epoch: {}'.format(epoch + 1))
-                for input, target in eval_dataloader:
-                    print("x")
+
+                for input_eval, target_eval in eval_dataloader:
                     eval_len += 1
 
-                    input_eval, target_eval = input, target
                     input_eval = input_eval.to(device)
                     target_eval = target_eval.to(device)
 
                     with torch.no_grad():
                         self.eval()
 
-                        Y_test_pred = self.predict(input_eval, target_len)
+                        Y_test_pred = self.predict(input_eval, target_len, "recursive")
                         Y_test_pred = Y_test_pred.to(device)
                         loss_test = criterion(Y_test_pred, target_eval)
                         batch_loss_test += loss_test.item()
@@ -305,11 +307,10 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input, target in train_dataloader:
+                for input_batch, target_batch in train_dataloader:
                     train_len += 1
                     self.train()
 
-                    input_batch, target_batch = input, target
                     input_batch = input_batch.to(device)
                     target_batch = target_batch.to(device)
 
@@ -336,11 +337,11 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
 
-                    outputs, decoder_hidden = self.decoder(decoder_input,
-                                                           encoder_hidden,
-                                                           outputs,
-                                                           training_prediction,
-                                                           target_len)
+                    outputs, decoder_hidden = self.decoder(decoder_input=decoder_input,
+                                                           decoder_hidden=encoder_hidden,
+                                                           outputs=outputs,
+                                                           training_prediction=training_prediction,
+                                                           target_len=target_len)
 
 
                     loss = criterion(outputs, target_batch)
@@ -363,7 +364,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 # Update progress bar with current loss
                 tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
 
-            return losses, losses_test
+        return losses, losses_test
 
 
     def evaluate_model(self, test_dataloader, target_len, batch_size, loss_type):
@@ -423,12 +424,12 @@ class LSTM_Sequence_Prediction(nn.Module):
         encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
         encoder_output, encoder_hidden = self.encoder(input_tensor, encoder_hidden)
 
-
+        #print("input_tensor shape : {}".format(input_tensor.shape))
         # Initialize outputs tensor
         outputs = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2], requires_grad=True)
         outputs = outputs.to(device)
 
-        decoder_input = torch.zeros = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2], requires_grad=True)
+        decoder_input = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2], requires_grad=True)
         decoder_input = decoder_input.to(device)
 
         # decode input_tensor
