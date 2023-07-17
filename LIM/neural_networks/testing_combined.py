@@ -17,7 +17,7 @@ def main():
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
-    data = data[:, 100000:105000]
+    data = data[:, 100000:110000]
     print("Data shape : {}".format(data.shape))
 
     # original fit of LIM
@@ -31,7 +31,6 @@ def main():
     model_num_lstm = "4919340np"
     model_num_lstm_input = "8424079np"
     model_num_fnn = "762324fnp"
-    #id = [""]
 
     saved_model_lstm = torch.load(f"./trained_models/lstm/model_{model_num_lstm}.pt")
     saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{model_num_lstm_input}.pt")
@@ -41,21 +40,17 @@ def main():
     params = saved_model_lstm["hyperparameters"]
     hidden_size_l = params["hidden_size"]
     num_layers_l = params["num_layers"]
-    batch_size_l = params["batch_size"]
     loss_type_l = params["loss_type"]
 
     # Load the hyperparameters of the lstm_input_model
     params = saved_model_lstm_input["hyperparameters"]
     hidden_size_li = params["hidden_size"]
     num_layers_li = params["num_layers"]
-    batch_size_li = params["batch_size"]
     loss_type_li = params["loss_type"]
 
     # Load the hyperparameters of the fnn_model
     params = saved_model_fnn["hyperparameters"]
     hidden_size_f = params["hidden_size"]
-    num_layers_f = params["num_layers"]
-    batch_size_f = params["batch_size"]
     loss_type_f = params["loss_type"]
 
 

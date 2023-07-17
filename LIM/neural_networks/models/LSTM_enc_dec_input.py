@@ -94,7 +94,7 @@ class LSTM_Encoder(nn.Module):
             self.lstms.append(nn.LSTM(input_size, hidden_size, batch_first=True))
 
 
-    def forward(self, x_input):
+    def forward(self, x_input, encoder_hidden):
         """
         : param x_input:               input of shape (seq_len, # in batch, input_size)
         : return lstm_out, hidden:     lstm_out gives all the hidden states in the sequence;
@@ -103,8 +103,8 @@ class LSTM_Encoder(nn.Module):
         """
 
         for i in range(self.num_layers):
-            lstm_out, hidden = self.lstms[i](x_input)
-            x_input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
+            lstm_out, hidden = self.lstms[i](x_input, encoder_hidden)
+            #x_input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
         return lstm_out, hidden
 
     def init_hidden(self, batch_size):
@@ -136,7 +136,7 @@ class LSTM_Decoder(nn.Module):
         self.num_layers = num_layers
 
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
-                            num_layers=num_layers)
+                            num_layers=num_layers, batch_first=True)
 
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
@@ -148,6 +148,7 @@ class LSTM_Decoder(nn.Module):
         :                                   hidden gives the hidden state and cell state for the last
         :                                   element in the sequence
         '''
+
 
 
         if training_prediction == 'recursive':
@@ -284,8 +285,9 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test = 0.0
                 train_len = 0
                 eval_len = 0
-
+                print('Epoch: {}'.format(epoch + 1))
                 for input, target in eval_dataloader:
+                    print("x")
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -313,20 +315,24 @@ class LSTM_Sequence_Prediction(nn.Module):
 
 
                     # Initialize outputs tensor
-                    outputs = torch.zeros(batch_size, target_len, num_features)
-                    outputs = torch.tensor(outputs, requires_grad=True)
+                    outputs = torch.zeros(batch_size, target_len, num_features, requires_grad=True)
                     outputs = outputs.to(device)
+
+                    decoder_input = torch.zeros(batch_size, target_len, num_features, requires_grad=True)
+                    decoder_input = decoder_input.to(device)
+
 
                     # Zero the gradients
                     optimizer.zero_grad()
-                    torch.set_anomaly_enabled(True)
 
+                    encoder_hidden = self.encoder.init_hidden(batch_size)
+                    encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
                     # Encoder forward pass
-                    encoder_output, encoder_hidden = self.encoder(input_batch)
+                    encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
 
                     # Decoder input for the current batch
-                    decoder_input = input_batch[:, -1, :]
-                    decoder_input = decoder_input.view(batch_size, 1, self.input_size)
+                    #decoder_input = input_batch[:, -1, :]
+                    decoder_input[:, 0, :] = input_batch[:, -1, :]
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
 
@@ -412,16 +418,22 @@ class LSTM_Sequence_Prediction(nn.Module):
         # encode input_tensor
         if prediction_type == 'forecast':
             input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
-        encoder_output, encoder_hidden = self.encoder(input_tensor)
+
+        encoder_hidden = self.encoder.init_hidden(input_tensor.shape[0])
+        encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
+        encoder_output, encoder_hidden = self.encoder(input_tensor, encoder_hidden)
 
 
         # Initialize outputs tensor
-        outputs = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2])
+        outputs = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2], requires_grad=True)
         outputs = outputs.to(device)
 
+        decoder_input = torch.zeros = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2], requires_grad=True)
+        decoder_input = decoder_input.to(device)
+
         # decode input_tensor
-        decoder_input = input_tensor[:, -1, :]
-        decoder_input = decoder_input.view(decoder_input.shape[0], 1, self.input_size)
+        #decoder_input = input_tensor[:, -1, :]
+        decoder_input[:, 0, :] = input_tensor[:, -1, :]
 
         outputs, decoder_hidden = self.decoder(decoder_input,
                                                encoder_hidden,

@@ -1,5 +1,5 @@
 #from LIM.neural_networks.models.LSTM_enc_dec import *
-#from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
 #from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
