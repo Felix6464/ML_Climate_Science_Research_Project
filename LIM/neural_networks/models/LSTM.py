@@ -109,32 +109,19 @@ class LSTM_Sequence_Prediction(nn.Module):
     def forward(self, input, hidden, outputs=None, training_prediction=None, target_len=None, prediction_type=None):
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        input = input.view(input.shape[0], 1, input.shape[1]).to(device)
-        hidden = (hidden[0].to(device), hidden[1].to(device))
+        #input = input.view(input.shape[0], 1, input.shape[1]).to(device)
+        #hidden = (hidden[0].to(device), hidden[1].to(device))
+        input = input.unsqueeze(1)
 
 
-        if prediction_type == "test" or prediction_type == "forecast":
-            for t in range(target_len):
-                for i in range(self.num_layers):
-                    #print("input shape: ", input.shape)
-                    lstm_out, hidden = self.lstms[i](input, hidden)
-                    input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
+        for t in range(target_len):
+            for i in range(self.num_layers):
+                lstm_out, hidden = self.lstms[i](input, hidden)
+                input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
 
-                output = self.linear(lstm_out.squeeze(0))
-                outputs[:, t, :] = output[:, 0, :]
-                input = output
-            else:
-
-                if training_prediction == 'recursive':
-                    # Predict recursively
-                    for t in range(target_len):
-                        for i in range(self.num_layers):
-                            lstm_out, hidden = self.lstms[i](input, hidden)
-                            input = hidden[0].view(hidden[0].shape[1], 1,hidden[0].shape[2])
-
-                        output = self.linear(lstm_out.squeeze(0))
-                        outputs[:, t, :] = output[:, 0, :]
-                        input = output
+            output = self.linear(lstm_out.squeeze(0))
+            outputs[:, t, :] = output[:, 0, :]
+            input = output
 
 
         return outputs, hidden
@@ -206,25 +193,23 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input, target in train_dataloader:
+                for input_batch, target_batch in train_dataloader:
                     train_len += 1
                     self.train()
 
-                    input_batch, target_batch = input, target
                     input_batch = input_batch.to(device)
                     target_batch = target_batch.to(device)
 
 
                     # Initialize outputs tensor
-                    outputs = torch.zeros(batch_size, target_len, num_features)
-                    outputs = torch.tensor(outputs, requires_grad=True)
+                    outputs = torch.zeros(batch_size, target_len, num_features, requires_grad=True)
                     outputs = outputs.to(device)
 
                     # Zero the gradients
                     optimizer.zero_grad()
 
-                    hidden = (torch.zeros(self.num_layers, batch_size, self.hidden_size),
-                                   torch.zeros(self.num_layers, batch_size, self.hidden_size))
+                    hidden = (torch.zeros(self.num_layers, batch_size, self.hidden_size, requires_grad=True),
+                                   torch.zeros(self.num_layers, batch_size, self.hidden_size, requires_grad=True))
                     hidden = (hidden[0].to(device), hidden[1].to(device))
 
                     input = input_batch[:, -1, :]
@@ -322,6 +307,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
         hidden = (torch.zeros(self.num_layers, input.shape[0], self.hidden_size),
                   torch.zeros(self.num_layers, input.shape[0], self.hidden_size))
+        hidden = (hidden[0].to(device), hidden[1].to(device))
 
 
         outputs, decoder_hidden = self.forward(input,
