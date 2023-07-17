@@ -10,11 +10,12 @@ from torch.utils.data import DataLoader
 def main():
 
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    print("Data shape : {}".format(data.shape))
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
     data = data[:, :30000]
+    print("Data shape : {}".format(data.shape))
+
 
     index_train = int(0.9 * len(data[0, :]))
     data = data[:, index_train:]

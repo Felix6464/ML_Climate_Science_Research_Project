@@ -123,6 +123,8 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     for row in range(num_rows):
         # Train set
         x_train = train_data[:, :, row]
+        print("x_train.shape: ", x_train.shape)
+        print("train_data.shape: ", train_data.shape)
         y_train_pred = lstm_model.predict(x_train, target_len=output_window, prediction_type="forecast").cpu()
 
         ax[row, 0].plot(np.arange(0, input_window), train_data[:, 0, row].cpu(), 'k', linewidth=2, label='Input')
@@ -192,7 +194,7 @@ def plot_loss(loss_train, loss_eval, identifier, loss_type):
     plt.savefig(f'trained_models/loss_{loss_type}_combined_{identifier}.png', dpi=300)
     plt.show()
 
-def plot_loss_horizon_combined(loss_values_lstm, loss_values_lstm_inp, loss_values_ffn, identifier, loss_type):
+def plot_loss_horizon_combined(loss_values, identifier, loss_type):
     """
     Plot the loss values over epochs.
 
@@ -204,10 +206,11 @@ def plot_loss_horizon_combined(loss_values_lstm, loss_values_lstm_inp, loss_valu
     Returns:
         None
     """
-    epochs = range(1, len(loss_values_lstm) + 1)
-    plt.plot(epochs, loss_values_lstm, 'b-', marker='o', markersize=5, linewidth=1, label='Loss-LSTM')
-    plt.plot(epochs, loss_values_lstm_inp, 'g-', marker='o', markersize=5, linewidth=1, label='Loss-LSTM-Input')
-    plt.plot(epochs, loss_values_ffn, 'r-', marker='o', markersize=5, linewidth=1, label='Loss-FFN')
+    epochs = range(1, len(loss_values[0][0]) + 1)
+    for m in range(len(loss_values)):
+        loss = loss_values[m][0]
+        id = loss_values[m][1]
+        plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss-{id}')
     plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
     plt.xlabel('Prediction Horizon', fontsize=12)
     plt.ylabel('Test Loss', fontsize=12)
@@ -235,7 +238,7 @@ def plot_loss_horizon(loss_values, loss_type, id):
     for m in range(len(loss_values)):
         loss = loss_values[m][0]
         identifier = loss_values[m][1]
-        plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss{id[m]}')
+        plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss-{id[m]}')
     plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
     plt.xlabel('Prediction Horizon', fontsize=12)
     plt.ylabel('Test Loss', fontsize=12)

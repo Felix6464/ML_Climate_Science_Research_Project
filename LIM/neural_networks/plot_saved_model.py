@@ -5,11 +5,11 @@ from plots import *
 
 # Create the DataLoader for first principal component
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-model_num = "2906070np"
+model_num = "4919340np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
-data = data[:, :20000]
+data = data[:, :8000]
 
 
 saved_model = torch.load(f"./trained_models/lstm/model_{model_num}.pt")
