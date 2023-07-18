@@ -5,85 +5,6 @@ import seaborn as sns
 from numpy import random
 
 
-def plot_model_forecast(lstm_model, train_data, target_data, test_data, test_target, rand, num_rows=5):
-    """
-    Plot examples of the LSTM encoder-decoder evaluated on the training/test data.
-
-    Args:
-        lstm_model (LSTM): Trained LSTM encoder-decoder model.
-        train_data (np.array): Windowed training input data.
-        target_data (np.array): Windowed training target data.
-        test_data (np.array): Windowed test input data.
-        test_target (np.array): Windowed test target data.
-        rand: Identifier.
-        num_rows (int): Number of training/test examples to plot.
-
-    Returns:
-        None
-    """
-
-    train_data = train_data.detach().cpu()
-    target_data = target_data.detach().cpu()
-    test_data = test_data.detach().cpu()
-    test_target = test_target.detach().cpu()
-
-    print("Xtrain.shape: ", train_data.shape)
-    print("Ytrain.shape: ", test_target.shape)
-
-    # Input nd output window size
-    input_window = train_data.shape[0]
-    output_window = test_target.shape[0]
-
-    fig, ax = plt.subplots(num_rows, 2, figsize=(13, 15))
-
-    # Plot training/test predictions for a manually set index i (for better visualization)
-    i = 300
-
-    # Plot training/test predictions
-    for row in range(num_rows):
-        # Train set
-        i += 20
-        x_train = train_data[:, row+i, :]
-        y_train_pred = lstm_model.predict(x_train, target_len=output_window, prediction_type="forecast").cpu()
-
-        ax[row, 0].plot(np.arange(0, input_window), train_data[:, row+i, 0].cpu(), 'k', linewidth=2, label='Input')
-        ax[row, 0].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[train_data[-1, row+i, 0]], target_data[:, row+i, 0]]),
-                        color="blue", linewidth=2, label='Target')
-        ax[row, 0].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[train_data[-1, row+i, 0]], y_train_pred[:, 0, 0]]),
-                        color="red", linewidth=2, label='Prediction')
-        ax[row, 0].set_xlim([0, input_window + output_window - 1])
-        ax[row, 0].set_xlabel('$Timestep$')
-        ax[row, 0].set_ylabel('$Prediction Value$')
-
-        # Test set
-        x_test = test_data[:, row+i, :]
-        y_test_pred = lstm_model.predict(x_test, target_len=output_window, prediction_type="forecast").cpu()
-        ax[row, 1].plot(np.arange(0, input_window), test_data[:, row+i, 0], 'k', linewidth=2, label='Input')
-        ax[row, 1].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[test_data[-1, row+i, 0]], test_target[:, row+i, 0]]),
-                        color="blue", linewidth=2, label='Target')
-        ax[row, 1].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[test_data[-1, row+i, 0]], y_test_pred[:, 0, 0]]),
-                        color="red", linewidth=2, label='Prediction')
-        ax[row, 1].set_xlim([0, input_window + output_window - 1])
-        ax[row, 1].set_xlabel('$Timestep$')
-        ax[row, 1].set_ylabel('$Prediction Values$')
-
-        if row == 0:
-            ax[row, 0].set_title('Prediction on Train Data')
-            ax[row, 1].legend(bbox_to_anchor=(1, 1))
-            ax[row, 1].set_title('Prediction on Test Data')
-
-    plt.suptitle('LSTM Encoder-Decoder Predictions', x=0.445, y=1., fontsize=20)
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.95)
-    plt.savefig(f'trained_models/predictions_{rand}.png')
-    plt.show()
-    plt.close()
-
-    return
 
 def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_target, rand, num_rows=5):
     """
@@ -111,42 +32,41 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     print("Ytrain.shape: ", test_target.shape)
 
     # Input nd output window size
-    input_window = train_data.shape[0]
-    output_window = test_target.shape[0]
+    input_window = train_data.shape[1]
+    output_window = test_target.shape[1]
 
     fig, ax = plt.subplots(num_rows, 2, figsize=(13, 15))
 
     # Plot training/test predictions for a manually set index i (for better visualization)
-    i = 300
+    i = 0
 
     # Plot training/test predictions
     for row in range(num_rows):
         # Train set
-        x_train = train_data[:, :, row]
-        print("x_train.shape: ", x_train.shape)
-        print("train_data.shape: ", train_data.shape)
-        y_train_pred = lstm_model.predict(x_train, target_len=output_window, prediction_type="forecast").cpu()
+        i += 20
 
-        ax[row, 0].plot(np.arange(0, input_window), train_data[:, 0, row].cpu(), 'k', linewidth=2, label='Input')
+        x_train = train_data[row+i, :, :]
+        y_train_pred = lstm_model.predict(x_train, target_len=output_window, prediction_type="forecast").cpu()
+        ax[row, 0].plot(np.arange(0, input_window), train_data[row+i, :, 0].cpu(), 'k', linewidth=2, label='Input')
         ax[row, 0].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[train_data[-1, 0, row]], target_data[:, 0, row]]),
+                        np.concatenate([[train_data[row+i, -1, 0]], target_data[row+i, :, 0]]),
                         color="blue", linewidth=2, label='Target')
         ax[row, 0].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[train_data[-1, 0, row]], y_train_pred[:, 0, row]]),
+                        np.concatenate([[train_data[row+i, -1, 0]], y_train_pred[0, :, 0]]),
                         color="red", linewidth=2, label='Prediction')
         ax[row, 0].set_xlim([0, input_window + output_window - 1])
         ax[row, 0].set_xlabel('$Timestep$', fontsize=15)
         ax[row, 0].set_ylabel('$Prediction Value$', fontsize=15)
 
         # Test set
-        x_test = test_data[:, row, :]
+        x_test = test_data[row+i, :, :]
         y_test_pred = lstm_model.predict(x_test, target_len=output_window, prediction_type="forecast").cpu()
-        ax[row, 1].plot(np.arange(0, input_window), test_data[:, 0, row], 'k', linewidth=2, label='Input')
+        ax[row, 1].plot(np.arange(0, input_window), test_data[row+i, :, 0], 'k', linewidth=2, label='Input')
         ax[row, 1].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[test_data[-1, 0, row]], test_target[:, 0, row]]),
+                        np.concatenate([[test_data[row+i, -1, 0]], test_target[row+i, :, 0]]),
                         color="blue", linewidth=2, label='Target')
         ax[row, 1].plot(np.arange(input_window - 1, input_window + output_window),
-                        np.concatenate([[test_data[-1, 0, row]], y_test_pred[:, 0, row]]),
+                        np.concatenate([[test_data[row+i, -1, 0]], y_test_pred[0, :, 0]]),
                         color="red", linewidth=2, label='Prediction')
         ax[row, 1].set_xlim([0, input_window + output_window - 1])
         ax[row, 1].set_xlabel('$Timestep$', fontsize=15)

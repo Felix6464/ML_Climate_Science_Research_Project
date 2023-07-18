@@ -381,8 +381,8 @@ class LSTM_Sequence_Prediction(nn.Module):
         input_tensor = input_tensor.to(device)
 
         # encode input_tensor
-        #if prediction_type == 'forecast':
-        #    input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
+        if prediction_type == 'forecast':
+            input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
         encoder_output, encoder_hidden = self.encoder(input_tensor)
 
 
