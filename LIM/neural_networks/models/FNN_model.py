@@ -134,22 +134,22 @@ class FeedforwardNetwork(nn.Module):
         return x
 
 # Function for training a model
-    def train_model(self, train_dataloader, eval_dataloader, num_epochs, optimizer):
+    def train_model(self, train_dataloader, eval_dataloader, optimizer, config):
 
-        wandb.init(project=f"ML-Climate-SST-{model_label}")
+        wandb.init(project=f"ML-Climate-SST-{config['model_label']}")
 
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
 
-        losses = np.full(num_epochs, np.nan)
-        losses_test = np.full(num_epochs, np.nan)
+        losses = np.full(config["num_epochs"], np.nan)
+        losses_test = np.full(config["num_epochs"], np.nan)
 
         # Initialize optimizer and criterion
         criterion = nn.MSELoss()
 
 
-        with trange(num_epochs) as tr:
+        with trange(config["num_epochs"]) as tr:
             for epoch in tr:
                 batch_loss = 0.0
                 batch_loss_test = 0.0

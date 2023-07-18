@@ -307,8 +307,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         self.encoder = LSTMEncoder(input_size=input_size, hidden_size=hidden_size, seq_len=seq_len)
         self.decoder = LSTMDecoder(input_size=input_size, hidden_size=hidden_size, seq_len=seq_len)
 
-    def train_model(self, train_dataloader, eval_dataloader, n_epochs, input_len, target_len, batch_size,
-                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer, num_features):
+    def train_model(self, train_dataloader, eval_dataloader, optimizer, config):
         """
         Train an LSTM encoder-decoder model.
 
@@ -332,68 +331,82 @@ class LSTM_Sequence_Prediction(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-        wandb.init(project=f"ML-Climate-SST-{model_label}")
+        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config)
 
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(device)
 
         # Initialize array to store losses for each epoch
-        losses = np.full(n_epochs, np.nan)
-        losses_test = np.full(n_epochs, np.nan)
+        losses = np.full(config["num_epochs"], np.nan)
+        losses_test = np.full(config["num_epochs"], np.nan)
 
         # Initialize optimizer and criterion
-        if loss_type == 'MSE':
+        if config["loss_type"] == 'MSE':
             criterion = nn.MSELoss()
-        elif loss_type == 'L1':
+        elif config["loss_type"] == 'L1':
             criterion = nn.L1Loss()
-        elif loss_type == 'RMSE':
+        elif config["loss_type"] == 'RMSE':
             criterion = RMSELoss()
 
 
 
-        with trange(n_epochs) as tr:
+        with trange(config["num_epochs"]) as tr:
             for epoch in tr:
                 batch_loss = 0.0
                 batch_loss_test = 0.0
+                train_len = 0
+                eval_len = 0
 
-                for batch_idx, train_data in train_dataloader:
+                for input, target in eval_dataloader:
+                    eval_len += 1
+
+                    input_eval, target_eval = input, target
+                    input_eval = input_eval.to(device)
+                    target_eval = target_eval.to(device)
+
+                    with torch.no_grad():
+                        self.eval()
+
+                        Y_test_pred = self.predict(input_eval, config["output_window"])
+                        Y_test_pred = Y_test_pred.to(device)
+                        loss_test = criterion(Y_test_pred, target_eval)
+                        batch_loss_test += loss_test.item()
+
+                batch_loss_test /= eval_len
+                losses_test[epoch] = batch_loss_test
+
+                for input, target in train_dataloader:
+                    train_len += 1
                     self.train()
 
-                    input_batch, target_batch = batch_idx, train_data
+                    input_batch, target_batch = input, target
                     input_batch = input_batch.to(device)
                     target_batch = target_batch.to(device)
 
 
                     # Initialize outputs tensor
-                    outputs = torch.zeros(target_len, batch_size, num_features)
+                    outputs = torch.zeros(config["batch_size"], config["output_window"], config["num_features"])
                     outputs = outputs.to(device)
-
-                    # Initialize hidden state for the encoder
-                    encoder_hidden = self.encoder.init_hidden(batch_size)
-                    encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
 
                     # Zero the gradients
                     optimizer.zero_grad()
 
                     # Encoder forward pass
-                    input_batch = input_batch.view(input_batch.shape[2], input_batch.shape[0] , input_batch.shape[1] )
-                    encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
+                    encoder_output, encoder_hidden = self.encoder(input_batch)
 
                     # Decoder input for the current batch
-                    decoder_input = input_batch[-1, :, :]
-                    decoder_hidden = encoder_hidden
+                    decoder_input = input_batch[:, -1, :]
 
+                    decoder_hidden = encoder_hidden[0]
+                    decoder_hidden = decoder_hidden.view(config["batch_size"], 1, self.hidden_size)
 
                     outputs, decoder_hidden = self.decoder(decoder_input,
                                                            decoder_hidden,
                                                            outputs,
-                                                           target_batch,
-                                                           training_prediction,
-                                                           target_len,
-                                                           teacher_forcing_ratio)
+                                                           config["training_prediction"],
+                                                           config["output_window"])
 
-                    target_batch = target_batch.view(target_batch.shape[2], target_batch.shape[0] , target_batch.shape[1])
 
                     loss = criterion(outputs, target_batch)
                     batch_loss += loss.item()
@@ -403,37 +416,20 @@ class LSTM_Sequence_Prediction(nn.Module):
                     optimizer.step()
 
                 # Compute average loss for the epoch
+                batch_loss /= train_len
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
-                if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio -= 0.01
+                if config["dynamic_tf"] and config["teacher_forcing_ratio"] > 0:
+                    config["teacher_forcing_ratio"] -= 0.01
 
-                for batch_idx, val_data in eval_dataloader:
-
-                    input_eval = batch_idx
-                    target_eval = val_data
-
-                    input_eval = input_eval.view(input_eval.shape[2], input_eval.shape[0] , input_eval.shape[1] )
-                    input_eval = input_eval.to(device)
-                    target_eval = target_eval.to(device)
-                    target_eval = target_eval.view(target_eval.shape[2], target_eval.shape[0], target_eval.shape[1])
-
-                    with torch.no_grad():
-                        self.eval()
-
-                        Y_test_pred = self.predict(input_eval, target_len)
-                        Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred, target_eval)
-                        batch_loss_test += loss_test.item()
-
-                losses_test[epoch] = batch_loss_test
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
 
                 # Update progress bar with current loss
                 tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
                 wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
                 wandb.watch(criterion, log="all")
+
 
             return losses, losses_test
 

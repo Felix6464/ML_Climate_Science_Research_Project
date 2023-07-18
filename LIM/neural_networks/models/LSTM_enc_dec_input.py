@@ -245,8 +245,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
         self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
-    def train_model(self, train_dataloader, eval_dataloader, n_epochs, input_len, target_len, batch_size,
-                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer, num_features, model_label):
+    def train_model(self, train_dataloader, eval_dataloader,optimizer, config):
         """
         Train an LSTM encoder-decoder model.
 
@@ -270,42 +269,43 @@ class LSTM_Sequence_Prediction(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-        wandb.init(project=f"ML-Climate-SST-{model_label}")
+        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
 
         # Initialize array to store losses for each epoch
-        losses = np.full(n_epochs, np.nan)
-        losses_test = np.full(n_epochs, np.nan)
+        losses = np.full(config["num_epochs"], np.nan)
+        losses_test = np.full(config["num_epochs"], np.nan)
 
         # Initialize optimizer and criterion
-        if loss_type == 'MSE':
+        if config["loss_type"] == 'MSE':
             criterion = nn.MSELoss()
-        elif loss_type == 'L1':
+        elif config["loss_type"] == 'L1':
             criterion = nn.L1Loss()
-        elif loss_type == 'RMSE':
+        elif config["loss_type"] == 'RMSE':
             criterion = RMSELoss()
 
 
 
-        with trange(n_epochs) as tr:
+        with trange(config["num_epochs"]) as tr:
             for epoch in tr:
                 batch_loss = 0.0
                 batch_loss_test = 0.0
                 train_len = 0
                 eval_len = 0
 
-                for input_eval, target_eval in eval_dataloader:
+                for input, target in eval_dataloader:
                     eval_len += 1
 
+                    input_eval, target_eval = input, target
                     input_eval = input_eval.to(device)
                     target_eval = target_eval.to(device)
 
                     with torch.no_grad():
                         self.eval()
 
-                        Y_test_pred = self.predict(input_eval, target_len)
+                        Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
                         loss_test = criterion(Y_test_pred, target_eval)
                         batch_loss_test += loss_test.item()
@@ -322,14 +322,14 @@ class LSTM_Sequence_Prediction(nn.Module):
 
 
                     # Initialize outputs tensor
-                    outputs = torch.zeros(batch_size, target_len, num_features, requires_grad=True)
+                    outputs = torch.zeros(config["batch_size"], config["output_window"], config["num_features"])
                     outputs = outputs.to(device)
 
 
                     # Zero the gradients
                     optimizer.zero_grad()
 
-                    encoder_hidden = self.encoder.init_hidden(batch_size)
+                    encoder_hidden = self.encoder.init_hidden(config["batch_size"])
                     encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))
                     # Encoder forward pass
                     encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
@@ -340,11 +340,11 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
 
-                    outputs, decoder_hidden = self.decoder(decoder_input=decoder_input,
-                                                           decoder_hidden=encoder_hidden,
-                                                           outputs=outputs,
-                                                           training_prediction=training_prediction,
-                                                           target_len=target_len)
+                    outputs, decoder_hidden = self.decoder(decoder_input,
+                                                           encoder_hidden,
+                                                           outputs,
+                                                           config["training_prediction"],
+                                                           config["output_window"])
 
 
                     loss = criterion(outputs, target_batch)
@@ -359,8 +359,8 @@ class LSTM_Sequence_Prediction(nn.Module):
                 losses[epoch] = batch_loss
 
                 # Dynamic teacher forcing
-                if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio -= 0.01
+                if config["dynamic_tf"] and config["teacher_forcing_ratio"] > 0:
+                    config["teacher_forcing_ratio"] -= 0.01
 
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
 
