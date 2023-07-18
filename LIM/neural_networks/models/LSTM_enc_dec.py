@@ -43,6 +43,9 @@ class TimeSeriesLSTM(Dataset):
             'month': one_hot_month
         }
 
+        input = input.reshape(input.shape[1], input.shape[0])
+        target = target.reshape(target.shape[1], target.shape[0])
+
         return input, target, label
 
 
@@ -235,7 +238,8 @@ class LSTM_Sequence_Prediction(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config)
+        if config["wandb"] is True:
+            wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config, name=config['name'])
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
@@ -261,7 +265,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for input, target in eval_dataloader:
+                for input, target, l in eval_dataloader:
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -279,7 +283,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input, target in train_dataloader:
+                for input, target, l in train_dataloader:
                     train_len += 1
                     self.train()
 
@@ -330,8 +334,10 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                 # Update progress bar with current loss
                 tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
-                wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
-                wandb.watch(criterion, log="all")
+
+                if config["wandb"] is True:
+                    wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
+                    wandb.watch(criterion, log="all")
 
 
             return losses, losses_test

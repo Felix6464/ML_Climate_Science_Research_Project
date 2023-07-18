@@ -269,7 +269,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config)
+        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config, name=config['name'])
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)

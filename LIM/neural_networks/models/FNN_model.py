@@ -136,7 +136,8 @@ class FeedforwardNetwork(nn.Module):
 # Function for training a model
     def train_model(self, train_dataloader, eval_dataloader, optimizer, config):
 
-        wandb.init(project=f"ML-Climate-SST-{config['model_label']}")
+        if config["wandb"] is True:
+            wandb.init(project=f"ML-Climate-SST-{config['model_label']}", name=config['name'])
 
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -201,8 +202,10 @@ class FeedforwardNetwork(nn.Module):
                 losses[epoch] = batch_loss
 
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
-                wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
-                wandb.watch(criterion, log="all")
+
+                if config["wandb"] is True:
+                    wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
+                    wandb.watch(criterion, log="all")
 
         return losses, losses_test
 

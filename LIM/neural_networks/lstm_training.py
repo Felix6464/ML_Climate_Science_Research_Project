@@ -1,3 +1,5 @@
+import torch
+
 from LIM.neural_networks.models.LSTM_enc_dec import *
 #from LIM.neural_networks.models.LSTM_enc_dec_input import *
 #from LIM.neural_networks.models.LSTM import *
@@ -7,14 +9,14 @@ import torch.utils.data as datat
 import os
 
 
-#data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
-data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
+#data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 
-
-data = normalize_data(data)
-data = data[:, :800]
+data.data = normalize_data(torch.from_numpy(data.data)).numpy()
+#data = normalize_data(data)
+#data = data[:, :80000]
 training_info_pth = "trained_models/training_info_lstm.txt"
-dt = "np"
+dt = "xr"
 
 lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
 lr = [0.0001]
@@ -23,6 +25,8 @@ windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10
 windows = [(6,6)]
 
 config = {
+    "wandb": False,
+    "name": "enc_dec-1",
     "num_features": 30,
     "hidden_size": 128,
     "input_window": windows[0][0],
@@ -34,11 +38,10 @@ config = {
     "training_prediction": "recursive",
     "loss_type": "MSE",
     "model_label": "LSTM_ENC_DEC",
-    "teacher_forcing_ratio": 0.4,
+    "teacher_forcing_ratio": 0.6,
     "dynamic_tf": True,
     "shuffle": True,
     "one_hot_month": False,
-    "shuffle": True
 }
 
 for window in windows:
