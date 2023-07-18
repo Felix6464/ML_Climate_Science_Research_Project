@@ -1,5 +1,5 @@
-#from LIM.neural_networks.models.LSTM_enc_dec import *
-from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+#from LIM.neural_networks.models.LSTM_enc_dec_input import *
 #from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
@@ -17,15 +17,16 @@ training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
 num_features = 30
-hidden_size = 64
+hidden_size = 128
 num_layers = 1
 num_epochs = 10
 batch_size = 64
 training_prediction = "recursive"
+loss_type = "MSE"
+model_label = "LSTM_ENC_DEC"
 teacher_forcing_ratio = 0.4
 dynamic_tf = True
 shuffle = True
-loss_type = "MSE"
 one_hot_month = False
 shuffle = True
 
@@ -94,11 +95,8 @@ for window in windows:
 
         print("Start training")
 
-
-        # Specify the device to be used for training
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        #model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, seq_len=input_window)
         model = LSTM_Sequence_Prediction(input_size=num_features, hidden_size=hidden_size, num_layers=num_layers)
         model.to(device)
 
@@ -124,6 +122,7 @@ for window in windows:
         # Save the model and hyperparameters to a file
         rand_identifier = str(np.random.randint(0, 10000000)) + dt
         parameters = {
+            "model_label": model_label,
             'hidden_size': hidden_size,
             "num_layers": num_layers,
             'learning_rate': learning_rate,
@@ -148,7 +147,8 @@ for window in windows:
                    f'./trained_models/lstm/model_{rand_identifier}.pt')
         print(f"Model saved as model_{rand_identifier}.pt")
 
-        model_dict = {"training_params": [hidden_size,
+        model_dict = {"training_params": [model_label,
+                                          hidden_size,
                                           num_layers,
                                           num_epochs,
                                           window[0],
