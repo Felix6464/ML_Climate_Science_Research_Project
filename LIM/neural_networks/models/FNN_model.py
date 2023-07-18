@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 from tqdm import trange
 import random
+import wandb
 
 
 # Custom dataset class for sequence prediction
@@ -135,6 +136,9 @@ class FeedforwardNetwork(nn.Module):
 # Function for training a model
     def train_model(self, train_dataloader, eval_dataloader, num_epochs, optimizer):
 
+        wandb.init(project=f"ML-Climate-SST-{model_label}")
+
+
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
 
@@ -197,6 +201,8 @@ class FeedforwardNetwork(nn.Module):
                 losses[epoch] = batch_loss
 
                 print("Epoch: {0:02d}, Training Loss: {1:.4f}, Test Loss: {2:.4f}".format(epoch, batch_loss, batch_loss_test))
+                wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
+                wandb.watch(criterion, log="all")
 
         return losses, losses_test
 

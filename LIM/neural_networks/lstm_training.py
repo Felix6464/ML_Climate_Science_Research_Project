@@ -19,7 +19,7 @@ dt = "np"
 num_features = 30
 hidden_size = 128
 num_layers = 1
-num_epochs = 10
+num_epochs = 100
 batch_size = 64
 training_prediction = "recursive"
 loss_type = "MSE"
@@ -114,7 +114,8 @@ for window in windows:
                                             dynamic_tf,
                                             loss_type,
                                             optimizer,
-                                            num_features)
+                                            num_features,
+                                            model_label)
 
         num_of_weigths = (window[0]*hidden_size + hidden_size + hidden_size*window[1] + window[1])
         num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)

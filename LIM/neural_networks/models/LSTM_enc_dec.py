@@ -4,6 +4,7 @@ import random
 from tqdm import trange
 import torch
 import torch.nn as nn
+import wandb
 
 
 
@@ -211,7 +212,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
     def train_model(self, train_dataloader, eval_dataloader, n_epochs, input_len, target_len, batch_size,
-                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer, num_features):
+                    training_prediction, teacher_forcing_ratio, learning_rate, dynamic_tf, loss_type, optimizer, num_features, model_label):
         """
         Train an LSTM encoder-decoder model.
 
@@ -234,6 +235,8 @@ class LSTM_Sequence_Prediction(nn.Module):
         :param dynamic_tf:                dynamic teacher forcing reduces the amount of teacher forcing for each epoch
         :return losses:                   Array of loss function for each epoch
         """
+
+        wandb.init(project=f"ML-Climate-SST-{model_label}")
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
@@ -328,6 +331,9 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                 # Update progress bar with current loss
                 tr.set_postfix(loss_test="{0:.3f}".format(batch_loss_test))
+                wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
+                wandb.watch(criterion, log="all")
+
 
             return losses, losses_test
 
