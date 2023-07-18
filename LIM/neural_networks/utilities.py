@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import json
 import torch
+import os
 import pickle
 
 
@@ -333,10 +334,30 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
 
 
 
-def save_dictionary(dictionary, filename):
-    with open(filename, 'w') as file:
-        json.dump(dictionary, file)
 
-def load_dictionary(filename):
-    with open(filename, 'r') as file:
-        return eval(json.load(file))
+def save_dict(file_path, dictionary):
+    if os.path.exists(file_path):
+        # Load existing dictionary from file
+        with open(file_path, 'r') as file:
+            existing_dict = json.load(file)
+
+        # Merge dictionaries
+        merged_dict = dict_merge([existing_dict, dictionary])
+        data_to_write = merged_dict
+    else:
+        # Create a new dictionary with the given dictionary
+        data_to_write = dictionary
+
+    # Save dictionary to file
+    with open(file_path, 'w') as file:
+        json.dump(data_to_write, file)
+
+
+def dict_merge(dicts_list):
+    d = {**dicts_list[0]}
+    for entry in dicts_list[1:]:
+        for k, v in entry.items():
+            d[k] = ([d[k], v] if k in d and type(d[k]) != list
+                    else [*d[k], v] if k in d
+            else v)
+    return d

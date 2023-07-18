@@ -2,6 +2,7 @@ import utilities as ut
 import models.LSTM_enc_dec_input as lstm_input
 import models.LSTM_enc_dec as lstm
 import models.FNN_model as ffn
+import models.LSTM as lstm_base
 from plots import *
 from utilities import *
 import torch.utils.data as datat
@@ -28,21 +29,30 @@ def main():
     criterion = nn.MSELoss()
 
     # Specify the model number of the model to be tested
+    model_num_lstm_base = "7874149np"
     model_num_lstm = "4919340np"
     model_num_lstm_input = "8424079np"
     model_num_fnn = "762324fnp"
 
+    # Load the saved models
+    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{model_num_lstm_base}.pt")
     saved_model_lstm = torch.load(f"./trained_models/lstm/model_{model_num_lstm}.pt")
     saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{model_num_lstm_input}.pt")
     saved_model_fnn = torch.load(f"./trained_models/ffn/model_{model_num_fnn}.pt")
 
-    # Load the hyperparameters of the lstm_model
+    # Load the hyperparameters of the lstm_model base
+    params = saved_model_lstm_base["hyperparameters"]
+    hidden_size_lb = params["hidden_size"]
+    num_layers_lb = params["num_layers"]
+    loss_type_lb = params["loss_type"]
+
+    # Load the hyperparameters of the lstm_model_enc_dec
     params = saved_model_lstm["hyperparameters"]
     hidden_size_l = params["hidden_size"]
     num_layers_l = params["num_layers"]
     loss_type_l = params["loss_type"]
 
-    # Load the hyperparameters of the lstm_input_model
+    # Load the hyperparameters of the lstm_input_model_enc_dec
     params = saved_model_lstm_input["hyperparameters"]
     hidden_size_li = params["hidden_size"]
     num_layers_li = params["num_layers"]
@@ -62,6 +72,8 @@ def main():
 
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     loss_list = []
+
+    loss_lstm_base_list = []
     loss_lstm_list = []
     loss_lstm_inp_list = []
     loss_ffn_list = []
@@ -83,74 +95,71 @@ def main():
         # Specify the device to be used for testing
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=num_features,
+                                        hidden_size=hidden_size_lb,
+                                        num_layers=num_layers_lb)
 
-        # Initialize the model and load the saved state dict
         model_lstm = lstm.LSTM_Sequence_Prediction(input_size=num_features,
                                                    hidden_size=hidden_size_l,
                                                    num_layers=num_layers_l)
-        model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
-        model_lstm.to(device)
 
-        # Initialize the model and load the saved state dict
         model_lstm_inp = lstm.LSTM_Sequence_Prediction(input_size=num_features,
                                                              hidden_size=hidden_size_li,
                                                              num_layers=num_layers_li)
-        model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
-        model_lstm_inp.to(device)
 
-        # Initialize the model and load the saved state dict
         model_ffn = ffn.FeedforwardNetwork(input_size=num_features,
                                            hidden_size=hidden_size_f,
                                            output_size=num_features,
                                            input_window=input_window)
+
+
+
+        model_lstm_base.load_state_dict(saved_model_lstm_base["model_state_dict"])
+        model_lstm_base = model_lstm_base.to(device)
+        model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
+        model_lstm = model_lstm.to(device)
+        model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
+        model_lstm_inp = model_lstm_inp.to(device)
         model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
-        model_ffn.to(device)
+        model_ffn = model_ffn.to(device)
 
-
+        loss_lstm_base = model_lstm_base.evaluate_model(test_dataloader, output_window, batch_size, loss_type_lb)
         loss_lstm = model_lstm.evaluate_model(test_dataloader, output_window, batch_size, loss_type_li)
         loss_lstm_inp = model_lstm_inp.evaluate_model(test_dataloader, output_window, batch_size, loss_type_l)
         loss_ffn = model_ffn.evaluate_model(test_dataloader, output_window, batch_size, loss_type_f)
 
+        loss_lstm_base_list.append(loss_lstm_base)
         loss_lstm_inp_list.append(loss_lstm_inp)
         loss_lstm_list.append(loss_lstm)
         loss_ffn_list.append(loss_ffn)
-        #print(f"Test loss LSTM: {loss_lstm}")
-        #print(f"Test loss LSTM input: {loss_lstm_inp}")
-        #print(f"Test loss FFN: {loss_ffn}")
 
     data = data.numpy()
     for output_window in x:
-
         loss = 0
-        sample_size = len(data[1]) - output_window - 50
-        print("sample_size: {}".format(sample_size))
-        print("output_window: {}".format(output_window))
+        sample_size = len(data[1]) - output_window*2
+
         for datapoint in range(sample_size):
 
             # Forecast mean using LIM model
             lim_integration, times_ = model_org.noise_integration(data[:, datapoint ], timesteps=output_window, num_comp=30)
             lim_integration = lim_integration.T[:, 1:]
-            #print("lim_integration: {} + type : {}".format(lim_integration, type(lim_integration)))
-            #print("datapoint: {} + type : {}".format(data[:, datapoint:datapoint+output_window], type(data[:, datapoint:datapoint+output_window])))
 
             lim_integration = torch.from_numpy(lim_integration)
             target = torch.from_numpy(data[:, datapoint:datapoint+output_window])
             loss_ = criterion(lim_integration, target)
             loss += loss_.item()
 
-
-
         loss /= sample_size
         loss_lim_list.append(loss)
         #print("Loss of LIM for output window {} : {}".format(output_window, loss))
 
-
-    loss_list.append((loss_lstm_list, f"{'LSTM'}"))
-    loss_list.append((loss_lstm_inp_list, f"{'LSTM-Input'}"))
+    loss_list.append((loss_lstm_base_list, f"{'LSTM-Base'}"))
+    loss_list.append((loss_lstm_list, f"{'LSTM-Enc-Dec'}"))
+    loss_list.append((loss_lstm_inp_list, f"{'LSTM-Enc-Dec-Input'}"))
     loss_list.append((loss_ffn_list, f"{'FFN'}"))
     loss_list.append((loss_lim_list, f"{'LIM'}"))
 
-    model_nums = str([model_num_lstm, model_num_lstm_input, model_num_fnn, model_num_lim])
+    model_nums = str([model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_fnn, model_num_lim])
     plot_loss_horizon_combined(loss_list, model_nums, loss_type_l)
 
 

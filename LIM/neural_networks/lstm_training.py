@@ -1,6 +1,6 @@
 #from LIM.neural_networks.models.LSTM_enc_dec import *
-#from LIM.neural_networks.models.LSTM_enc_dec_input import *
-from LIM.neural_networks.models.LSTM import *
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
+#from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
 import torch.utils.data as datat
@@ -12,17 +12,17 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 
 
 data = normalize_data(data)
-data = data[:, :80000]
+data = data[:, :800]
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
 num_features = 30
-hidden_size = 128
+hidden_size = 64
 num_layers = 1
-num_epochs = 75
+num_epochs = 10
 batch_size = 64
 training_prediction = "recursive"
-teacher_forcing_ratio = 0.6
+teacher_forcing_ratio = 0.4
 dynamic_tf = True
 shuffle = True
 loss_type = "MSE"
@@ -160,10 +160,4 @@ for window in windows:
                                           loss_type],
                       "models": (rand_identifier, learning_rate)}
 
-    # if os.path.exists(training_info_pth):
-    #     # Load the existing dictionary from the file
-    #     temp = [load_dictionary(training_info_pth)]
-    #     temp.append(model_dict)
-    #     save_dictionary(str(temp), training_info_pth)
-    # else:
-    #     save_dictionary(str(model_dict), training_info_pth)
+    save_dict(training_info_pth, model_dict)
