@@ -11,32 +11,34 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
 data = normalize_data(data)
-data = data[:, :10000]
+data = data[:, :20000]
 print("Data shape : {}".format(data.data.shape))
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
 lr = [0.001, 0.0005, 0.0001, 0.00005]
-lr = [0.0005]
 
 windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12, 12)]
-windows = [(4,4)]
+windows = [(2,1), (6,1), (12, 1), (2,2), (6,2), (12,2), (12, 1), (12, 2), (12, 6)]
+
+model_label = "LSTM_ENC_DEC"
+name = "enc_dec-"
 
 config = {
-    "wandb": False,
-    "name": "enc_dec-TEST_",
+    "wandb": True,
+    "name": name,
     "num_features": 30,
     "hidden_size": 256,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 30,
+    "num_epochs": 50,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
     "loss_type": "MSE",
-    "model_label": "LSTM_ENC_DEC",
+    "model_label": model_label,
     "teacher_forcing_ratio": 0.6,
     "dynamic_tf": True,
     "shuffle": True,
@@ -47,7 +49,7 @@ for window in windows:
 
     config["input_window"] = window[0]
     config["output_window"] = window[1]
-    config["name"] = config["name"] + str(window[0]) + "-" + str(window[1])
+    config["name"] = name + str(window[0]) + "-" + str(window[1])
 
     if dt == "xr":
 
@@ -133,13 +135,14 @@ for window in windows:
         config["loss_train"] = loss.tolist()
         config["loss_test"] = loss_test.tolist()
         config["identifier"] = rand_identifier
-        config["name"] = f'LSTM_enc_dec_{rand_identifier}'
+        config["name"] = config["name"] + "-" + rand_identifier
 
         torch.save({'hyperparameters': config,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict()},
                    f'trained_models/lstm/model_{rand_identifier}.pt')
         print(f"Model saved as model_{rand_identifier}.pt")
+        wandb.finish()
 
         model_dict = {"training_params": config,
                       "models": (rand_identifier, l)}

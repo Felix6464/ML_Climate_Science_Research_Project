@@ -40,7 +40,8 @@ def main():
     #             ("7068253np", "10-10"),
     #             ("3454772np", "11-11"),
     #             ("3706716np", "12-12")]
-    model_num = [("6752170np", "new_dataloader")]
+    model_num = [("1471187np", "loss_last+train"),
+                 ("9517919np", "loss_last"),]
     id = ["test_dataloader"]
 
     loss_list = []
