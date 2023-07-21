@@ -282,7 +282,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                         Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred, target_eval)
+                        loss_test = criterion(Y_test_pred[:, -1, :], target_eval[:, -1, :])
                         batch_loss_test += loss_test.item()
 
                 batch_loss_test /= eval_len
