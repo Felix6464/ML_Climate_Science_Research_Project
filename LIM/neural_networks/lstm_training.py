@@ -12,6 +12,7 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
 data = normalize_data(data)
 data = data[:, :10000]
+print("Data shape : {}".format(data.data.shape))
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
@@ -23,7 +24,7 @@ windows = [(4,4)]
 
 config = {
     "wandb": False,
-    "name": "enc_dec-TEST",
+    "name": "enc_dec-TEST_",
     "num_features": 30,
     "hidden_size": 256,
     "input_window": windows[0][0],
@@ -58,17 +59,18 @@ for window in windows:
         val_data = data[: :, idx_train: idx_train+idx_val]
         test_data = data[: :, idx_train+idx_val: ]
 
-        train_datan = train_data.data
-        val_datan = val_data.data
-        test_datan = test_data.data
 
         train_dataset = TimeSeriesLSTM(train_data, window[0], window[1])
-        train_dataloader = DataLoader(
-            train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
+        train_dataloader = DataLoader(train_dataset,
+                                      batch_size=config["batch_size"],
+                                      shuffle=config["shuffle"],
+                                      drop_last=True)
 
         val_dataset = TimeSeriesLSTM(val_data, window[0], window[1])
-        val_dataloader = DataLoader(
-            val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
+        val_dataloader = DataLoader(val_dataset,
+                                    batch_size=config["batch_size"],
+                                    shuffle=config["shuffle"],
+                                    drop_last=True)
 
     else:
 
@@ -79,32 +81,24 @@ for window in windows:
         val_data = data[:, idx_train: idx_train+idx_val]
         test_data = data[:, idx_train+idx_val: ]
 
-        # input_data, target_data = dataloader_seq2seq_feat(train_data,
-        #                                                   input_window=window[0],
-        #                                                   output_window=window[1],
-        #                                                   num_features=config["num_features"])
-        #
-        # input_data_val, target_data_val = dataloader_seq2seq_feat(val_data,
-        #                                                           input_window=window[0],
-        #                                                           output_window=window[1],
-        #                                                           num_features=config["num_features"])
 
-        # # convert windowed data from np.array to PyTorch tensor
-        # train_data, target_data, val_data, val_target = numpy_to_torch(input_data, target_data, input_data_val, target_data_val)
-        # train_dataloader = DataLoader(
-        #     datat.TensorDataset(train_data, target_data), batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
-        # val_dataloader = DataLoader(
-        #     datat.TensorDataset(val_data, val_target), batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
+        train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0),
+                                         window[0],
+                                         window[1])
 
+        train_dataloader = DataLoader(train_dataset,
+                                      batch_size=config["batch_size"],
+                                      shuffle=config["shuffle"],
+                                      drop_last=True)
 
-        train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0), window[0], window[1])
-        train_dataloader = DataLoader(
-        train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
+        val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0),
+                                       window[0],
+                                       window[1])
 
-        val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0), window[0], window[1])
-        val_dataloader = DataLoader(
-        val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
-
+        val_dataloader = DataLoader(val_dataset,
+                                    batch_size=config["batch_size"],
+                                    shuffle=config["shuffle"],
+                                    drop_last=True)
 
 
     for l in lr:
@@ -112,16 +106,16 @@ for window in windows:
         config["learning_rate"] = l
         config["name"] = config["name"] + "-" + str(l)
 
-        learning_rate = l
-
         print("Start training")
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        model = LSTM_Sequence_Prediction(input_size=config["num_features"], hidden_size=config["hidden_size"], num_layers=config["num_layers"])
+        model = LSTM_Sequence_Prediction(input_size=config["num_features"],
+                                         hidden_size=config["hidden_size"],
+                                         num_layers=config["num_layers"])
         model.to(device)
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr=l)
 
         loss, loss_test = model.train_model(train_dataloader,
                                             val_dataloader,
@@ -148,6 +142,6 @@ for window in windows:
         print(f"Model saved as model_{rand_identifier}.pt")
 
         model_dict = {"training_params": config,
-                      "models": (rand_identifier, learning_rate)}
+                      "models": (rand_identifier, l)}
 
     save_dict(training_info_pth, model_dict)

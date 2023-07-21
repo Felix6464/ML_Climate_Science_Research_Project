@@ -214,10 +214,8 @@ class LIM:
             np.random.seed(seed)
 
         state_start = np.array(input_data)
-        out_arr = np.zeros((timesteps + 1, state_start.shape[0]))
+        out_arr = np.zeros((timesteps, state_start.shape[0]))
 
-
-        out_arr[0] = state_start
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
         t_decay = min(t_decay) -1e-5
@@ -242,7 +240,7 @@ class LIM:
             state_mid = (state_start + state_new) / 2
             state_start = state_new
 
-            out_arr[t + 1] = state_mid
+            out_arr[t] = state_mid
             times = np.arange(timesteps + 1) * t_decay
 
         return out_arr, times

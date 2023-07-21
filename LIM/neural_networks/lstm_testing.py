@@ -69,36 +69,27 @@ def main():
 
             for output_window in x:
 
-                # test_dataset = TimeSeriesLSTMnp(data, input_window, output_window)
-                # test_dataloader = DataLoader(
-                #     test_dataset, batch_size=batch_size, shuffle=shuffle, drop_last=True)
+                test_dataset = TimeSeriesLSTMnp(data.permute(1, 0),
+                                               input_window,
+                                               output_window)
 
-                input_data_test, target_data_test = dataloader_seq2seq_feat(data,
-                                                                            input_window=input_window,
-                                                                            output_window=output_window,
-                                                                            num_features=num_features)
-                input_data_test = torch.from_numpy(input_data_test)
-                target_data_test = torch.from_numpy(target_data_test)
-                test_dataloader = DataLoader(
-                    datat.TensorDataset(input_data_test, target_data_test), batch_size=batch_size, shuffle=shuffle, drop_last=True)
-
-
+                test_dataloader = DataLoader(test_dataset,
+                                            batch_size=batch_size,
+                                            shuffle=shuffle,
+                                            drop_last=True)
 
                 # Specify the device to be used for testing
                 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 
                 # Initialize the model and load the saved state dict
                 model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
                 model.load_state_dict(saved_model["model_state_dict"])
                 model.to(device)
 
-
                 loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
                 print("Output window: {}, Loss: {}".format(output_window, loss))
                 losses.append(loss)
 
-            print(f"Test loss: {losses[-1]}")
             loss_list.append((losses, model_num[m][1]))
         loss_list_eval.append((loss_eval, model_num[m][1]))
 

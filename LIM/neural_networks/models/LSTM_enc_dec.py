@@ -65,8 +65,8 @@ class TimeSeriesLSTMnp(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        input = self.arr[idx:idx+self.input_window, :].float()
-        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :].float()
+        input = self.arr[idx:idx+self.input_window, :30].float()
+        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :30].float()
 
         label = "not set"
 

@@ -65,6 +65,23 @@ def crop_xarray(lon_start, lon_end, input_data):
 
     return cropped_dataset
 
+def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
+
+    if data_type == "xr":
+        #Concatenate along a specified dimension
+        concatenated_xarray = xr.concat([pc_ts, pc_zos], dim='eof')
+
+        #Save the xarray to a NetCDF file
+        concatenated_xarray.to_netcdf(filename + '.nc')
+    else:
+        ts_20 = torch.from_numpy(pc_ts.data)
+        zos_10 = torch.from_numpy(pc_zos.data)
+        print(ts_20.shape)
+        print(zos_10.shape)
+        data = torch.cat((ts_20, zos_10), dim=0)
+        print(data.shape)
+        torch.save(data, filename + '.pt')
+
 def map2flatten(x_map: xr.Dataset) -> list:
     """Flatten dataset/dataarray and remove NaNs.
     Args:
