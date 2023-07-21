@@ -8,11 +8,10 @@ from torch.utils.data import DataLoader
 def main():
 
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    print("Data shape : {}".format(data.shape))
-
     # Calculate the mean and standard deviation along the feature dimension
     data = normalize_data(data)
     data = data[:, 120000:130000]
+    print("Data shape : {}".format(data.shape))
 
     horizon = True
 
@@ -41,7 +40,8 @@ def main():
     #             ("7068253np", "10-10"),
     #             ("3454772np", "11-11"),
     #             ("3706716np", "12-12")]
-    id = ["combined_test_horizon__"]
+    model_num = [("6752170np", "new_dataloader")]
+    id = ["test_dataloader"]
 
     loss_list = []
     loss_list_eval = []
@@ -95,6 +95,7 @@ def main():
 
 
                 loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
+                print("Output window: {}, Loss: {}".format(output_window, loss))
                 losses.append(loss)
 
             print(f"Test loss: {losses[-1]}")

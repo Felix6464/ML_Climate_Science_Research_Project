@@ -5,7 +5,6 @@ from tqdm import trange
 import torch
 import torch.nn as nn
 import wandb
-import xbatcher
 
 
 
@@ -58,7 +57,7 @@ class TimeSeriesLSTMnp(Dataset):
         self.arr = arr
 
     def __len__(self):
-        return len(self.arr[0, :]) - self.input_window - self.output_window - 2
+        return len(self.arr[:, 0]) - self.input_window - self.output_window - 2
 
 
     def __getitem__(self, idx):
@@ -66,11 +65,8 @@ class TimeSeriesLSTMnp(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
-
-        input = input.reshape(input.shape[1], input.shape[0])
-        target = target.reshape(target.shape[1], target.shape[0])
+        input = self.arr[idx:idx+self.input_window, :].float()
+        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :].float()
 
         label = "not set"
 
@@ -270,7 +266,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for input, target in eval_dataloader:
+                for input, target, l in eval_dataloader:
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -288,7 +284,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input, target in train_dataloader:
+                for input, target, l in train_dataloader:
                     train_len += 1
                     self.train()
 
