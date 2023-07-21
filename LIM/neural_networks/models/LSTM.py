@@ -7,7 +7,6 @@ import torch.nn as nn
 import wandb
 
 
-
 class TimeSeriesLSTM(Dataset):
     def __init__(self, xarr, input_window, output_window, one_hot_month=False):
         self.input_window = input_window
@@ -43,6 +42,9 @@ class TimeSeriesLSTM(Dataset):
             'month': one_hot_month
         }
 
+        input = input.reshape(input.shape[1], input.shape[0])
+        target = target.reshape(target.shape[1], target.shape[0])
+
         return input, target, label
 
 
@@ -57,12 +59,15 @@ class TimeSeriesLSTMnp(Dataset):
 
 
     def __getitem__(self, idx):
-        #if torch.is_tensor(idx):
-        #    idx = idx.tolist()
+
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
 
         input = self.arr[:, idx:idx+self.input_window].float()
         target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
 
+        input = input.reshape(input.shape[1], input.shape[0])
+        target = target.reshape(target.shape[1], target.shape[0])
 
         label = "not set"
 

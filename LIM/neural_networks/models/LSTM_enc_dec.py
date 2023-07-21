@@ -5,6 +5,8 @@ from tqdm import trange
 import torch
 import torch.nn as nn
 import wandb
+import xbatcher
+
 
 
 
@@ -60,12 +62,15 @@ class TimeSeriesLSTMnp(Dataset):
 
 
     def __getitem__(self, idx):
-        #if torch.is_tensor(idx):
-        #    idx = idx.tolist()
+
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
 
         input = self.arr[:, idx:idx+self.input_window].float()
         target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
 
+        input = input.reshape(input.shape[1], input.shape[0])
+        target = target.reshape(target.shape[1], target.shape[0])
 
         label = "not set"
 
@@ -265,7 +270,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for input, target, l in eval_dataloader:
+                for input, target in eval_dataloader:
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -283,7 +288,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input, target, l in train_dataloader:
+                for input, target in train_dataloader:
                     train_len += 1
                     self.train()
 
@@ -338,6 +343,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 if config["wandb"] is True:
                     wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
                     wandb.watch(criterion, log="all")
+                    #wandb.finish()
 
 
             return losses, losses_test

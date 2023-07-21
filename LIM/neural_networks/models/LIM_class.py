@@ -161,8 +161,6 @@ class LIM:
                 Dimensions (n_components, n_time).
         """
 
-        print('Performing LIM forecast for tau values: '
-                    + str(forecast_leads))
 
         num_forecast_times = len(forecast_leads)
 

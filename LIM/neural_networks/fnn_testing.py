@@ -1,6 +1,6 @@
 import utilities as ut
 from models.FNN_model import *
-from plots import *
+from LIM.neural_networks.plots.plots import *
 from utilities import *
 import torch.utils.data as datat
 from torch.utils.data import DataLoader

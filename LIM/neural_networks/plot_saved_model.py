@@ -1,15 +1,15 @@
 from models.LSTM_enc_dec import *
 from utilities import *
-from plots import *
+from LIM.neural_networks.plots.plots import *
 
 
 # Create the DataLoader for first principal component
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-model_num = "4919340np"
+model_num = "3116990np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
-data = data[:, :5000]
+data = data[:, 70000:85000]
 num_features = 30
 
 
@@ -21,7 +21,7 @@ num_layers = params["num_layers"]
 input_window = params["input_window"]
 output_window = params["output_window"]
 loss_type = params["loss_type"]
-loss = params["loss"]
+loss = params["loss_train"]
 loss_test = params["loss_test"]
 
 
