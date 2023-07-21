@@ -251,8 +251,8 @@ class FeedforwardNetwork(nn.Module):
                     input = input[:, 30:]
 
 
-
-            loss_test = criterion(Y_test_pred, target.float())
+            last_idx = (target_len-1) * input_batch.shape[2]
+            loss_test = criterion(Y_test_pred[:, last_idx:], target[:, last_idx:].float())
             batch_loss_test += loss_test.item()
 
         batch_loss_test /= eval_len

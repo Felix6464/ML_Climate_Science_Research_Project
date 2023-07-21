@@ -343,8 +343,8 @@ class LSTM_Sequence_Prediction(nn.Module):
                 if config["wandb"] is True:
                     wandb.log({"Epoch": epoch, "Training Loss": batch_loss, "Test Loss": batch_loss_test})
                     wandb.watch(criterion, log="all")
-                    #wandb.finish()
 
+            if config["wandb"] is True: wandb.finish()
 
             return losses, losses_test
 
@@ -377,7 +377,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                 Y_test_pred = self.predict(input_batch.float(), target_len)
                 Y_test_pred = Y_test_pred.to(device)
-                loss_test = criterion(Y_test_pred, target_batch)
+                loss_test = criterion(Y_test_pred[:, -1, :], target_batch[:, -1, :])
                 batch_loss_test += loss_test.item()
 
         batch_loss_test /= eval_len

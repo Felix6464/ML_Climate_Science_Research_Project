@@ -20,7 +20,7 @@ def main():
 
     # Calculate the mean and standard deviation along the feature dimension
     data = ut.normalize_data(data)
-    data = data[:, :10000]
+    data = data[:, :5000]
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested
@@ -81,62 +81,62 @@ def main():
     loss_lim_list = []
 
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-    x = [1, 2, 3, 4]
+    #x = [1, 2, 3, 4]
 
-    # for output_window in x:
-    #     print("Output window : {}".format(output_window))
-    #
-    #     input_data_test, target_data_test = dataloader_seq2seq_feat(data,
-    #                                                                 input_window=input_window,
-    #                                                                 output_window=output_window,
-    #                                                                 num_features=num_features)
-    #
-    #     input_data_test = torch.from_numpy(input_data_test)
-    #     target_data_test = torch.from_numpy(target_data_test)
-    #     test_dataloader = DataLoader(
-    #         datat.TensorDataset(input_data_test, target_data_test), batch_size=batch_size, shuffle=shuffle, drop_last=True)
-    #
-    #
-    #     # Specify the device to be used for testing
-    #     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #
-    #     model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=num_features,
-    #                                     hidden_size=hidden_size_lb,
-    #                                     num_layers=num_layers_lb)
-    #
-    #     model_lstm = lstm.LSTM_Sequence_Prediction(input_size=num_features,
-    #                                                hidden_size=hidden_size_l,
-    #                                                num_layers=num_layers_l)
-    #
-    #     model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=num_features,
-    #                                                          hidden_size=hidden_size_li,
-    #                                                          num_layers=num_layers_li)
-    #
-    #     model_ffn = ffn.FeedforwardNetwork(input_size=num_features,
-    #                                        hidden_size=hidden_size_f,
-    #                                        output_size=num_features,
-    #                                        input_window=input_window)
-    #
-    #
-    #
-    #     model_lstm_base.load_state_dict(saved_model_lstm_base["model_state_dict"])
-    #     model_lstm_base = model_lstm_base.to(device)
-    #     model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
-    #     model_lstm = model_lstm.to(device)
-    #     model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
-    #     model_lstm_inp = model_lstm_inp.to(device)
-    #     model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
-    #     model_ffn = model_ffn.to(device)
-    #
-    #     loss_lstm_base = model_lstm_base.evaluate_model(test_dataloader, output_window, batch_size, loss_type_lb)
-    #     loss_lstm = model_lstm.evaluate_model(test_dataloader, output_window, batch_size, loss_type_li)
-    #     loss_lstm_inp = model_lstm_inp.evaluate_model(test_dataloader, output_window, batch_size, loss_type_l)
-    #     loss_ffn = model_ffn.evaluate_model(test_dataloader, output_window, batch_size, loss_type_f)
-    #
-    #     loss_lstm_base_list.append(loss_lstm_base)
-    #     loss_lstm_inp_list.append(loss_lstm_inp)
-    #     loss_lstm_list.append(loss_lstm)
-    #     loss_ffn_list.append(loss_ffn)
+    for output_window in x:
+        print("Output window : {}".format(output_window))
+
+        input_data_test, target_data_test = dataloader_seq2seq_feat(data,
+                                                                    input_window=input_window,
+                                                                    output_window=output_window,
+                                                                    num_features=num_features)
+
+        input_data_test = torch.from_numpy(input_data_test)
+        target_data_test = torch.from_numpy(target_data_test)
+        test_dataloader = DataLoader(
+            datat.TensorDataset(input_data_test, target_data_test), batch_size=batch_size, shuffle=shuffle, drop_last=True)
+
+
+        # Specify the device to be used for testing
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=num_features,
+                                        hidden_size=hidden_size_lb,
+                                        num_layers=num_layers_lb)
+
+        model_lstm = lstm.LSTM_Sequence_Prediction(input_size=num_features,
+                                                   hidden_size=hidden_size_l,
+                                                   num_layers=num_layers_l)
+
+        model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=num_features,
+                                                             hidden_size=hidden_size_li,
+                                                             num_layers=num_layers_li)
+
+        model_ffn = ffn.FeedforwardNetwork(input_size=num_features,
+                                           hidden_size=hidden_size_f,
+                                           output_size=num_features,
+                                           input_window=input_window)
+
+
+
+        model_lstm_base.load_state_dict(saved_model_lstm_base["model_state_dict"])
+        model_lstm_base = model_lstm_base.to(device)
+        model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
+        model_lstm = model_lstm.to(device)
+        model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
+        model_lstm_inp = model_lstm_inp.to(device)
+        model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
+        model_ffn = model_ffn.to(device)
+
+        loss_lstm_base = model_lstm_base.evaluate_model(test_dataloader, output_window, batch_size, loss_type_lb)
+        loss_lstm = model_lstm.evaluate_model(test_dataloader, output_window, batch_size, loss_type_li)
+        loss_lstm_inp = model_lstm_inp.evaluate_model(test_dataloader, output_window, batch_size, loss_type_l)
+        loss_ffn = model_ffn.evaluate_model(test_dataloader, output_window, batch_size, loss_type_f)
+
+        loss_lstm_base_list.append(loss_lstm_base)
+        loss_lstm_inp_list.append(loss_lstm_inp)
+        loss_lstm_list.append(loss_lstm)
+        loss_ffn_list.append(loss_ffn)
 
     data = data.numpy()
     for output_window in x:
@@ -144,13 +144,18 @@ def main():
         sample_size = len(data[1]) - output_window*2
 
         forecast_output = model_org.forecast(data, [output_window])
-        forecast_output = torch.from_numpy(forecast_output[0, : , :])
+        forecast_output = torch.from_numpy(forecast_output[0, :, :])
+
+        print(forecast_output[0, 5:10])
+        print(torch.from_numpy(data[0, 5:10]))
 
         for datapoint in range(sample_size):
 
-            target = torch.from_numpy(data[:, datapoint:datapoint+output_window])
-            loss_ = criterion(forecast_output[:, datapoint:datapoint+output_window], target)
-            loss += loss_.item()
+            target = torch.from_numpy(data[:, datapoint+output_window-1])
+            loss_ = criterion(forecast_output[:, datapoint], target)
+
+        #loss_ = criterion(forecast_output[:, output_window:], torch.from_numpy(data[: , :-output_window]))
+        loss += loss_.item()
 
         loss /= sample_size
         loss_lim_list.append(loss)
@@ -164,9 +169,6 @@ def main():
 
     model_nums = str([model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_fnn, model_num_lim])
     plot_loss_horizon_combined(loss_list, model_nums, loss_type_l)
-
-    # Forecasting
-
 
 
 

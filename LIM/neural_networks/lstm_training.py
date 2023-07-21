@@ -15,11 +15,10 @@ data = data[:, :20000]
 training_info_pth = "trained_models/training_info_lstm.txt"
 dt = "np"
 
-lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
-lr = [0.0005]
+lr = [0.001, 0.0005, 0.0001, 0.00005]
 
 windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12, 12)]
-windows = [(2,2)]
+windows = [(2,1), (2,2), (2,6), (6,1), (6,2), (6,6), (12,1), (12,2), (12,6)]
 
 config = {
     "wandb": True,
@@ -30,7 +29,7 @@ config = {
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 250,
+    "num_epochs": 100,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
