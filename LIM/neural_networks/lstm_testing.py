@@ -11,7 +11,7 @@ def main():
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
     # Calculate the mean and standard deviation along the feature dimension
     data = data[:, 100000:110000]
-    data = normalize_tensor_individual(data)
+    #data = normalize_tensor_individual(data)
     print("Data shape : {}".format(data.shape))
 
     horizon = True
@@ -64,36 +64,39 @@ def main():
     #              ("1986764np", "5-5-permute"),
     #              ("2971989np", "5-5-last-only")]
     # model num 2-6
-    #model_num = [("5415593np", "0.00005"),
-                    #("3417220np", "0.00005_40k"),
-                    #("1967542np", "0.00005_60k"),
+    model_num = [("5415593np", "0.00005_overfit"),
+                    ("3417220np", "0.00005_40k"),
+                    ("1967542np", "0.00005_60k"),
                     #("7668078np", "0.00005_80k"),
                     #("3737982np", "0.00005_80k_drop"),
-                    #("1319995np", "0.00008_control"),
-                    #("5797841np", "0.00008_64_batch"),
+                    ("1319995np", "0.00008_control"),
+                    ("5797841np", "0.00008_80k")]
                     #("9037420np", "0.00005_norm"),
                     #("4386809np", "0.00005_norm_wod")]
-    model_num = [("8389752np", "12-6"),
-                 ("9177999np", "12-1"),
-                 ("3212319np", "12-2"),
-                 ("8364180np", "6-2"),
-                 ("6113293np", "2-2"),
-                 ("3650104np", "6-1"),
-                 ("9670756np", "2-1"),
-                 ("8221899np", "6-6"),
-                 ("9388021np", "2-6")]
-    #model num min max normalized
-    model_num = [("3237362np", "12-6"),
-                 ("8153371np", "12-1"),
-                 ("1745540np", "12-2"),
-                 ("6881306np", "6-2"),
-                 ("8541071np", "2-2"),
-                 ("9933030np", "6-1"),
-                 ("7583665np", "2-1"),
-                 ("9383950np", "6-6"),
-                 ("6486631np", "2-6")]
+    # model_num = [("8389752np", "12-6"),
+    #              ("9177999np", "12-1"),
+    #              ("3212319np", "12-2"),
+    #              ("8364180np", "6-2"),
+    #              ("6113293np", "2-2"),
+    #              ("3650104np", "6-1"),
+    #              ("9670756np", "2-1"),
+    #              ("8221899np", "6-6"),
+    #              ("9388021np", "2-6")]
+    # #model num min max normalized
+    # model_num = [("3237362np", "12-6"),
+    #              ("8153371np", "12-1"),
+    #              ("1745540np", "12-2"),
+    #              ("6881306np", "6-2"),
+    #              ("8541071np", "2-2"),
+    #              ("9933030np", "6-1"),
+    #              ("7583665np", "2-1"),
+    #              ("9383950np", "6-6"),
+    #              ("6486631np", "2-6")]
+    model_num = [("1209901np", "2-6"),
+                 ("9122071np", "2-6_drop"),]
+    #model_num = [("5755771np", "2-6_gru")]
 
-    id = ["horizon_eval_test15"]
+    id = ["horizon_eval_test21"]
 
     loss_list = []
     loss_list_eval = []
@@ -103,14 +106,17 @@ def main():
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
+        print("Hyperparameters of model {} : {}".format(model_num[m][0], params))
 
         hidden_size = params["hidden_size"]
+        #dropout = params["dropout"]
         num_layers = params["num_layers"]
         input_window = params["input_window"]
         batch_size = params["batch_size"]
         loss_type = params["loss_type"]
         shuffle = params["shuffle"]
         loss_eval = params["loss_test"]
+
 
         if horizon is True:
 
@@ -134,7 +140,8 @@ def main():
                 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
                 # Initialize the model and load the saved state dict
-                model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
+                model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers,
+                                                 dropout=0)
                 model.load_state_dict(saved_model["model_state_dict"])
                 model.to(device)
 

@@ -140,7 +140,7 @@ def plot_loss_combined(loss_values, identifier, loss_type):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=12)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'trained_models/loss_{loss_type}_combined_{identifier}.png', dpi=300)
+    plt.savefig(f'trained_models/loss_{loss_type}_combined_{identifier}_.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon_combined(loss_values, identifier, loss_type):

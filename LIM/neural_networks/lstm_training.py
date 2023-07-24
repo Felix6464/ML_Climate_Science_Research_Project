@@ -3,23 +3,18 @@ from LIM.neural_networks.models.LSTM_enc_dec import *
 #from LIM.neural_networks.models.LSTM import *
 from torch.utils.data import DataLoader
 from utilities import *
-import torch.utils.data as datat
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
-
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
 
 data = data[:, :80000]
 #data = normalize_tensor_individual(data)
 
-print("Data shape : {}".format(data.data.shape))
 training_info_pth = "trained_models/training_info_lstm.txt"
-dt = "np"
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
-lr = [0.00005]
 lr = [0.0001]
 
 windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12, 12)]
@@ -27,18 +22,20 @@ windows = [(2,1), (2,2), (2,6), (6,1), (6,2), (6,6), (12,2), (12, 1), (12, 6)]
 windows = [(2,6)]
 
 model_label = "ENC-DEC-INPUT-2-6"
-name = "lstm-enc-dec"
+name = "lstm-enc-dec_drop_64h_2l"
+dt = "np"
 
 config = {
     "wandb": True,
     "name": name,
     "num_features": 30,
-    "hidden_size": 128,
+    "hidden_size": 64,
+    "dropout": 0.25,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
-    "num_layers": 1,
-    "num_epochs": 50,
+    "num_layers": 2,
+    "num_epochs": 100,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
@@ -119,7 +116,8 @@ for window in windows:
 
         model = LSTM_Sequence_Prediction(input_size=config["num_features"],
                                          hidden_size=config["hidden_size"],
-                                         num_layers=config["num_layers"])
+                                         num_layers=config["num_layers"],
+                                         dropout=config["dropout"])
         model.to(device)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=l)

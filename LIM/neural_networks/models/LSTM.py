@@ -87,7 +87,7 @@ class LSTM_Sequence_Prediction(nn.Module):
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size, num_layers):
+    def __init__(self, input_size, hidden_size, num_layers, dropout):
 
         '''
         : param input_size:     the number of expected features in the input X
@@ -105,17 +105,13 @@ class LSTM_Sequence_Prediction(nn.Module):
 
         for i in range(num_layers):
             input_size = input_size if i == 0 else hidden_size
-            self.lstms.append(nn.LSTM(input_size, hidden_size, batch_first=True))
+            self.lstms.append(nn.LSTM(input_size, hidden_size, batch_first=True, dropout=dropout))
 
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
     def forward(self, input, hidden, outputs=None, training_prediction=None, target_len=None, prediction_type=None):
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        #input = input.view(input.shape[0], 1, input.shape[1]).to(device)
-        #hidden = (hidden[0].to(device), hidden[1].to(device))
         input = input.unsqueeze(1)
-
 
         for t in range(target_len):
             for i in range(self.num_layers):
@@ -191,7 +187,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                         Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred[:, -1, :], target_eval[:, -1, :])
+                        loss_test = criterion(Y_test_pred, target_eval)
                         batch_loss_test += loss_test.item()
 
                 batch_loss_test /= eval_len

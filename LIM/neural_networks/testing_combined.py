@@ -16,10 +16,10 @@ import torch.nn as nn
 def main():
 
     data_lim = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    #data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
+    data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
 
     # Calculate the mean and standard deviation along the feature dimension
-    data = data_lim[:, 80000:90000]
+    #data = data_lim[:, 80000:90000]
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested
