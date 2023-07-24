@@ -55,7 +55,7 @@ class TimeSeriesLSTMnp(Dataset):
         self.arr = arr
 
     def __len__(self):
-        return len(self.arr[0, :]) - self.input_window - self.output_window - 2
+        return len(self.arr[:, 0]) - self.input_window - self.output_window - 2
 
 
     def __getitem__(self, idx):
@@ -63,11 +63,8 @@ class TimeSeriesLSTMnp(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
-
-        input = input.reshape(input.shape[1], input.shape[0])
-        target = target.reshape(target.shape[1], target.shape[0])
+        input = self.arr[idx:idx+self.input_window, :].float()
+        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :].float()
 
         label = "not set"
 
@@ -182,7 +179,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for input, target in eval_dataloader:
+                for input, target, l in eval_dataloader:
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -194,13 +191,13 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                         Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred, target_eval)
+                        loss_test = criterion(Y_test_pred[:, -1, :], target_eval[:, -1, :])
                         batch_loss_test += loss_test.item()
 
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input_batch, target_batch in train_dataloader:
+                for input_batch, target_batch, l in train_dataloader:
                     train_len += 1
                     self.train()
 
@@ -221,7 +218,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     input = input_batch[:, -1, :]
 
-                    outputs, decoder_hidden = self.decoder(input,
+                    outputs, decoder_hidden = self.forward(input,
                                                            hidden,
                                                            outputs,
                                                            config["training_prediction"],
@@ -271,7 +268,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         eval_len = 0
         batch_loss_test = 0.0
 
-        for input, target in test_dataloader:
+        for input, target, l in test_dataloader:
             eval_len += 1
             self.eval()
 

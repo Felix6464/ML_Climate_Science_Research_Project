@@ -378,3 +378,22 @@ def dict_merge(dicts_list):
                     else [*d[k], v] if k in d
             else v)
     return d
+
+
+def normalize_tensor_individual(tensor):
+
+    normalized_tensor = torch.zeros(tensor.size())
+
+    for feature_idx in range(len(tensor[:,0])):
+        # Calculate the minimum and maximum values of the tensor
+        min_value = torch.min(tensor[feature_idx, :])
+        max_value = torch.max(tensor[feature_idx, :])
+
+        # Check if the tensor has a single value (min and max are the same) to avoid division by zero
+        if min_value == max_value:
+            return tensor.new_ones(tensor.size())
+
+        # Normalize the tensor using min-max normalization formula
+        normalized_tensor[feature_idx, :] = (tensor[feature_idx, :] - min_value) / (max_value - min_value)
+
+    return normalized_tensor

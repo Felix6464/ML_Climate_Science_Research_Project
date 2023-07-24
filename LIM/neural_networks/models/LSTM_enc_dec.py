@@ -65,8 +65,8 @@ class TimeSeriesLSTMnp(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        input = self.arr[idx:idx+self.input_window, :30].float()
-        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :30].float()
+        input = self.arr[idx:idx+self.input_window, :].float()
+        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :].float()
 
         label = "not set"
 
@@ -109,7 +109,7 @@ class LSTM_Encoder(nn.Module):
 
         for i in range(self.num_layers):
             lstm_out, hidden = self.lstms[i](x_input)
-            x_input = hidden[0].view(hidden[0].shape[1], 1, hidden[0].shape[2])
+            x_input = hidden[0].permute(1, 0, 2)
         return lstm_out, hidden
 
     def init_hidden(self, batch_size):
@@ -157,26 +157,14 @@ class LSTM_Decoder(nn.Module):
         :                                   element in the sequence
         '''
 
-        if prediction_type == "test" or prediction_type == "forecast":
-            for t in range(target_len):
-                for i in range(self.num_layers):
-                    lstm_out, decoder_hidden = self.lstms[i](decoder_input)
-                    decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
+        # Predict recursively
+        for t in range(target_len):
+            for i in range(self.num_layers):
+                lstm_out, decoder_hidden = self.lstms[i](decoder_input)
+                decoder_input = decoder_hidden[0].permute(1, 0, 2)
 
-                decoder_output = self.linear(lstm_out.squeeze(0))
-                outputs[:, t, :] = decoder_output[:, 0, :]
-        else:
-
-            if training_prediction == 'recursive':
-                # Predict recursively
-                for t in range(target_len):
-                    for i in range(self.num_layers):
-                        lstm_out, decoder_hidden = self.lstms[i](decoder_input)
-                        decoder_input = decoder_hidden[0].view(decoder_hidden[0].shape[1], 1, decoder_hidden[0].shape[2])
-
-                    decoder_output = self.linear(lstm_out.squeeze(0))
-                    outputs[:, t, :] = decoder_output[:, 0, :]
-
+            decoder_output = self.linear(lstm_out.squeeze(0))
+            outputs[:, t, :] = decoder_output[:, 0, :]
 
         return outputs, decoder_hidden
 
@@ -278,7 +266,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                         Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred, target_eval)
+                        loss_test = criterion(Y_test_pred[:, -1, :], target_eval[:, -1, :])
                         batch_loss_test += loss_test.item()
 
                 batch_loss_test /= eval_len
@@ -306,8 +294,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                     # Decoder input for the current batch
                     decoder_input = input_batch[:, -1, :]
 
-                    decoder_hidden = encoder_hidden[0]
-                    decoder_hidden = decoder_hidden.view(config["batch_size"], 1, self.hidden_size)
+                    decoder_hidden = encoder_hidden[0].permute(1, 0, 2)
 
                     outputs, decoder_hidden = self.decoder(decoder_input,
                                                            decoder_hidden,
@@ -391,11 +378,10 @@ class LSTM_Sequence_Prediction(nn.Module):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         input_tensor = input_tensor.to(device)
 
-        # encode input_tensor
         if prediction_type == 'forecast':
-            input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
-        encoder_output, encoder_hidden = self.encoder(input_tensor)
+            input_tensor = input_tensor.unsqueeze(1)
 
+        encoder_output, encoder_hidden = self.encoder(input_tensor)
 
         # Initialize outputs tensor
         outputs = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2])
@@ -404,8 +390,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         # decode input_tensor
         decoder_input = input_tensor[:, -1, :]
 
-        decoder_hidden = encoder_hidden[0]
-        decoder_hidden = decoder_hidden.view(input_tensor.shape[0], 1, self.hidden_size)
+        decoder_hidden = encoder_hidden[0].permute(1, 0, 2)
 
         outputs, decoder_hidden = self.decoder(decoder_input,
                                                decoder_hidden,

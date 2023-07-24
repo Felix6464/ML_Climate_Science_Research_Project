@@ -53,16 +53,16 @@ class TimeSeriesLSTMnp(Dataset):
         self.arr = arr
 
     def __len__(self):
-        return len(self.arr[0, :]) - self.input_window - self.output_window - 2
+        return len(self.arr[:, 0]) - self.input_window - self.output_window - 2
 
 
     def __getitem__(self, idx):
-        #if torch.is_tensor(idx):
-        #    idx = idx.tolist()
 
-        input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
 
+        input = self.arr[idx:idx+self.input_window, :].float()
+        target = self.arr[idx+self.input_window:idx+self.input_window  + self.output_window, :].float()
 
         label = "not set"
 
@@ -295,7 +295,7 @@ class LSTM_Sequence_Prediction(nn.Module):
                 train_len = 0
                 eval_len = 0
 
-                for input, target in eval_dataloader:
+                for input, target, l in eval_dataloader:
                     eval_len += 1
 
                     input_eval, target_eval = input, target
@@ -307,13 +307,13 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                         Y_test_pred = self.predict(input_eval, config["output_window"])
                         Y_test_pred = Y_test_pred.to(device)
-                        loss_test = criterion(Y_test_pred, target_eval)
+                        loss_test = criterion(Y_test_pred[:, -1, :], target_eval[:, -1, :])
                         batch_loss_test += loss_test.item()
 
                 batch_loss_test /= eval_len
                 losses_test[epoch] = batch_loss_test
 
-                for input_batch, target_batch in train_dataloader:
+                for input_batch, target_batch, l in train_dataloader:
                     train_len += 1
                     self.train()
 
@@ -335,16 +335,15 @@ class LSTM_Sequence_Prediction(nn.Module):
                     encoder_output, encoder_hidden = self.encoder(input_batch, encoder_hidden)
 
                     # Decoder input for the current batch
-                    #decoder_input = input_batch[:, -1, :]
                     decoder_input = input_batch[:, -1, :]
 
                     #print("decoder_hidden shape : {}".format(decoder_hidden.shape))
 
                     outputs, decoder_hidden = self.decoder(decoder_input,
                                                            encoder_hidden,
-                                                           outputs,
-                                                           config["training_prediction"],
-                                                           config["output_window"])
+                                                           outputs=outputs,
+                                                           training_prediction=config["training_prediction"],
+                                                           target_len=config["output_window"])
 
 
                     loss = criterion(outputs, target_batch)
@@ -388,7 +387,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         eval_len = 0
         batch_loss_test = 0.0
 
-        for input, target in test_dataloader:
+        for input, target, l in test_dataloader:
             eval_len += 1
             self.eval()
 
@@ -423,7 +422,7 @@ class LSTM_Sequence_Prediction(nn.Module):
 
         # encode input_tensor
         if prediction_type == 'forecast':
-            input_tensor = input_tensor.unsqueeze(1)  # add in batch size of 1
+            input_tensor = input_tensor.unsqueeze(0)  # add in batch size of 1
 
         encoder_hidden = self.encoder.init_hidden(input_tensor.shape[0])
         encoder_hidden = (encoder_hidden[0].to(device), encoder_hidden[1].to(device))

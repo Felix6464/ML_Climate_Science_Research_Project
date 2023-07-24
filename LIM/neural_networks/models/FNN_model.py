@@ -54,15 +54,15 @@ class TimeSeriesnp(Dataset):
         self.arr = arr
 
     def __len__(self):
-        return len(self.arr[0, :]) - self.input_window - 1
+        return len(self.arr[:, 0]) - self.input_window - 1
 
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window].float()
+        input = self.arr[idx:idx+self.input_window, :].float()
+        target = self.arr[idx+self.input_window, :].float()
 
         label = "not set"
 
@@ -160,10 +160,9 @@ class FeedforwardNetwork(nn.Module):
                 self.eval()
                 # For validation no gradients are computed
                 with torch.no_grad():
-                    for input, target in eval_dataloader:
+                    for input, target, l in eval_dataloader:
                         eval_len += 1
 
-                        target = target[:, 0, :]
                         input = input.view(input.shape[0], input.shape[2] * input.shape[1])
 
                         # Forward pass
@@ -177,16 +176,16 @@ class FeedforwardNetwork(nn.Module):
                     losses_test[epoch] = batch_loss_test
 
                 self.train()
-                for input, target in train_dataloader:
+                for input, target, l in train_dataloader:
                     train_len += 1
                     # Set gradients to zero in the beginning of each batch
 
-                    input = input.view(input.shape[0], input.shape[2] * input.shape[1])
-                    target = target[:, 0, :]
 
                     optimizer.zero_grad()
                     # Forward pass
                     #print(input.shape)
+                    input = input.view(input.shape[0], input.shape[2] * input.shape[1])
+
                     pred = self.forward(input.to(device))
 
                     # loss function
@@ -228,14 +227,13 @@ class FeedforwardNetwork(nn.Module):
         eval_len = 0
         batch_loss_test = 0.0
 
-        for input, target in test_dataloader:
+        for input, target, l in test_dataloader:
             eval_len += 1
             self.eval()
 
             input_batch, target_batch = input, target
             input = input_batch.to(device)
             target = target_batch.to(device)
-            target = target[:, 0, :]
             input = input.view(input.shape[0], input.shape[2] * input.shape[1])
 
             with torch.no_grad():
@@ -250,9 +248,11 @@ class FeedforwardNetwork(nn.Module):
                     input = torch.cat((input, Y_test_pred), dim=1)
                     input = input[:, 30:]
 
-
+            #print(input.shape)
+            #print(target.shape)
+            #print(Y_test_pred.shape)
             last_idx = (target_len-1) * input_batch.shape[2]
-            loss_test = criterion(Y_test_pred[:, last_idx:], target[:, last_idx:].float())
+            loss_test = criterion(Y_test_pred[:, last_idx:], target[:, -1, last_idx:].float())
             batch_loss_test += loss_test.item()
 
         batch_loss_test /= eval_len

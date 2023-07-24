@@ -5,11 +5,12 @@ from LIM.neural_networks.plots.plots import *
 
 # Create the DataLoader for first principal component
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-model_num = "3116990np"
+model_num = "9388021np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
 data = data[:, 70000:85000]
+#data = normalize_tensor_individual(data)
 num_features = 30
 
 

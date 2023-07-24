@@ -7,10 +7,11 @@ from torch.utils.data import DataLoader
 
 def main():
 
+    #data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
     # Calculate the mean and standard deviation along the feature dimension
-    data = normalize_data(data)
-    data = data[:, 120000:130000]
+    data = data[:, 100000:110000]
+    data = normalize_tensor_individual(data)
     print("Data shape : {}".format(data.shape))
 
     horizon = True
@@ -40,9 +41,59 @@ def main():
     #             ("7068253np", "10-10"),
     #             ("3454772np", "11-11"),
     #             ("3706716np", "12-12")]
-    model_num = [("1471187np", "loss_last+train"),
-                 ("9517919np", "loss_last"),]
-    id = ["test_dataloader"]
+    # model_num_normal = [("1188459np", "12-6"),
+    #              ("7565543np", "12-1"),
+    #              ("1947308np", "12-2"),
+    #              ("4545275np", "6-2"),
+    #              ("7435437np", "2-2"),
+    #              ("9868835np", "6-1"),
+    #              ("3215220np", "2-1"),
+    #              ("8613331np", "6-6"),
+    #              ("4868397np", "2-6")]
+    # model_num_last_predic = [("9944518np", "12-6"),
+    #              ("3048114np", "12-1"),
+    #              ("6077068np", "12-2"),
+    #              ("6054232np", "6-2"),
+    #              ("8427209np", "2-2"),
+    #              ("4990867np", "6-1"),
+    #              ("7061039np", "2-1"),
+    #              ("206371np", "6-6"),
+    #              ("2987414np", "2-6")]
+    # model_num = [("5723466np", "5-5"),
+    #              ("6807315np", "5-5-last"),
+    #              ("1986764np", "5-5-permute"),
+    #              ("2971989np", "5-5-last-only")]
+    # model num 2-6
+    #model_num = [("5415593np", "0.00005"),
+                    #("3417220np", "0.00005_40k"),
+                    #("1967542np", "0.00005_60k"),
+                    #("7668078np", "0.00005_80k"),
+                    #("3737982np", "0.00005_80k_drop"),
+                    #("1319995np", "0.00008_control"),
+                    #("5797841np", "0.00008_64_batch"),
+                    #("9037420np", "0.00005_norm"),
+                    #("4386809np", "0.00005_norm_wod")]
+    model_num = [("8389752np", "12-6"),
+                 ("9177999np", "12-1"),
+                 ("3212319np", "12-2"),
+                 ("8364180np", "6-2"),
+                 ("6113293np", "2-2"),
+                 ("3650104np", "6-1"),
+                 ("9670756np", "2-1"),
+                 ("8221899np", "6-6"),
+                 ("9388021np", "2-6")]
+    #model num min max normalized
+    model_num = [("3237362np", "12-6"),
+                 ("8153371np", "12-1"),
+                 ("1745540np", "12-2"),
+                 ("6881306np", "6-2"),
+                 ("8541071np", "2-2"),
+                 ("9933030np", "6-1"),
+                 ("7583665np", "2-1"),
+                 ("9383950np", "6-6"),
+                 ("6486631np", "2-6")]
+
+    id = ["horizon_eval_test15"]
 
     loss_list = []
     loss_list_eval = []
