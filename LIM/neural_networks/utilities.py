@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 import json
 import torch
 import os
-import pickle
+import models.GRU_enc_dec as gru
+import models.LSTM_enc_dec_input as lstm_input
+import models.LSTM_enc_dec as lstm
+import models.FNN_model as ffn
+import models.LSTM as lstm_base
 
 
 def reshape_xarray(input_data):
@@ -397,3 +401,66 @@ def normalize_tensor_individual(tensor):
         normalized_tensor[feature_idx, :] = (tensor[feature_idx, :] - min_value) / (max_value - min_value)
 
     return normalized_tensor
+
+def load_models_testing(num_lb, num_l, num_li, num_g, num_f):
+
+    # Load the saved models
+    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{num_lb}.pt")
+    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{num_l}.pt")
+    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{num_li}.pt")
+    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{num_f}.pt")
+    saved_model_gru = torch.load(f"./trained_models/lstm/model_{num_g}.pt")
+
+    # Load the hyperparameters of the lstm_model base
+    params_lb = saved_model_lstm_base["hyperparameters"]
+
+    # Load the hyperparameters of the lstm_model_enc_dec
+    params_l = saved_model_lstm["hyperparameters"]
+
+    # Load the hyperparameters of the lstm_input_model_enc_dec
+    params_li = saved_model_lstm_input["hyperparameters"]
+
+    # Load the hyperparameters of the fnn_model
+    params_f = saved_model_fnn["hyperparameters"]
+
+    # Load the hyperparameters of the fnn_model
+    params_g = saved_model_gru["hyperparameters"]
+
+
+    # Specify the device to be used for testing
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
+                                                         hidden_size=params_lb["hidden_size"],
+                                                         num_layers=params_lb["num_layers"])
+
+    model_lstm = lstm.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
+                                               hidden_size=params_l["hidden_size"],
+                                               num_layers=params_l["num_layers"])
+
+    model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
+                                                         hidden_size=params_li["hidden_size"],
+                                                         num_layers=params_li["num_layers"])
+
+    model_ffn = ffn.FeedforwardNetwork(input_size=params_lb["num_features"],
+                                       hidden_size=params_f["hidden_size"],
+                                       output_size=params_lb["num_features"],
+                                       input_window=params_f["input_window"])
+
+    model_gru = gru.GRU_Sequence_Prediction(input_size=params_lb["num_features"],
+                                            hidden_size=params_g["hidden_size"],
+                                            num_layers=params_g["num_layers"])
+
+    # Load the saved models
+    model_gru.load_state_dict(saved_model_gru["model_state_dict"])
+    model_gru = model_gru.to(device)
+    model_lstm_base.load_state_dict(saved_model_lstm_base["model_state_dict"])
+    model_lstm_base = model_lstm_base.to(device)
+    model_lstm.load_state_dict(saved_model_lstm["model_state_dict"])
+    model_lstm = model_lstm.to(device)
+    model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
+    model_lstm_inp = model_lstm_inp.to(device)
+    model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
+    model_ffn = model_ffn.to(device)
+
+    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru

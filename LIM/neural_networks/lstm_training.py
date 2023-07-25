@@ -10,34 +10,33 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.load("./data/data_piControl.pt")
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
 
-data = data[:, :80000]
+data = data[:, :20000]
 #data = normalize_tensor_individual(data)
 
 training_info_pth = "trained_models/training_info_lstm.txt"
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
-lr = [0.000075]
+lr = [0.0001]
 
-windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12, 12)]
-windows = [(2,1), (2,2), (2,6), (6,1), (6,2), (6,6), (12,2), (12, 1), (12, 6)]
-windows = [(2,6)]
+windows = [(2,1), (2,2), (2,6), (2, 12), (2, 4), (6,1), (6,2), (6,6), (4, 6), (6, 4), (6, 12), (12,2), (12, 1), (12, 6)]
+#windows = [(2,6)]
 
-model_label = "ENC-DEC-INPUT-2-6"
-name = "lstm-enc-dec_64_lessl"
+model_label = "ENC-DEC-HORIZON2"
+name = "lstm-enc-dec"
 dt = "np"
 
 config = {
     "wandb": True,
     "name": name,
     "num_features": 30,
-    "hidden_size": 64,
+    "hidden_size": 128,
     "dropout": 0.1,
     "weight_decay": 0,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 100,
+    "num_epochs": 50,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",

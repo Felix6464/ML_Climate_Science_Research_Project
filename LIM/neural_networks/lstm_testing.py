@@ -94,7 +94,7 @@ def main():
     #              ("9383950np", "6-6"),
     #              ("6486631np", "2-6")]
     model_num = [("6358986np", "2-6_128_wdecay3")]
-    model_num = [("8219936np", "2-6_lstm_64")]
+    model_num = [("2674237np", "2-6_lstm_64_")]
 
     id = ["horizon_eval_test21"]
 
