@@ -87,7 +87,7 @@ class TimeSeriesDropout(nn.Module):
             x = x * mask / (1 - self.dropout_prob)
         return x
 
-class LSTM_Encoder(nn.Module):
+class GRU_Encoder(nn.Module):
     """
     Encodes time-series sequence
     """
@@ -99,16 +99,16 @@ class LSTM_Encoder(nn.Module):
         : param num_layers:     number of recurrent layers
         """
 
-        super(LSTM_Encoder, self).__init__()
+        super(GRU_Encoder, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.dropout = TimeSeriesDropout(dropout_prob)
-        self.lstms = nn.ModuleList()
+        self.grus = nn.ModuleList()
 
         for i in range(num_layers):
             input_size = input_size if i == 0 else hidden_size
-            self.lstms.append(nn.LSTM(input_size, hidden_size, batch_first=True))
+            self.grus.append(nn.GRU(input_size, hidden_size, batch_first=True))
 
 
 
@@ -124,14 +124,14 @@ class LSTM_Encoder(nn.Module):
             x_input = self.dropout(x_input)
 
         for i in range(self.num_layers):
-            lstm_out, hidden = self.lstms[i](x_input, hidden)
+            gru_out, hidden = self.grus[i](x_input, hidden)
             if dropout is True:
-                x_input = self.dropout(hidden[0].permute(1, 0, 2))
+                x_input = self.dropout(hidden.permute(1, 0, 2))
             else:
-                x_input = hidden[0].permute(1, 0, 2)
+                x_input = hidden.permute(1, 0, 2)
 
 
-        return lstm_out, hidden
+        return gru_out, hidden
 
     def init_hidden(self, batch_size):
         """
@@ -140,11 +140,10 @@ class LSTM_Encoder(nn.Module):
         : return:              zeroed hidden state and cell state
         """
 
-        return (init.xavier_normal_(torch.empty(1, batch_size, self.hidden_size)),
-                torch.zeros(1, batch_size, self.hidden_size))
+        return init.xavier_normal_(torch.empty(1, batch_size, self.hidden_size))
 
 
-class LSTM_Decoder(nn.Module):
+class GRU_Decoder(nn.Module):
     """
     Decodes hidden state output by encoder
     """
@@ -156,16 +155,16 @@ class LSTM_Decoder(nn.Module):
         : param num_layers:     number of recurrent layers
         """
 
-        super(LSTM_Decoder, self).__init__()
+        super(GRU_Decoder, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.dropout = TimeSeriesDropout(dropout_prob)
 
-        self.lstms = nn.ModuleList()
+        self.grus = nn.ModuleList()
 
         for i in range(num_layers):
-            self.lstms.append(nn.LSTM(self.hidden_size, self.hidden_size, batch_first=True))
+            self.grus.append(nn.GRU(self.hidden_size, self.hidden_size, batch_first=True))
 
         self.linear = nn.Linear(self.hidden_size, self.input_size)
 
@@ -186,13 +185,13 @@ class LSTM_Decoder(nn.Module):
         # Predict recursively
         for t in range(target_len):
             for i in range(self.num_layers):
-                lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
+                gru_out, decoder_hidden = self.grus[i](decoder_input, decoder_hidden)
                 if dropout is True:
-                    decoder_input = self.dropout(decoder_hidden[0].permute(1, 0, 2))
+                    decoder_input = self.dropout(decoder_hidden.permute(1, 0, 2))
                 else:
-                    decoder_input = decoder_hidden[0].permute(1, 0, 2)
+                    decoder_input = decoder_hidden.permute(1, 0, 2)
 
-            decoder_output = self.linear(lstm_out.squeeze(0))
+            decoder_output = self.linear(gru_out.squeeze(0))
             outputs[:, t, :] = decoder_output[:, 0, :]
 
         return outputs, decoder_hidden
@@ -210,7 +209,7 @@ class RMSELoss(torch.nn.Module):
         loss = torch.sqrt(criterion(x, y) + eps)
         return loss
 
-class LSTM_Sequence_Prediction(nn.Module):
+class GRU_Sequence_Prediction(nn.Module):
     """
     train LSTM encoder-decoder and make predictions
     """
@@ -223,14 +222,14 @@ class LSTM_Sequence_Prediction(nn.Module):
         : param num_layers:     number of recurrent layers
         '''
 
-        super(LSTM_Sequence_Prediction, self).__init__()
+        super(GRU_Sequence_Prediction, self).__init__()
 
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
-        self.encoder = LSTM_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, dropout_prob=dropout)
-        self.decoder = LSTM_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, dropout_prob=dropout)
+        self.encoder = GRU_Encoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, dropout_prob=dropout)
+        self.decoder = GRU_Decoder(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, dropout_prob=dropout)
 
     def train_model(self, train_dataloader, eval_dataloader, optimizer, config):
         """
@@ -319,11 +318,11 @@ class LSTM_Sequence_Prediction(nn.Module):
 
                     # Encoder forward pass
                     hidden = self.encoder.init_hidden(input_batch.shape[0])
-                    hidden = (hidden[0].to(device), hidden[1].to(device))
+                    hidden = hidden.to(device)
                     encoder_output, encoder_hidden = self.encoder(input_batch, hidden)
 
 
-                    decoder_input = encoder_hidden[0].permute(1, 0, 2)
+                    decoder_input = encoder_hidden.permute(1, 0, 2)
 
                     outputs, decoder_hidden = self.decoder(decoder_input,
                                                            hidden,
@@ -410,7 +409,7 @@ class LSTM_Sequence_Prediction(nn.Module):
             input_tensor = input_tensor.unsqueeze(1)
 
         hidden = self.encoder.init_hidden(input_tensor.shape[0])
-        hidden = (hidden[0].to(device), hidden[1].to(device))
+        hidden = hidden.to(device)
         encoder_output, encoder_hidden = self.encoder(input_tensor, hidden, prediction_type)
 
         # Initialize outputs tensor
@@ -418,7 +417,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         outputs = outputs.to(device)
 
 
-        decoder_input = encoder_hidden[0].permute(1, 0, 2)
+        decoder_input = encoder_hidden.permute(1, 0, 2)
 
         outputs, decoder_hidden = self.decoder(decoder_input,
                                                hidden,

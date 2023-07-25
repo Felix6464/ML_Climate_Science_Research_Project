@@ -1,6 +1,7 @@
 from LIM.neural_networks.models.LSTM_enc_dec import *
 #from LIM.neural_networks.models.LSTM_enc_dec_input import *
 #from LIM.neural_networks.models.LSTM import *
+#from LIM.neural_networks.models.GRU_enc_dec import *
 from torch.utils.data import DataLoader
 from utilities import *
 
@@ -15,14 +16,14 @@ data = data[:, :80000]
 training_info_pth = "trained_models/training_info_lstm.txt"
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
-lr = [0.0001]
+lr = [0.000075]
 
 windows = [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10), (11,11), (12, 12)]
 windows = [(2,1), (2,2), (2,6), (6,1), (6,2), (6,6), (12,2), (12, 1), (12, 6)]
 windows = [(2,6)]
 
 model_label = "ENC-DEC-INPUT-2-6"
-name = "lstm-enc-dec_drop_64h_2l"
+name = "lstm-enc-dec_64_lessl"
 dt = "np"
 
 config = {
@@ -30,11 +31,12 @@ config = {
     "name": name,
     "num_features": 30,
     "hidden_size": 64,
-    "dropout": 0.25,
+    "dropout": 0.1,
+    "weight_decay": 0,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
-    "num_layers": 2,
+    "num_layers": 1,
     "num_epochs": 100,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
@@ -120,7 +122,7 @@ for window in windows:
                                          dropout=config["dropout"])
         model.to(device)
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=l)
+        optimizer = torch.optim.Adam(model.parameters(), lr=l, weight_decay=config["weight_decay"])
 
         # Save the model and hyperparameters to a file
         rand_identifier = str(np.random.randint(0, 10000000)) + dt

@@ -229,7 +229,7 @@ class LSTM_Sequence_Prediction(nn.Module):
     train LSTM encoder-decoder and make predictions
     """
 
-    def __init__(self, input_size, hidden_size, num_layers, dropout):
+    def __init__(self, input_size, hidden_size, num_layers, dropout=0):
 
         '''
         : param input_size:     the number of expected features in the input X

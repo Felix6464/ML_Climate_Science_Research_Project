@@ -1,4 +1,5 @@
 from models.LSTM_enc_dec import *
+import models.GRU_enc_dec as gru
 from LIM.neural_networks.plots.plots import *
 from utilities import *
 import torch.utils.data as datat
@@ -10,7 +11,7 @@ def main():
     #data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
     # Calculate the mean and standard deviation along the feature dimension
-    data = data[:, 100000:110000]
+    data = data[:, 80000:90000]
     #data = normalize_tensor_individual(data)
     print("Data shape : {}".format(data.shape))
 
@@ -92,9 +93,8 @@ def main():
     #              ("7583665np", "2-1"),
     #              ("9383950np", "6-6"),
     #              ("6486631np", "2-6")]
-    model_num = [("1209901np", "2-6"),
-                 ("9122071np", "2-6_drop"),]
-    #model_num = [("5755771np", "2-6_gru")]
+    model_num = [("6358986np", "2-6_128_wdecay3")]
+    model_num = [("8219936np", "2-6_lstm_64")]
 
     id = ["horizon_eval_test21"]
 
@@ -107,6 +107,7 @@ def main():
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
         print("Hyperparameters of model {} : {}".format(model_num[m][0], params))
+        wandb.init(project=f"ML-Climate-SST-{'Horizon'}", config=params, name=params['name'])
 
         hidden_size = params["hidden_size"]
         #dropout = params["dropout"]
@@ -140,17 +141,18 @@ def main():
                 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
                 # Initialize the model and load the saved state dict
-                model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers,
-                                                 dropout=0)
+                model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
                 model.load_state_dict(saved_model["model_state_dict"])
                 model.to(device)
 
                 loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
                 print("Output window: {}, Loss: {}".format(output_window, loss))
                 losses.append(loss)
+                wandb.log({"Horizon": output_window, "Test Loss": loss})
 
             loss_list.append((losses, model_num[m][1]))
         loss_list_eval.append((loss_eval, model_num[m][1]))
+        wandb.finish()
 
     if horizon is True: plot_loss_horizon(loss_list, loss_type, id)
     plot_loss_combined(loss_list_eval, id, loss_type)
