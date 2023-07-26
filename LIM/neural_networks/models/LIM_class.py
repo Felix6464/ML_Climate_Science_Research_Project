@@ -180,7 +180,7 @@ class LIM:
 
         return forecast_output
 
-    def noise_integration(self, input_data, timesteps, out_arr=None, seed=None, num_comp=10):
+    def noise_integration(self, input_data, timesteps, t_delta_=None, seed=None, num_comp=10):
 
         """Perform a numerical integration forced by stochastic noise
 
@@ -218,12 +218,15 @@ class LIM:
 
 
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
-        t_decay = min(t_decay) -1e-5
+        t_decay = min(t_decay) -1e-4
 
         print("t_decay: {}".format(t_decay))
 
         if 2 < t_decay:
-            t_delta_int = 1
+            if t_delta_ is not None:
+                t_delta_int = t_delta_
+            else:
+                t_delta_int = t_decay / 2
         else:
             t_delta_int = t_decay
 
@@ -241,7 +244,7 @@ class LIM:
             state_start = state_new
 
             out_arr[t] = state_mid
-            times = np.arange(timesteps + 1) * t_decay
+            times = np.arange(timesteps) * t_decay
 
         return out_arr, times
 
