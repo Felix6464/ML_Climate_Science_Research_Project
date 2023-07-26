@@ -12,20 +12,20 @@ from utilities import *
 #raw_data = normalize_tensor_individual(raw_data)
 
 
-data = torch.load("./synthetic_data/raw_data/lim_integration_multipleLim_XL_160k.pt")
+data = torch.load("./synthetic_data/data/lim_integration_multipleLim_XL_160k.pt")
 data = data[:, :]
 data = normalize_data(data)
 print(min_max_values_per_slice(data))
 print("Data shape : {}".format(data.shape))
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
-lr = [0.00005]
+lr = [0.0001]
 
 windows = [(2,1), (2,2), (2,6), (2, 12), (2, 4), (6,1), (6,2), (6,6), (4, 6), (6, 4), (6, 12), (12,2), (12, 1), (12, 6)]
 windows = [(2,10)]
 
 model_label = "ENC-DEC-[2-10]"
-name = "lstm-enc-dec-XL-160k"
+name = "lstm-enc-dec-XLimXtau_200k_nd"
 dt = "np"
 
 config = {
@@ -33,13 +33,13 @@ config = {
     "name": name,
     "num_features": 30,
     "hidden_size": 256,
-    "dropout": 0.1,
+    "dropout": 0,
     "weight_decay": 0,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 50,
+    "num_epochs": 25,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",

@@ -2,15 +2,12 @@ from models.LSTM_enc_dec import *
 import models.GRU_enc_dec as gru
 from LIM.neural_networks.plots.plots import *
 from utilities import *
-import torch.utils.data as datat
 from torch.utils.data import DataLoader
 
 
 def main():
 
-    #raw_data = torch.load("./synthetic_data/raw_data/lim_integration_TEST_20k[-1]p.pt")
-    data = torch.load("./synthetic_data/raw_data/lim_integration_130k[-1].pt")
-    data = torch.load("./synthetic_data/raw_data/data_piControl.pt")
+    data = torch.load("./synthetic_data/data/data_piControl.pt")
     data = normalize_data(data)
 
     horizon = True
@@ -78,7 +75,7 @@ def main():
                  ("9969766np", "2-10-XLIM_tau")]
                  #("6859043np", "2-10-60k"),
                  #("788373np", "2-10_30k")]
-    model_num = [("2480517np", "2-10-XL-160k2")]
+    model_num = [("3561908np", "2-10-XLimXtau")]
 
     id = ["horizon_eval_test23"]
 
@@ -94,7 +91,6 @@ def main():
         wandb.init(project=f"ML-Climate-SST-{'Horizon'}", config=params, name=params['name'])
 
         hidden_size = params["hidden_size"]
-        #dropout = params["dropout"]
         num_layers = params["num_layers"]
         input_window = params["input_window"]
         batch_size = params["batch_size"]
