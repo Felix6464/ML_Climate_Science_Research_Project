@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 import json
 import torch
 import os
-import models.GRU_enc_dec as gru
-import models.LSTM_enc_dec_input as lstm_input
-import models.LSTM_enc_dec as lstm
-import models.FNN_model as ffn
-import models.LSTM as lstm_base
+
+import LIM.neural_networks.models.GRU_enc_dec as gru
+import LIM.neural_networks.models.LSTM_enc_dec_input as lstm_input
+import LIM.neural_networks.models.LSTM_enc_dec as lstm
+import LIM.neural_networks.models.FNN_model as ffn
+import LIM.neural_networks.models.LSTM as lstm_base
 
 
 def reshape_xarray(input_data):
@@ -402,14 +403,14 @@ def normalize_tensor_individual(tensor):
 
     return normalized_tensor
 
-def load_models_testing(num_lb, num_l, num_li, num_g, num_f):
+def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn):
 
     # Load the saved models
-    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{num_lb}.pt")
-    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{num_l}.pt")
-    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{num_li}.pt")
-    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{num_f}.pt")
-    saved_model_gru = torch.load(f"./trained_models/lstm/model_{num_g}.pt")
+    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{num_lstm_base}.pt")
+    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{num_lstm_input}.pt")
+    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{num_ffn}.pt")
+    saved_model_gru = torch.load(f"./trained_models/lstm/model_{num_gru}.pt")
 
     # Load the hyperparameters of the lstm_model base
     params_lb = saved_model_lstm_base["hyperparameters"]
@@ -464,3 +465,24 @@ def load_models_testing(num_lb, num_l, num_li, num_g, num_f):
     model_ffn = model_ffn.to(device)
 
     return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru
+
+
+def min_max_values_per_slice(tensor):
+    """
+    Calculate the minimum and maximum values for each slice along the first dimension of the input tensor.
+
+    Args:
+    tensor (torch.Tensor): Input tensor.
+
+    Returns:
+    dict: A dictionary containing the minimum and maximum values for each slice.
+    """
+    result_dict = {}
+    num_slices = tensor.size(0)
+
+    for i in range(num_slices):
+        slice_min = tensor[i].min().item()
+        slice_max = tensor[i].max().item()
+        result_dict[f'slice_{i}'] = {'min': slice_min, 'max': slice_max}
+
+    return result_dict

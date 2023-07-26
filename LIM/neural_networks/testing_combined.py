@@ -45,6 +45,7 @@ def main():
     criterion = nn.MSELoss()
 
     loss_list = []
+    loss_list_temp = []
 
     wandb.init(project=f"ML-Climate-SST-{'Horizon-Combined'}", name="model_comparison")
 
@@ -94,15 +95,15 @@ def main():
 
         loss_lim /= sample_size
 
-        loss_list.append([loss_gru, loss_lstm_base, loss_lstm, loss_lstm_inp, loss_ffn, loss_lim])
-        wandb.log({"Loss-Horizon": loss_list})
+        loss_list_temp.append([loss_gru, loss_lstm_base, loss_lstm, loss_lstm_inp, loss_ffn, loss_lim])
+        wandb.log({"Loss-Horizon": loss_list_temp})
 
-    loss_list.append(([lst[0] for lst in loss_list], f"{'GRU'}"))
-    loss_list.append(([lst[1] for lst in loss_list], f"{'LSTM-Base'}"))
-    loss_list.append(([lst[2] for lst in loss_list], f"{'LSTM-Enc-Dec'}"))
-    loss_list.append(([lst[3] for lst in loss_list], f"{'LSTM-Enc-Dec-Input'}"))
-    loss_list.append(([lst[4] for lst in loss_list], f"{'FFN'}"))
-    loss_list.append(([lst[5] for lst in loss_list], f"{'LIM'}"))
+    loss_list.append(([lst[0] for lst in loss_list_temp], f"{'GRU'}"))
+    loss_list.append(([lst[1] for lst in loss_list_temp], f"{'LSTM-Base'}"))
+    loss_list.append(([lst[2] for lst in loss_list_temp], f"{'LSTM-Enc-Dec'}"))
+    loss_list.append(([lst[3] for lst in loss_list_temp], f"{'LSTM-Enc-Dec-Input'}"))
+    loss_list.append(([lst[4] for lst in loss_list_temp], f"{'FFN'}"))
+    loss_list.append(([lst[5] for lst in loss_list_temp], f"{'LIM'}"))
 
     model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_fnn, model_num_lim])
     plot_loss_horizon_combined(loss_list, model_nums, loss_type)

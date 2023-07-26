@@ -7,22 +7,28 @@ from utilities import *
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data = torch.load("./data/data_piControl.pt")
+#data_control = torch.load("./data/data_piControl.pt")
+#data_control = normalize_data(data_control)
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
-
-data = data[:, :20000]
+#print(data_control[0, :10])
+#data = torch.cat((data_control, data), 1)
 #data = normalize_tensor_individual(data)
 
+
+data = data[:, :80000]
+print(min_max_values_per_slice(data))
+
+print("Data shape : {}".format(data.shape))
 training_info_pth = "trained_models/training_info_lstm.txt"
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
 lr = [0.0001]
 
 windows = [(2,1), (2,2), (2,6), (2, 12), (2, 4), (6,1), (6,2), (6,6), (4, 6), (6, 4), (6, 12), (12,2), (12, 1), (12, 6)]
-#windows = [(2,6)]
+windows = [(2,10)]
 
-model_label = "ENC-DEC-HORIZON2"
-name = "lstm-enc-dec"
+model_label = "ENC-DEC-[2-10]"
+name = "lstm-enc-dec-c+s-"
 dt = "np"
 
 config = {
@@ -36,7 +42,7 @@ config = {
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 50,
+    "num_epochs": 75,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
