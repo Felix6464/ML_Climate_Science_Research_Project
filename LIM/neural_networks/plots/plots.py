@@ -8,14 +8,14 @@ from numpy import random
 
 def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_target, rand, num_rows=5):
     """
-    Plot examples of the LSTM encoder-decoder evaluated on the training/test data.
+    Plot examples of the LSTM encoder-decoder evaluated on the training/test raw_data.
 
     Args:
         lstm_model (LSTM): Trained LSTM encoder-decoder model.
-        train_data (np.array): Windowed training input data.
-        target_data (np.array): Windowed training target data.
-        test_data (np.array): Windowed test input data.
-        test_target (np.array): Windowed test target data.
+        train_data (np.array): Windowed training input raw_data.
+        target_data (np.array): Windowed training target raw_data.
+        test_data (np.array): Windowed test input raw_data.
+        test_target (np.array): Windowed test target raw_data.
         rand: Identifier.
         num_rows (int): Number of training/test examples to plot.
 

@@ -1,49 +1,45 @@
 from LIM.neural_networks.models.LSTM_enc_dec import *
-#from LIM.neural_networks.models.LSTM_enc_dec_input import *
-#from LIM.neural_networks.models.LSTM import *
-#from LIM.neural_networks.models.GRU_enc_dec import *
 from torch.utils.data import DataLoader
 from utilities import *
 
-#data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
-#data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data_control = torch.load("./data/data_piControl.pt")
+#raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
+#raw_data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+#data_control = torch.load("./raw_data/data_piControl.pt")
 #data_control = normalize_data(data_control)
-#data.data = normalize_data(torch.from_numpy(data.data)).numpy()
+#raw_data.raw_data = normalize_data(torch.from_numpy(raw_data.raw_data)).numpy()
 #print(data_control[0, :10])
-#data = torch.cat((data_control, data), 1)
-#data = normalize_tensor_individual(data)
+#raw_data = torch.cat((data_control, raw_data), 1)
+#raw_data = normalize_tensor_individual(raw_data)
 
-data = torch.load("./synthetic_data/lim_integration_multipleLim_XL.pt")
+
+data = torch.load("./synthetic_data/raw_data/lim_integration_multipleLim_XL_160k.pt")
 data = data[:, :]
 data = normalize_data(data)
 print(min_max_values_per_slice(data))
-
 print("Data shape : {}".format(data.shape))
-training_info_pth = "trained_models/training_info_lstm.txt"
 
 lr = [0.0005, 0.0002, 0.0001, 0.000075, 0.00005]
-lr = [0.0001]
+lr = [0.00005]
 
 windows = [(2,1), (2,2), (2,6), (2, 12), (2, 4), (6,1), (6,2), (6,6), (4, 6), (6, 4), (6, 12), (12,2), (12, 1), (12, 6)]
 windows = [(2,10)]
 
 model_label = "ENC-DEC-[2-10]"
-name = "lstm-enc-dec-XLIM_tau=0_9"
+name = "lstm-enc-dec-XL-160k"
 dt = "np"
 
 config = {
     "wandb": True,
     "name": name,
     "num_features": 30,
-    "hidden_size": 128,
+    "hidden_size": 256,
     "dropout": 0.1,
     "weight_decay": 0,
     "input_window": windows[0][0],
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 75,
+    "num_epochs": 50,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
@@ -54,6 +50,7 @@ config = {
     "shuffle": True,
     "one_hot_month": False,
 }
+training_info_pth = "trained_models/training_info_lstm.txt"
 
 for window in windows:
 

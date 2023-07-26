@@ -7,23 +7,23 @@ def main():
     torch.manual_seed(42)
 
     # Create the DataLoader for first principal component
-    #data = torch.load("./data/data_piControl.pt")
+    #raw_data = torch.load("./raw_data/data_piControl.pt")
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
     data = data[:, :10000]
     print("Data shape : {}".format(data.shape))
 
-    # Reshape the data if necessary (assuming a 2D tensor)
+    # Reshape the raw_data if necessary (assuming a 2D tensor)
     if len(data.shape) == 1:
         data = data.unsqueeze(1)
 
     # Calculate the mean and standard deviation along the feature dimension
-    #data = normalize_data(data)
+    #raw_data = normalize_data(raw_data)
 
     index_train = int(0.8 * len(data[0, :]))
     data_train = data[:, :index_train]
     data_test = data[:, index_train:]
 
-    # Setting input and output window sizes for data
+    # Setting input and output window sizes for raw_data
     input_window = 6
     output_window = 12
     num_features = 30
@@ -41,7 +41,7 @@ def main():
                                                                 stride=stride,
                                                                 num_features=num_features)
 
-    # convert windowed data from np.array to PyTorch tensor
+    # convert windowed raw_data from np.array to PyTorch tensor
     data_train, target, data_test, target_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 
 

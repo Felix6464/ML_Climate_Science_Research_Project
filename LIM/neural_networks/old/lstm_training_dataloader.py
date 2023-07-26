@@ -3,9 +3,9 @@ from torch.utils.data import DataLoader
 from utilities import *
 
 
-#data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
+#raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data = torch.load("./data/data_piControl.pt")
+#raw_data = torch.load("./raw_data/data_piControl.pt")
 data = data[:, :10000]
 
 data = normalize_data(data)
@@ -16,7 +16,7 @@ output_window = 6
 batch_size = 64
 one_hot_month = False
 
-#print(data, type(data), data.shape)
+#print(raw_data, type(raw_data), raw_data.shape)
 
 
 if dt == "xr":

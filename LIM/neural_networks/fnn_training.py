@@ -6,9 +6,9 @@ from utilities import *
 import torch.utils.data as datat
 import os
 
-#data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
+#raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data = torch.load("./data/data_piControl.pt")
+#raw_data = torch.load("./raw_data/data_piControl.pt")
 data = data[:, :80000]
 data = normalize_data(data)
 

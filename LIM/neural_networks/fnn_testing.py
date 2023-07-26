@@ -37,7 +37,7 @@ def main():
         batch_size = params["batch_size"]
         loss_type = params["loss_type"]
 
-        # Specify the number of features and the stride for generating timeseries data
+        # Specify the number of features and the stride for generating timeseries raw_data
         num_features = 30
         input_window = 6
 

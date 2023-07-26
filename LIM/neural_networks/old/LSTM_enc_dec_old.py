@@ -45,8 +45,8 @@ class LSTM_Sequence_Prediction(nn.Module):
         :param input_len:
         :param target_test:
         :param input_test:
-        :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
-        :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
+        :param input_tensor:              Input raw_data with shape (seq_len, # in batch, number features)
+        :param target_tensor:             Target raw_data with shape (seq_len, # in batch, number features)
         :param n_epochs:                  Number of epochs
         :param target_len:                Number of values to predict
         :param batch_size:                Number of samples per gradient update
@@ -106,16 +106,16 @@ class LSTM_Sequence_Prediction(nn.Module):
                 batch_loss_test = 0.0
 
                 for batch_idx in n_batches:
-                    #for batch_idx, data in enumerate(train_loader):
+                    #for batch_idx, raw_data in enumerate(train_loader):
                     self.train()
 
-                    #input_batch, target_batch = data
+                    #input_batch, target_batch = raw_data
                     #input_batch = input_batch.to(device)
                     #target_batch = target_batch.to(device)
                     #print("Input batch : {} + shape : {} ".format(input_batch, input_batch.shape))
                     #print("Target batch : {} + shape : {}".format(targets, targets.shape))
 
-                    # Select data for the current batch
+                    # Select raw_data for the current batch
                     input_batch = input_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     target_batch = target_tensor[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                     # Initialize outputs tensor
@@ -188,16 +188,16 @@ class LSTM_Sequence_Prediction(nn.Module):
                 if dynamic_tf and teacher_forcing_ratio > 0:
                     teacher_forcing_ratio -= 0.01
 
-                #for batch_idx, data in enumerate(test_loader):
+                #for batch_idx, raw_data in enumerate(test_loader):
                 for batch_idx in n_batches_test:
-                    #input_test, target_test = data
+                    #input_test, target_test = raw_data
                     #input_test = input_test.to(device)
                     #target_test = target_test.to(device)
 
                     with torch.no_grad():
                         self.eval()
 
-                        # Select data for the current batch
+                        # Select raw_data for the current batch
                         input_test_batch = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                         target_test_batch = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                         input_test_batch = input_test_batch.to(device)
@@ -251,7 +251,7 @@ class LSTM_Sequence_Prediction(nn.Module):
             with torch.no_grad():
                 self.eval()
 
-                # Select data for the current batch
+                # Select raw_data for the current batch
                 input_test_batch = input_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                 target_test_batch = target_test[:, batch_idx * batch_size: (batch_idx + 1) * batch_size, :]
                 input_test_batch = input_test_batch.to(device)
@@ -271,7 +271,7 @@ class LSTM_Sequence_Prediction(nn.Module):
     def predict(self, input_tensor, target_len, prediction_type='test'):
 
         """
-        : param input_tensor:      input data (seq_len, input_size); PyTorch tensor
+        : param input_tensor:      input raw_data (seq_len, input_size); PyTorch tensor
         : param target_len:        number of target values to predict
         : return np_outputs:       np.array containing predicted values; prediction done recursively
         """
@@ -429,10 +429,10 @@ def dataloader_seq2seq_feat(y, input_window, output_window, stride, num_features
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
-    : param Xtrain:                    windowed training input data (input window size, # examples, # features)
-    : param Ytrain:                    windowed training target data (output window size, # examples, # features)
-    : param Xtest:                     windowed test input data (input window size, # examples, # features)
-    : param Ytest:                     windowed test target data (output window size, # examples, # features)
+    : param Xtrain:                    windowed training input raw_data (input window size, # examples, # features)
+    : param Ytrain:                    windowed training target raw_data (output window size, # examples, # features)
+    : param Xtest:                     windowed test input raw_data (input window size, # examples, # features)
+    : param Ytest:                     windowed test target raw_data (output window size, # examples, # features)
     : return X_train_torch, Y_train_torch,
     :        X_test_torch, Y_test_torch:      all input np.arrays converted to PyTorch tensors
 

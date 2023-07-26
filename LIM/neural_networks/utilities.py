@@ -18,7 +18,7 @@ def reshape_xarray(input_data):
     target_lat = xr.DataArray(np.linspace(-90, 90, 192), dims='lat')
     target_lon = xr.DataArray(np.linspace(-180, 180, 360), dims='lon')
 
-    # Reshape the input data using xr.interp()
+    # Reshape the input raw_data using xr.interp()
     reshaped_data = input_data.interp(lat=target_lat, lon=target_lon, method='nearest')
 
     return reshaped_data
@@ -114,13 +114,13 @@ def map2flatten(x_map: xr.Dataset) -> list:
 
 
 def flattened2map(x_flat: np.ndarray, ids_notNaN: xr.DataArray, times: np.ndarray = None) -> xr.Dataset:
-    """Transform flattened array without NaNs to gridded data with NaNs.
+    """Transform flattened array without NaNs to gridded raw_data with NaNs.
     Args:
         x_flat (np.ndarray): Flattened array of size (n_times, n_points) or (n_points).
         ids_notNaN (xr.DataArray): Boolean dataarray of size (n_points).
         times (np.ndarray): Time coordinate of xarray if x_flat has time dimension.
     Returns:
-        xr.Dataset: Gridded data.
+        xr.Dataset: Gridded raw_data.
     """
     if len(x_flat.shape) == 1:
         x_map = xr.full_like(ids_notNaN, np.nan, dtype=float)
@@ -147,7 +147,7 @@ def flattened2map(x_flat: np.ndarray, ids_notNaN: xr.DataArray, times: np.ndarra
 
 
 class SpatioTemporalPCA:
-    """PCA of spatio-temporal data.
+    """PCA of spatio-temporal raw_data.
     Wrapper for sklearn.decomposition.PCA with xarray.DataArray input.
 
     See EOF tutorial.
@@ -278,20 +278,18 @@ def load_text_as_json(file_path):
 
 def normalize_data(data):
     """
-    Normalize the data using mean and standard deviation.
+    Normalize the raw_data using mean and standard deviation.
 
     Args:
-        data (torch.Tensor): Input data to be normalized.
+        data (torch.Tensor): Input raw_data to be normalized.
 
     Returns:
-        torch.Tensor: Normalized data.
+        torch.Tensor: Normalized raw_data.
 
     """
     # Calculate the mean and standard deviation along the feature dimension
     mean = torch.mean(data, dim=1, keepdim=True)
-    print(mean)
     std = torch.std(data, dim=1, keepdim=True)
-    print(std)
 
     # Apply normalization using the mean and standard deviation
     normalized_data = torch.zeros_like(data)
@@ -342,10 +340,10 @@ def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
-    : param Xtrain:                    windowed training input data (input window size, # examples, # features)
-    : param Ytrain:                    windowed training target data (output window size, # examples, # features)
-    : param Xtest:                     windowed test input data (input window size, # examples, # features)
-    : param Ytest:                     windowed test target data (output window size, # examples, # features)
+    : param Xtrain:                    windowed training input raw_data (input window size, # examples, # features)
+    : param Ytrain:                    windowed training target raw_data (output window size, # examples, # features)
+    : param Xtest:                     windowed test input raw_data (input window size, # examples, # features)
+    : param Ytest:                     windowed test target raw_data (output window size, # examples, # features)
     : return X_train_torch, Y_train_torch,
     :        X_test_torch, Y_test_torch:      all input np.arrays converted to PyTorch tensors
 

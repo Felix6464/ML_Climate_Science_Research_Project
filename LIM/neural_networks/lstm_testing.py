@@ -8,60 +8,14 @@ from torch.utils.data import DataLoader
 
 def main():
 
-    #data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
-    data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    data = torch.load("./synthetic_data/data_piControl.pt")
+    #raw_data = torch.load("./synthetic_data/raw_data/lim_integration_TEST_20k[-1]p.pt")
+    data = torch.load("./synthetic_data/raw_data/lim_integration_130k[-1].pt")
+    data = torch.load("./synthetic_data/raw_data/data_piControl.pt")
     data = normalize_data(data)
-    # Calculate the mean and standard deviation along the feature dimension
-    #data = data[:, 80000:90000]
-    #data = normalize_tensor_individual(data)
-    print("Data shape : {}".format(data.shape))
 
     horizon = True
 
     # Specify the model number of the model to be tested
-    model_num = [("913676np", "1-1"),
-                 ("2942352np", "2-2"),
-                 ("9683124np", "3-3"),
-                 ("5229087np", "4-4"),
-                 ("6633299np", "5-5"),
-                 ("4181719np", "6-6"),
-                 ("6927195np", "7-7"),
-                 ("6928194np", "8-8"),
-                 ("2731141np", "9-9"),
-                 ("8674294np", "10-10"),
-                 ("9822140np", "11-11"),
-                 ("4770780np", "12-12")]
-    model_num = [("3415419np", "1-1"),
-                 ("796025np", "2-2"),
-                 ("8424079np", "3-3"),
-                 ("7059384np", "4-4"),
-                 ("3941080np", "5-5"),
-                 ("4919340np", "6-6")]
-    #model_num = [("6373822np", "7-7"),
-    #             ("9672309np", "8-8"),
-    #             ("1657797np", "9-9"),
-    #             ("7068253np", "10-10"),
-    #             ("3454772np", "11-11"),
-    #             ("3706716np", "12-12")]
-    # model_num_normal = [("1188459np", "12-6"),
-    #              ("7565543np", "12-1"),
-    #              ("1947308np", "12-2"),
-    #              ("4545275np", "6-2"),
-    #              ("7435437np", "2-2"),
-    #              ("9868835np", "6-1"),
-    #              ("3215220np", "2-1"),
-    #              ("8613331np", "6-6"),
-    #              ("4868397np", "2-6")]
-    # model_num_last_predic = [("9944518np", "12-6"),
-    #              ("3048114np", "12-1"),
-    #              ("6077068np", "12-2"),
-    #              ("6054232np", "6-2"),
-    #              ("8427209np", "2-2"),
-    #              ("4990867np", "6-1"),
-    #              ("7061039np", "2-1"),
-    #              ("206371np", "6-6"),
-    #              ("2987414np", "2-6")]
     # model_num = [("5723466np", "5-5"),
     #              ("6807315np", "5-5-last"),
     #              ("1986764np", "5-5-permute"),
@@ -124,7 +78,7 @@ def main():
                  ("9969766np", "2-10-XLIM_tau")]
                  #("6859043np", "2-10-60k"),
                  #("788373np", "2-10_30k")]
-    model_num = [("4814998np", "2-10-XLIM_tau=0_9")]
+    model_num = [("2480517np", "2-10-XL-160k2")]
 
     id = ["horizon_eval_test23"]
 
@@ -151,7 +105,7 @@ def main():
 
         if horizon is True:
 
-            # Specify the number of features and the stride for generating timeseries data
+            # Specify the number of features and the stride for generating timeseries raw_data
             num_features = 30
             x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
             losses = []

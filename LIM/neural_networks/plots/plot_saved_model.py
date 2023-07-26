@@ -1,5 +1,5 @@
-from models.LSTM_enc_dec import *
-from utilities import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+from LIM.neural_networks.utilities import *
 from LIM.neural_networks.plots.plots import *
 
 
@@ -10,7 +10,7 @@ model_num = "9388021np"
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
 data = data[:, 70000:85000]
-#data = normalize_tensor_individual(data)
+#raw_data = normalize_tensor_individual(raw_data)
 num_features = 30
 
 
@@ -42,7 +42,7 @@ print("Data loaded")
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# convert windowed data from np.array to PyTorch tensor
+# convert windowed raw_data from np.array to PyTorch tensor
 X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
 

@@ -15,7 +15,7 @@ def main():
     data = data_lim[:, 80000:90000]
 
     # Calculate the mean and standard deviation along the feature dimension
-    #data = data_lim[:, 80000:90000]
+    #raw_data = data_lim[:, 80000:90000]
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested
@@ -25,7 +25,7 @@ def main():
     model_num_lstm_input = "5322765np"
     model_num_fnn = "905019fnp"
 
-    # Specify the number of features and the stride for generating timeseries data
+    # Specify the number of features and the stride for generating timeseries raw_data
     input_window = 2
     input_window_ffn = 6
     batch_size = 64

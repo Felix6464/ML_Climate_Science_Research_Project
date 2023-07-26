@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 '''
 The LIM class creates a Linear Inverse Model for time series analysis.
 
-The class has one input parameter, tau, which represents the time lag between the input and output data.
+The class has one input parameter, tau, which represents the time lag between the input and output raw_data.
 
 The class has three class variables that are initialized as None:
 
@@ -21,13 +21,13 @@ G: Green's function
 L: Logarithmic matrix
 Q: Noise covariance matrix
 
-The class has a fit method that takes in data, which is a numpy array with dimensions (n_components, n_time).
- The method computes the C_0 and C_tau covariance matrices of the input data, and then computes the time-evolution operator G
+The class has a fit method that takes in raw_data, which is a numpy array with dimensions (n_components, n_time).
+ The method computes the C_0 and C_tau covariance matrices of the input raw_data, and then computes the time-evolution operator G
   using these covariance matrices.
 
 The method then performs a matrix decomposition on G to obtain its eigenvectors and eigenvalues, and sorts them in descending order
  based on their decay time. Using these sorted eigenvectors and eigenvalues, it computes the logarithmic matrix L,
-  which represents the linear relationship between the input and output data.
+  which represents the linear relationship between the input and output raw_data.
 
 The method checks for the existence of a Nyquist mode, which occurs when the imaginary part of L is greater than a small epsilon value. 
 If a Nyquist mode exists, a warning message is printed and the imaginary part is kept in the L matrix. If not, only the real part of L is stored. 
@@ -64,13 +64,13 @@ class LIM:
 
     def fit(self, data, eps=0.01):
         """
-        Fit LIM to data.
+        Fit LIM to raw_data.
 
         Args:
-            data (np.ndarray): Input data to estimate Green's function from.
+            data (np.ndarray): Input raw_data to estimate Green's function from.
                 Dimensions (n_components, n_time).
         """
-        # Split data into x and x_tau
+        # Split raw_data into x and x_tau
         x = data[:, :-self.tau]
         x_tau = data[:, self.tau:]
         assert x.shape == x_tau.shape
@@ -127,7 +127,7 @@ class LIM:
         """
         Estimate the noise covariance matrix.
 
-        Assumes that the system is stationary, and estimates the noise covariance by solving the Lyapunov equation 0 = L @ C_0 + C_0 @ L.T + Q, where L is the time derivative of the Green's function and C_0 is the covariance matrix of the input data.
+        Assumes that the system is stationary, and estimates the noise covariance by solving the Lyapunov equation 0 = L @ C_0 + C_0 @ L.T + Q, where L is the time derivative of the Green's function and C_0 is the covariance matrix of the input raw_data.
 
         Returns:
             Q (np.ndarray): Estimated noise covariance matrix of dimensions (n_components, n_components).
@@ -151,7 +151,7 @@ class LIM:
          using the Green's function G.
 
         Args:
-            input_data (np.ndarray): Input data to estimate Green's function from.
+            input_data (np.ndarray): Input raw_data to estimate Green's function from.
                 Dimensions (n_components, n_time).
             forecast_leads List<int>: Time-lag for forecasting. Each value is interpreted as a tau value
                                       for which the forecast matrix is determined as G_1^tau
@@ -190,10 +190,10 @@ class LIM:
         Parameters
         ----------
         input_data (np.ndarray):
-            Input data to estimate Green's function from.
+            Input raw_data to estimate Green's function from.
             Dimensions (n_components, n_time).
         out_arr: Optional, ndarray
-            Optional output container for data at the resolution of deltaT.
+            Optional output container for raw_data at the resolution of deltaT.
             Expected dimensions of (timesteps + 1, input_data.shape[0], input_data.shape[0])
         timesteps: int
             Number of timesteps in a single tau segment of the noise

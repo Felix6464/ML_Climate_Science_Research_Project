@@ -238,8 +238,8 @@ class GRU_Sequence_Prediction(nn.Module):
         :param input_len:
         :param target_test:
         :param input_test:
-        :param input_tensor:              Input data with shape (seq_len, # in batch, number features)
-        :param target_tensor:             Target data with shape (seq_len, # in batch, number features)
+        :param input_tensor:              Input raw_data with shape (seq_len, # in batch, number features)
+        :param target_tensor:             Target raw_data with shape (seq_len, # in batch, number features)
         :param n_epochs:                  Number of epochs
         :param target_len:                Number of values to predict
         :param batch_size:                Number of samples per gradient update
@@ -397,7 +397,7 @@ class GRU_Sequence_Prediction(nn.Module):
     def predict(self, input_tensor, target_len, prediction_type='test'):
 
         """
-        : param input_tensor:      input data (seq_len, input_size); PyTorch tensor
+        : param input_tensor:      input raw_data (seq_len, input_size); PyTorch tensor
         : param target_len:        number of target values to predict
         : return np_outputs:       np.array containing predicted values; prediction done recursively
         """
