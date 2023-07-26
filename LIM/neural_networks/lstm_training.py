@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from utilities import *
 
 #data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
-data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+#data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data_control = torch.load("./data/data_piControl.pt")
 #data_control = normalize_data(data_control)
 #data.data = normalize_data(torch.from_numpy(data.data)).numpy()
@@ -14,8 +14,9 @@ data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 #data = torch.cat((data_control, data), 1)
 #data = normalize_tensor_individual(data)
 
-
-data = data[:, :80000]
+data = torch.load("./synthetic_data/lim_integration_multipleLim_XL.pt")
+data = data[:, :]
+data = normalize_data(data)
 print(min_max_values_per_slice(data))
 
 print("Data shape : {}".format(data.shape))
@@ -28,7 +29,7 @@ windows = [(2,1), (2,2), (2,6), (2, 12), (2, 4), (6,1), (6,2), (6,6), (4, 6), (6
 windows = [(2,10)]
 
 model_label = "ENC-DEC-[2-10]"
-name = "lstm-enc-dec-c+s-"
+name = "lstm-enc-dec-XLIM_tau=0_9"
 dt = "np"
 
 config = {

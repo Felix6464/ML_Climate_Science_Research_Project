@@ -180,7 +180,7 @@ class LIM:
 
         return forecast_output
 
-    def noise_integration(self, input_data, timesteps, t_delta_=None, seed=None, num_comp=10):
+    def noise_integration(self, input_data, timesteps, t_delta_=1, seed=None, num_comp=10):
 
         """Perform a numerical integration forced by stochastic noise
 

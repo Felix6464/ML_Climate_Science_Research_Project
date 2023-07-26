@@ -10,8 +10,10 @@ def main():
 
     #data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+    data = torch.load("./synthetic_data/data_piControl.pt")
+    data = normalize_data(data)
     # Calculate the mean and standard deviation along the feature dimension
-    data = data[:, 80000:90000]
+    #data = data[:, 80000:90000]
     #data = normalize_tensor_individual(data)
     print("Data shape : {}".format(data.shape))
 
@@ -116,7 +118,13 @@ def main():
     model_num = [("788373np", "2-10_30k"),
                 ("6859043np", "2-10-60k"),
                 ("6976427np", "2-10-80k"),
-                ("722556np", "2-10_c+s")]
+                 ("1027275np", "2-10-XLIM_norm_before"),]
+    model_num = [("5390553np", "2-10_XLIM-80k"),
+                 ("6976427np", "2-10-80k"),
+                 ("9969766np", "2-10-XLIM_tau")]
+                 #("6859043np", "2-10-60k"),
+                 #("788373np", "2-10_30k")]
+    model_num = [("4814998np", "2-10-XLIM_tau=0_9")]
 
     id = ["horizon_eval_test23"]
 
