@@ -47,7 +47,7 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
         else:
             lim_integration_ = torch.cat((lim_integration_, lim_integration), dim=1)
 
-    amount_data -= 1000
+        amount_data -= 1000
 
     torch.save(lim_integration_, save_name)
     print("saved model")
@@ -56,9 +56,9 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
 
 num_models = 20
 tau_list = [1 for x in range(num_models)]
-timesteps = 40000
+timesteps = 20000
 
-generate_lim_data(timesteps, tau_list, len(tau_list), data, "lim_integration_XLimXtau_200k.pt", time=False)
+generate_lim_data(timesteps, tau_list, len(tau_list), data, "lim_integration_200kXLim.pt", time=False)
 
 
 
