@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 def main():
 
-    data = torch.load("./synthetic_data/data/data_piControl.pt")
+    data = torch.load("data_piControl.pt")
     data = normalize_data(data)
 
     horizon = True
@@ -77,7 +77,7 @@ def main():
                  #("788373np", "2-10_30k")]
     model_num = [("3561908np", "2-10-XLimXtau")]
 
-    id = ["horizon_eval_test23"]
+    id = ["test-horizon"]
 
     loss_list = []
     loss_list_eval = []
@@ -88,7 +88,7 @@ def main():
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
         print("Hyperparameters of model {} : {}".format(model_num[m][0], params))
-        wandb.init(project=f"ML-Climate-SST-{'Horizon'}", config=params, name=params['name'])
+        wandb.init(project=f"SST-{'Test-Horizon'}", config=params, name=params['name'])
 
         hidden_size = params["hidden_size"]
         num_layers = params["num_layers"]

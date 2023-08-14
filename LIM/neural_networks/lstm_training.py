@@ -13,24 +13,19 @@ from utilities import *
 
 
 data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
-data = data[:, :100000]
-data = normalize_data(data)
 print(min_max_values_per_slice(data))
 print("Data shape : {}".format(data.shape))
 
-lr = [0.001, 0.0001, 0.00001]
+lr = [0.001, 0.0001, 0.0005, 0.00001]
 
 windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
            (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-windows = [(4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
-           (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-#windows = [(2,10)]
+windows = [(2,10)]
 
 
-data_sizes = [500, 1000, 2000, 5000, 10000, 20000, 30000, 400000, 50000, 60000, 70000, 80000, 90000, 100000,
-              110000, 120000, 130000, 140000, 150000]
+data_sizes = [110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
 
-model_label = "ENC-DEC-100k"
+model_label = "ENC-DEC-DATA"
 name = "lstm-"
 dt = "np"
 
@@ -45,7 +40,7 @@ config = {
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 100,
+    "num_epochs": 250,
     "batch_size": 128,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
@@ -59,114 +54,114 @@ config = {
 training_info_pth = "trained_models/training_info_lstm.txt"
 
 for window in windows:
-#for data_len in data_sizes:
-#    data = data[:, :data_len]
-#    data = normalize_data(data)
+    for data_len in data_sizes:
+        data = data[:, :data_len]
+        data = normalize_data(data)
 
-    config["input_window"] = window[0]
-    config["output_window"] = window[1]
+        config["input_window"] = window[0]
+        config["output_window"] = window[1]
 
-    if dt == "xr":
+        if dt == "xr":
 
-        idx_train = int(len(data['time']) * 0.7)
-        idx_val = int(len(data['time']) * 0.2)
-        print(idx_train, idx_val)
+            idx_train = int(len(data['time']) * 0.7)
+            idx_val = int(len(data['time']) * 0.2)
+            print(idx_train, idx_val)
 
-        train_data = data[: :,  :idx_train]
-        val_data = data[: :, idx_train: idx_train+idx_val]
-        test_data = data[: :, idx_train+idx_val: ]
-
-
-        train_dataset = TimeSeriesLSTM(train_data, window[0], window[1])
-        train_dataloader = DataLoader(train_dataset,
-                                      batch_size=config["batch_size"],
-                                      shuffle=config["shuffle"],
-                                      drop_last=True)
-
-        val_dataset = TimeSeriesLSTM(val_data, window[0], window[1])
-        val_dataloader = DataLoader(val_dataset,
-                                    batch_size=config["batch_size"],
-                                    shuffle=config["shuffle"],
-                                    drop_last=True)
-
-    else:
-
-        idx_train = int(len(data[0, :]) * 0.7)
-        idx_val = int(len(data[0, :]) * 0.2)
-
-        train_data = data[:, :idx_train]
-        val_data = data[:, idx_train: idx_train+idx_val]
-        test_data = data[:, idx_train+idx_val: ]
+            train_data = data[: :,  :idx_train]
+            val_data = data[: :, idx_train: idx_train+idx_val]
+            test_data = data[: :, idx_train+idx_val: ]
 
 
-        train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0),
-                                         window[0],
-                                         window[1])
+            train_dataset = TimeSeriesLSTM(train_data, window[0], window[1])
+            train_dataloader = DataLoader(train_dataset,
+                                          batch_size=config["batch_size"],
+                                          shuffle=config["shuffle"],
+                                          drop_last=True)
 
-        train_dataloader = DataLoader(train_dataset,
-                                      batch_size=config["batch_size"],
-                                      shuffle=config["shuffle"],
-                                      drop_last=True)
+            val_dataset = TimeSeriesLSTM(val_data, window[0], window[1])
+            val_dataloader = DataLoader(val_dataset,
+                                        batch_size=config["batch_size"],
+                                        shuffle=config["shuffle"],
+                                        drop_last=True)
 
-        val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0),
-                                       window[0],
-                                       window[1])
+        else:
 
-        val_dataloader = DataLoader(val_dataset,
-                                    batch_size=config["batch_size"],
-                                    shuffle=config["shuffle"],
-                                    drop_last=True)
+            idx_train = int(len(data[0, :]) * 0.7)
+            idx_val = int(len(data[0, :]) * 0.2)
 
-
-    for l in lr:
-
-        config["learning_rate"] = l
-
-        config["name"] = name + str(window[0]) + "-" + str(window[1]) + "-" + str(l)
-
-        print("Start training")
-
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-        model = LSTM_Sequence_Prediction(input_size=config["num_features"],
-                                         hidden_size=config["hidden_size"],
-                                         num_layers=config["num_layers"],
-                                         dropout=config["dropout"])
-        model.to(device)
-
-        optimizer = torch.optim.Adam(model.parameters(), lr=l, weight_decay=config["weight_decay"])
-
-        # Save the model and hyperparameters to a file
-        rand_identifier = str(np.random.randint(0, 10000000)) + dt
-        config["name"] = config["name"] + "-" + rand_identifier
+            train_data = data[:, :idx_train]
+            val_data = data[:, idx_train: idx_train+idx_val]
+            test_data = data[:, idx_train+idx_val: ]
 
 
-        loss, loss_test = model.train_model(train_dataloader,
-                                            val_dataloader,
-                                            optimizer,
-                                            config)
+            train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0),
+                                             window[0],
+                                             window[1])
+
+            train_dataloader = DataLoader(train_dataset,
+                                          batch_size=config["batch_size"],
+                                          shuffle=config["shuffle"],
+                                          drop_last=True)
+
+            val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0),
+                                           window[0],
+                                           window[1])
+
+            val_dataloader = DataLoader(val_dataset,
+                                        batch_size=config["batch_size"],
+                                        shuffle=config["shuffle"],
+                                        drop_last=True)
 
 
-        num_of_weigths = (window[0]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*window[1] + window[1])
-        num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        for l in lr:
 
-        config["num_of_weigths"] = num_of_weigths
-        config["num_of_params"] = num_of_params
-        config["loss_train"] = loss.tolist()
-        config["loss_test"] = loss_test.tolist()
-        config["identifier"] = rand_identifier
+            config["learning_rate"] = l
+
+            config["name"] = name + str(data_len) + "-" + str(l)
+
+            print("Start training")
+
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+            model = LSTM_Sequence_Prediction(input_size=config["num_features"],
+                                             hidden_size=config["hidden_size"],
+                                             num_layers=config["num_layers"],
+                                             dropout=config["dropout"])
+            model.to(device)
+
+            optimizer = torch.optim.Adam(model.parameters(), lr=l, weight_decay=config["weight_decay"])
+
+            # Save the model and hyperparameters to a file
+            rand_identifier = str(np.random.randint(0, 10000000)) + dt
+            config["name"] = config["name"] + "-" + rand_identifier
 
 
-        torch.save({'hyperparameters': config,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict()},
-                   f'trained_models/lstm/model_{rand_identifier}.pt')
+            loss, loss_test = model.train_model(train_dataloader,
+                                                val_dataloader,
+                                                optimizer,
+                                                config)
 
-        print(f"Model saved as model_{rand_identifier}.pt")
-        print("Config : {}".format(config))
-        wandb.finish()
 
-        model_dict = {"training_params": config,
-                      "models": (rand_identifier, l)}
+            num_of_weigths = (window[0]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*window[1] + window[1])
+            num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-    save_dict(training_info_pth, model_dict)
+            config["num_of_weigths"] = num_of_weigths
+            config["num_of_params"] = num_of_params
+            config["loss_train"] = loss.tolist()
+            config["loss_test"] = loss_test.tolist()
+            config["identifier"] = rand_identifier
+
+
+            torch.save({'hyperparameters': config,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict()},
+                       f'trained_models/lstm/model_{rand_identifier}.pt')
+
+            print(f"Model saved as model_{rand_identifier}.pt")
+            print("Config : {}".format(config))
+            wandb.finish()
+
+            model_dict = {"training_params": config,
+                          "models": (rand_identifier, l)}
+
+        save_dict(training_info_pth, model_dict)
