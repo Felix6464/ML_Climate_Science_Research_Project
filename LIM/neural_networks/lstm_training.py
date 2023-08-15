@@ -12,7 +12,7 @@ from utilities import *
 #raw_data = normalize_tensor_individual(raw_data)
 
 
-data = torch.load("./synthetic_data/data/lim_integration_200kXLIM.pt")
+data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 print(min_max_values_per_slice(data))
 print("Data shape : {}".format(data.shape))
 
@@ -26,10 +26,10 @@ windows = [(2,12)]
 #data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000,
 #              90000, 100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
 
-data_sizes = [50000, 100000, 150000, 200000]
+data_sizes = [100000]
 
-model_label = "ENC-DEC-FINAL"
-name = "lstm-XLIM-XTAU"
+model_label = "MODEL-DIFF"
+name = "lstm-enc-dec"
 dt = "np"
 
 config = {
@@ -120,7 +120,7 @@ for window in windows:
 
             config["learning_rate"] = l
 
-            config["name"] = name + str(data_len) + "-" + str(l)
+            config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])
 
             print("Start training")
 
