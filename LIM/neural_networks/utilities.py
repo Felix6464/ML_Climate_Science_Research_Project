@@ -6,11 +6,11 @@ import json
 import torch
 import os
 
-import LIM.neural_networks.models.GRU_enc_dec as gru
-import LIM.neural_networks.models.LSTM_enc_dec_input as lstm_input
-import LIM.neural_networks.models.LSTM_enc_dec as lstm
-import LIM.neural_networks.models.FNN_model as ffn
-import LIM.neural_networks.models.LSTM as lstm_base
+import models.GRU_enc_dec as gru
+import models.LSTM_enc_dec_input as lstm_input
+import models.LSTM_enc_dec as lstm
+import models.FNN_model as ffn
+import models.LSTM as lstm_base
 
 
 def reshape_xarray(input_data):

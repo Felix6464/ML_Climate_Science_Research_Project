@@ -1,0 +1,127 @@
+
+
+  0%|▎                                                                                  | 1/250 [00:09<40:09,  9.68s/it, loss_test=1.006]
+Epoch: 00, Training Loss: 0.6439, Test Loss: 1.0055
+
+  1%|▋                                                                                  | 2/250 [00:18<39:06,  9.46s/it, loss_test=0.573]
+
+  1%|▉                                                                                  | 3/250 [00:28<39:34,  9.61s/it, loss_test=0.557]
+
+
+  2%|█▋                                                                                 | 5/250 [00:47<38:52,  9.52s/it, loss_test=0.548]
+Epoch: 04, Training Loss: 0.5355, Test Loss: 0.5480
+
+  2%|█▉                                                                                 | 6/250 [00:57<38:32,  9.48s/it, loss_test=0.546]
+
+
+  3%|██▋                                                                                | 8/250 [01:15<38:01,  9.43s/it, loss_test=0.544]
+Epoch: 07, Training Loss: 0.5280, Test Loss: 0.5440
+
+
+  4%|███▎                                                                              | 10/250 [01:34<37:03,  9.27s/it, loss_test=0.544]
+Epoch: 09, Training Loss: 0.5248, Test Loss: 0.5441
+
+  4%|███▌                                                                              | 11/250 [01:43<37:13,  9.34s/it, loss_test=0.543]
+
+  5%|███▉                                                                              | 12/250 [01:53<37:23,  9.43s/it, loss_test=0.544]
+
+  5%|████▎                                                                             | 13/250 [02:03<37:36,  9.52s/it, loss_test=0.544]
+
+
+  6%|████▉                                                                             | 15/250 [02:22<37:11,  9.50s/it, loss_test=0.546]
+
+  6%|█████▏                                                                            | 16/250 [02:31<37:17,  9.56s/it, loss_test=0.548]
+
+  7%|█████▌                                                                            | 17/250 [02:42<38:04,  9.80s/it, loss_test=0.546]
+Epoch: 16, Training Loss: 0.5159, Test Loss: 0.5464
+
+  7%|█████▉                                                                            | 18/250 [02:51<37:39,  9.74s/it, loss_test=0.548]
+
+  8%|██████▏                                                                           | 19/250 [03:01<37:30,  9.74s/it, loss_test=0.549]
+
+  8%|██████▌                                                                           | 20/250 [03:11<37:10,  9.70s/it, loss_test=0.551]
+
+
+  8%|██████▉                                                                           | 21/250 [03:30<36:45,  9.63s/it, loss_test=0.556]
+
+
+  9%|███████▌                                                                          | 23/250 [03:40<36:35,  9.67s/it, loss_test=0.556]
+Epoch: 22, Training Loss: 0.5059, Test Loss: 0.5559
+
+ 10%|███████▊                                                                          | 24/250 [03:49<36:28,  9.68s/it, loss_test=0.557]
+
+ 10%|████████▏                                                                         | 25/250 [03:59<36:13,  9.66s/it, loss_test=0.559]
+
+
+ 11%|████████▊                                                                         | 27/250 [04:18<35:27,  9.54s/it, loss_test=0.566]
+
+ 11%|█████████▏                                                                        | 28/250 [04:28<35:38,  9.63s/it, loss_test=0.570]
+Epoch: 27, Training Loss: 0.4945, Test Loss: 0.5697
+
+ 12%|█████████▌                                                                        | 29/250 [04:37<35:33,  9.66s/it, loss_test=0.571]
+
+ 12%|█████████▊                                                                        | 30/250 [04:47<35:15,  9.61s/it, loss_test=0.572]
+
+
+ 13%|██████████▍                                                                       | 32/250 [05:06<34:33,  9.51s/it, loss_test=0.579]
+Epoch: 31, Training Loss: 0.4848, Test Loss: 0.5794
+
+ 13%|██████████▊                                                                       | 33/250 [05:15<34:24,  9.51s/it, loss_test=0.584]
+
+ 14%|███████████▏                                                                      | 34/250 [05:25<34:33,  9.60s/it, loss_test=0.584]
+
+ 14%|███████████▍                                                                      | 35/250 [05:35<34:43,  9.69s/it, loss_test=0.588]
+
+
+ 15%|████████████▏                                                                     | 37/250 [05:54<34:07,  9.61s/it, loss_test=0.594]
+
+ 15%|████████████▍                                                                     | 38/250 [06:04<34:05,  9.65s/it, loss_test=0.598]
+Epoch: 37, Training Loss: 0.4714, Test Loss: 0.5980
+
+ 16%|████████████▊                                                                     | 39/250 [06:13<33:48,  9.61s/it, loss_test=0.601]
+
+ 16%|█████████████                                                                     | 40/250 [06:23<33:53,  9.68s/it, loss_test=0.602]
+
+ 16%|█████████████▍                                                                    | 41/250 [06:33<33:44,  9.69s/it, loss_test=0.604]
+
+ 17%|█████████████▊                                                                    | 42/250 [06:43<33:44,  9.74s/it, loss_test=0.608]
+
+
+ 18%|██████████████▍                                                                   | 44/250 [07:02<33:19,  9.71s/it, loss_test=0.609]
+Epoch: 43, Training Loss: 0.4598, Test Loss: 0.6095
+
+ 18%|██████████████▊                                                                   | 45/250 [07:12<32:56,  9.64s/it, loss_test=0.613]
+
+ 18%|███████████████                                                                   | 46/250 [07:21<32:46,  9.64s/it, loss_test=0.613]
+
+
+ 19%|███████████████▋                                                                  | 48/250 [07:40<32:17,  9.59s/it, loss_test=0.618]
+
+ 20%|████████████████                                                                  | 49/250 [07:50<32:00,  9.56s/it, loss_test=0.622]
+Epoch: 48, Training Loss: 0.4517, Test Loss: 0.6216
+
+ 20%|████████████████▍                                                                 | 50/250 [07:59<31:54,  9.57s/it, loss_test=0.623]
+
+ 20%|████████████████▋                                                                 | 51/250 [08:09<31:43,  9.56s/it, loss_test=0.625]
+
+
+ 21%|█████████████████▍                                                                | 53/250 [08:28<31:13,  9.51s/it, loss_test=0.628]
+Epoch: 52, Training Loss: 0.4460, Test Loss: 0.6280
+
+ 22%|█████████████████▋                                                                | 54/250 [08:37<30:41,  9.40s/it, loss_test=0.629]
+
+
+ 22%|██████████████████▎                                                               | 56/250 [08:56<30:46,  9.52s/it, loss_test=0.633]
+
+ 23%|██████████████████▋                                                               | 57/250 [09:06<30:36,  9.51s/it, loss_test=0.632]
+ 23%|██████████████████▋                                                               | 57/250 [09:08<30:56,  9.62s/it, loss_test=0.632]
+Traceback (most recent call last):
+  File "lstm_training.py", line 142, in <module>
+    loss, loss_test = model.train_model(train_dataloader,
+  File "/mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/models/LSTM_enc_dec_input.py", line 353, in train_model
+    loss.backward()
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/_tensor.py", line 487, in backward
+    torch.autograd.backward(
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/autograd/__init__.py", line 200, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

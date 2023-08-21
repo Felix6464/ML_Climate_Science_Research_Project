@@ -1,0 +1,283 @@
+2023-08-21 08:01:30,356 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Current SDK version is 0.15.8
+2023-08-21 08:01:30,356 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Configure stats pid to 153844
+2023-08-21 08:01:30,356 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Loading settings from /home/goswami/gkd235/.config/wandb/settings
+2023-08-21 08:01:30,357 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Loading settings from /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/settings
+2023-08-21 08:01:30,357 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-08-21 08:01:30,357 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-08-21 08:01:30,357 INFO    MainThread:153844 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'LIM/neural_networks/lstm_training.py', 'program': 'lstm_training.py'}
+2023-08-21 08:01:30,357 INFO    MainThread:153844 [wandb_init.py:_log_setup():507] Logging user logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230821_080130-hyobiq9h/logs/debug.log
+2023-08-21 08:01:30,358 INFO    MainThread:153844 [wandb_init.py:_log_setup():508] Logging internal logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230821_080130-hyobiq9h/logs/debug-internal.log
+2023-08-21 08:01:30,359 INFO    MainThread:153844 [wandb_init.py:init():547] calling init triggers
+2023-08-21 08:01:30,359 INFO    MainThread:153844 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {'wandb': True, 'name': 'lstm-enc-dec-0.0001-2-12160000-133216np', 'num_features': 30, 'hidden_size': 128, 'dropout': 0, 'weight_decay': 0, 'input_window': 2, 'output_window': 12, 'learning_rate': 0.0001, 'num_layers': 1, 'num_epochs': 250, 'batch_size': 128, 'train_data_len': 200000, 'training_prediction': 'recursive', 'loss_type': 'MSE', 'model_label': 'ENC-DEC-100k-DATA', 'teacher_forcing_ratio': -4.198030811863873e-16, 'dynamic_tf': True, 'shuffle': True, 'one_hot_month': False, 'num_of_weigths': 1932, 'num_of_params': 217886, 'loss_train': [0.9960259914398193, 0.9944348573684693, 1.0004939198493958, 0.9965215921401978, 0.9987288117408752, 0.9940284848213196, 0.9947763085365295, 0.9915221571922302, 0.9950747847557068, 0.9888338446617126, 0.9948432445526123, 0.9938349962234497, 0.9889812707901001, 0.9880651950836181, 0.9897783517837524, 0.9905117154121399, 0.986456549167633, 0.9927093982696533, 0.988344156742096, 0.9831959009170532, 0.9867026090621949, 0.9878168940544129, 0.9793723940849304, 0.9806541323661804, 0.9873417854309082, 0.9808577537536621, 0.9795897841453552, 0.9828972816467285, 0.982838237285614, 0.981963038444519, 0.9768810391426086, 0.9777268409729004, 0.9702635407447815, 0.9730623722076416, 0.9634217381477356, 0.955219829082489, 0.9476402521133422, 0.9439630746841431, 0.9325667500495911, 0.9226658582687378, 0.9195422291755676, 0.9145691990852356, 0.9096829533576966, 0.9019643545150757, 0.8996636271476746, 0.8899408221244812, 0.8875728964805603, 0.8807480573654175, 0.8753552198410034, 0.8708580255508422, 0.8654064655303955, 0.8587005257606506, 0.856184184551239, 0.8474377274513245, 0.841794216632843, 0.8383153319358826, 0.8316621899604797, 0.8285135507583619, 0.818654453754425, 0.8175896883010865, 0.8047751784324646, 0.8010818243026734, 0.7967081308364868, 0.7910111427307129, 0.7862073898315429, 0.7838800191879273, 0.7783624410629273, 0.7750287055969238, 0.766451358795166, 0.7635125398635865, 0.7559040188789368, 0.7529712796211243, 0.7474464535713196, 0.7428465843200683, 0.7372054100036621, 0.7350576519966125, 0.7282379031181335, 0.7237988352775574, 0.7189582228660584, 0.7180339932441712, 0.7105404257774353, 0.7038387537002564, 0.7038897275924683, 0.7011421084403991, 0.6966763496398926, 0.6915927767753601, 0.6869710326194763, 0.684926974773407, 0.6788592100143432, 0.6769049286842346, 0.6748663783073425, 0.6712343454360962, 0.6648282766342163, 0.662315309047699, 0.6574427843093872, 0.6560060501098632, 0.6529772877693176, 0.6472453355789185, 0.6456077933311463, 0.6403561592102051, 0.6379200696945191, 0.6343415141105652, 0.6332801103591919, 0.6270321130752563, 0.6270612716674805, 0.6213528275489807, 0.6200673699378967, 0.6171609878540039, 0.6112071514129639, 0.6112717032432556, 0.6058036804199218, 0.6036644577980042, 0.6003680109977723, 0.5967015504837037, 0.5965248823165894, 0.59041348695755, 0.5894198417663574, 0.586343252658844, 0.5848661422729492, 0.5810515642166137, 0.5768975377082824, 0.5739758133888244, 0.5716666579246521, 0.5695624113082886, 0.5652192592620849, 0.5619455099105835, 0.558905303478241, 0.5556690931320191, 0.5560003757476807, 0.5541937112808227, 0.5495002388954162, 0.5452278256416321, 0.5440211772918702, 0.5393016934394836, 0.5403427243232727, 0.5347177743911743, 0.5329779982566833, 0.5297583222389222, 0.5262986660003662, 0.5244085669517518, 0.523500633239746, 0.5177149593830108, 0.5168056726455689, 0.515965735912323, 0.5114379942417144, 0.5089086711406707, 0.5047808587551117, 0.5065868616104126, 0.5041544079780579, 0.4988203406333923, 0.4948065459728241, 0.4934963881969452, 0.49241477251052856, 0.4896386981010437, 0.4898818492889404, 0.48574466705322267, 0.48151096105575564, 0.47727895975112916, 0.4765020549297333, 0.4739744305610657, 0.47246657609939574, 0.46950157880783083, 0.46713910698890687, 0.46629010438919066, 0.4622900664806366, 0.458865761756897, 0.4578199326992035, 0.45755885243415834, 0.45402511954307556, 0.45053504705429076, 0.4484586477279663, 0.44552398324012754, 0.4434686303138733, 0.4443315386772156, 0.43881420493125917, 0.43802924156188966, 0.43544335961341857, 0.43334659934043884, 0.43090746402740476, 0.42963454127311707, 0.4253138303756714, 0.4243709444999695, 0.4230805814266205, 0.41724247932434083, 0.41655716896057127, 0.4155306935310364, 0.4139146268367767, 0.41187761425971986, 0.4100872874259949, 0.40690137147903443, 0.4058425545692444, 0.4021353363990784, 0.3997623920440674, 0.3988735437393188, 0.39675356149673463, 0.39254833459854127, 0.3935519874095917, 0.39078755378723146, 0.3881528556346893, 0.38671048283576964, 0.38401579260826113, 0.38136855959892274, 0.380171936750412, 0.37974876165390015, 0.37674257159233093, 0.3758553147315979, 0.37362487316131593, 0.36962506771087644, 0.3689405083656311, 0.3689492106437683, 0.36561280488967896, 0.36412985920906066, 0.36109310388565063, 0.36029332280159, 0.3570014417171478, 0.35652275681495665, 0.3551247715950012, 0.35302047729492186, 0.3512348771095276, 0.3495537340641022, 0.34826700687408446, 0.34537922739982607, 0.3429412543773651, 0.34270307421684265, 0.34099392890930175, 0.3400468468666077, 0.3368227005004883, 0.3363401174545288, 0.3345874845981598, 0.3326768517494202, 0.33127317428588865, 0.33028407096862794, 0.3268173038959503, 0.3274277627468109, 0.3252062737941742, 0.3235690832138062, 0.32203882932662964, 0.3212256669998169, 0.31980851888656614, 0.3164539933204651, 0.3156252920627594, 0.3140572547912598, 0.3130648910999298, 0.3116461753845215, 0.3105572760105133, 0.307759952545166, 0.30739972591400144, 0.30541210174560546, 0.3047187030315399, 0.3026599586009979], 'loss_test': [1.0776488780975342, 1.0795716047286987, 1.077274203300476, 1.0940046310424805, 1.087935447692871, 1.0802381038665771, 1.084473729133606, 1.0846110582351685, 1.0640407800674438, 1.0824939012527466, 1.0654566287994385, 1.0820542573928833, 1.0702476501464844, 1.0753810405731201, 1.0849921703338623, 1.0944017171859741, 1.079424262046814, 1.0894336700439453, 1.0823049545288086, 1.079819917678833, 1.0952215194702148, 1.0856552124023438, 1.0774118900299072, 1.0679391622543335, 1.0972437858581543, 1.0877814292907715, 1.0907775163650513, 1.0952214002609253, 1.0684207677841187, 1.0751618146896362, 1.0855107307434082, 1.0665919780731201, 1.0782052278518677, 1.0631035566329956, 1.0778597593307495, 1.0644841194152832, 1.0605125427246094, 1.0587587356567383, 1.0520809888839722, 1.0340816974639893, 1.0391478538513184, 1.0373919010162354, 1.0119924545288086, 1.0212117433547974, 1.0074677467346191, 1.00705885887146, 1.0119115114212036, 1.0019621849060059, 0.9995333552360535, 0.9860533475875854, 0.96923828125, 0.9837585687637329, 0.9802505970001221, 0.97566157579422, 0.9584912657737732, 0.9687188267707825, 0.9722317457199097, 0.9677886962890625, 0.9463024735450745, 0.9339010715484619, 0.9376136064529419, 0.9322013854980469, 0.9282287955284119, 0.9485007524490356, 0.933626651763916, 0.9213664531707764, 0.9158750772476196, 0.921109139919281, 0.9293398857116699, 0.9168523550033569, 0.9153088331222534, 0.9154913425445557, 0.9131556153297424, 0.9063356518745422, 0.9198485016822815, 0.9286988377571106, 0.9053245186805725, 0.9284996390342712, 0.9066833853721619, 0.8970362544059753, 0.9077615737915039, 0.9085213541984558, 0.9135243892669678, 0.9099891185760498, 0.9024149179458618, 0.9002512693405151, 0.9076575040817261, 0.912731945514679, 0.9075533151626587, 0.9050577282905579, 0.9072698354721069, 0.909699022769928, 0.9180030226707458, 0.9104649424552917, 0.8933145403862, 0.9076605439186096, 0.907048225402832, 0.9086092114448547, 0.9092028737068176, 0.9013882875442505, 0.903414785861969, 0.8970534801483154, 0.9072557687759399, 0.903961718082428, 0.9102688431739807, 0.9195443391799927, 0.9038645625114441, 0.9093185663223267, 0.9108490347862244, 0.90073162317276, 0.894608736038208, 0.9010037183761597, 0.9022907614707947, 0.9060290455818176, 0.9045112729072571, 0.9068271517753601, 0.9053022861480713, 0.9106025099754333, 0.8942245841026306, 0.9085832834243774, 0.8951653838157654, 0.9038075804710388, 0.9178532958030701, 0.9062178134918213, 0.9153102040290833, 0.9027530550956726, 0.9144107699394226, 0.9115028381347656, 0.9170874953269958, 0.9167905449867249, 0.9107798337936401, 0.9172336459159851, 0.9123803377151489, 0.9167895913124084, 0.9157724380493164, 0.9205666780471802, 0.917354166507721, 0.9162214994430542, 0.9097944498062134, 0.9247342944145203, 0.8964654803276062, 0.9147567749023438, 0.9197070598602295, 0.9270545244216919, 0.9285047054290771, 0.9290828704833984, 0.9188034534454346, 0.9265155792236328, 0.9299848079681396, 0.9169210195541382, 0.9307506084442139, 0.9181423783302307, 0.9385716915130615, 0.9239228367805481, 0.9128865003585815, 0.9295693635940552, 0.9236882925033569, 0.9302520751953125, 0.9207854866981506, 0.9261640906333923, 0.9283370971679688, 0.9184263944625854, 0.9444685578346252, 0.9337729811668396, 0.9452060461044312, 0.9270864725112915, 0.9354845285415649, 0.9245149493217468, 0.9272422194480896, 0.9338405132293701, 0.9286064505577087, 0.9326721429824829, 0.9331679940223694, 0.9431365132331848, 0.928716242313385, 0.9418084025382996, 0.9362808465957642, 0.9373072385787964, 0.9418204426765442, 0.9383383989334106, 0.938446581363678, 0.9559444785118103, 0.9477391839027405, 0.9389560222625732, 0.9491018652915955, 0.962376594543457, 0.9465842843055725, 0.9511926770210266, 0.9483217000961304, 0.9542136788368225, 0.9533522725105286, 0.9498973488807678, 0.9565826654434204, 0.9579129815101624, 0.9425174593925476, 0.9519675374031067, 0.9542227983474731, 0.9486920237541199, 0.9544497132301331, 0.9572152495384216, 0.9650378227233887, 0.9574440121650696, 0.9627857804298401, 0.9644539952278137, 0.958357572555542, 0.9577969312667847, 0.9621466398239136, 0.9637199640274048, 0.9686883687973022, 0.9739329814910889, 0.9744430184364319, 0.9684357047080994, 0.9687010049819946, 0.9693354368209839, 0.9669130444526672, 0.9678833484649658, 0.9686977863311768, 0.982090950012207, 0.9703732132911682, 0.9720308184623718, 0.9683417677879333, 0.9714643359184265, 0.9804750680923462, 0.9844062328338623, 0.983974039554596, 0.9801544547080994, 0.9751915335655212, 0.9724012613296509, 0.9745190143585205, 0.992343008518219, 0.9790958166122437, 0.9865025281906128, 0.9874027967453003, 1.0048874616622925, 0.9915269613265991, 0.9899717569351196, 0.9798779487609863, 0.9766883850097656, 1.0014370679855347, 0.9718607664108276, 0.995032787322998, 0.9825869202613831, 0.9936695098876953, 0.9963312745094299, 0.9986392855644226, 0.9984562397003174, 0.9837034940719604, 0.9970560669898987, 0.9946771860122681, 1.0071076154708862], 'identifier': '9915537np'}
+2023-08-21 08:01:30,361 INFO    MainThread:153844 [wandb_init.py:init():596] starting backend
+2023-08-21 08:01:30,361 INFO    MainThread:153844 [wandb_init.py:init():600] setting up manager
+2023-08-21 08:01:30,373 INFO    MainThread:153844 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-08-21 08:01:30,373 INFO    MainThread:153844 [wandb_init.py:init():606] backend started and connected
+2023-08-21 08:01:30,428 INFO    MainThread:153844 [wandb_init.py:init():697] updated telemetry
+2023-08-21 08:01:30,516 INFO    MainThread:153844 [wandb_init.py:init():730] communicating run to backend with 60.0 second timeout
+2023-08-21 08:01:31,689 INFO    MainThread:153844 [wandb_run.py:_on_init():2180] communicating current version
+2023-08-21 08:01:31,758 INFO    MainThread:153844 [wandb_run.py:_on_init():2189] got version response 
+2023-08-21 08:01:31,758 INFO    MainThread:153844 [wandb_init.py:init():781] starting run threads in backend
+2023-08-21 08:01:34,297 INFO    MainThread:153844 [wandb_run.py:_console_start():2159] atexit reg
+2023-08-21 08:01:34,299 INFO    MainThread:153844 [wandb_run.py:_redirect():2014] redirect: wrap_raw
+2023-08-21 08:01:34,299 INFO    MainThread:153844 [wandb_run.py:_redirect():2079] Wrapping output streams.
+2023-08-21 08:01:34,299 INFO    MainThread:153844 [wandb_run.py:_redirect():2104] Redirects installed.
+2023-08-21 08:01:34,301 INFO    MainThread:153844 [wandb_init.py:init():822] run started, returning control to user process
+2023-08-21 08:01:34,399 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,485 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,568 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,651 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,729 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,816 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,896 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:34,970 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,057 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,153 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,239 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,321 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,398 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,483 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,569 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,650 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,732 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,815 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,902 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:35,990 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,075 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,170 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,261 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,345 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,432 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,515 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,622 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,713 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,799 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,876 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:36,956 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,036 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,109 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,190 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,265 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,345 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,431 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,509 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,597 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,670 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,750 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,832 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,907 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:37,990 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,082 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,160 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,248 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,334 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,409 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,494 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,578 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,659 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,733 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,815 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,896 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:38,973 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,046 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,119 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,208 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,285 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,357 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,444 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,525 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,618 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,695 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,786 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,875 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:39,959 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,043 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,120 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,203 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,277 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,354 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,430 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,515 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,598 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,672 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,748 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,826 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,903 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:40,993 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,084 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,168 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,259 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,341 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,418 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,500 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,589 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,691 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,776 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,870 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:41,954 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,042 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,125 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,209 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,292 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,379 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,455 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,538 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,622 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,711 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,793 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,880 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:42,966 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,065 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,147 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,225 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,300 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,383 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,456 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,538 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,628 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,700 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,781 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,869 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:43,953 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,040 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,125 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,207 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,289 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,367 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,449 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,531 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,619 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,700 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,781 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,861 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:44,966 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,067 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,153 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,247 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,333 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,407 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,489 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,570 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,647 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,727 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,804 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,888 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:45,978 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,074 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,168 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,245 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,337 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,430 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,517 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,616 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,698 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,786 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,880 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:46,962 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,039 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,116 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,194 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,276 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,363 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,450 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,541 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,618 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,705 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,786 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,862 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:47,935 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,025 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,099 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,190 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,267 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,340 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,418 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,504 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,577 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,656 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,738 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,828 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:48,915 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,004 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,089 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,176 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,267 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,343 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,421 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,505 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,586 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,672 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,761 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,848 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:49,928 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,006 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,084 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,165 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,238 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,319 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,403 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,486 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,584 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,675 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,763 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,846 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:50,923 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,000 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,093 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,179 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,262 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,334 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,408 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,480 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,557 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,644 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,725 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,808 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,890 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:51,967 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,060 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,144 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,231 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,308 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,392 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,465 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,538 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,623 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,705 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,778 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,857 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:52,944 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,054 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,134 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,209 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,299 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,375 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,452 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,526 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,604 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,691 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,773 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,856 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:53,939 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,016 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,090 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,168 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,256 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,338 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,416 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,494 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,584 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,665 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,751 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,838 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,915 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:54,989 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:55,062 INFO    MainThread:153844 [wandb_watch.py:watch():51] Watching
+2023-08-21 08:01:55,083 INFO    MainThread:153844 [wandb_run.py:_finish():1894] finishing run climate_ml/SST-ENC-DEC-100k-DATA/hyobiq9h
+2023-08-21 08:01:55,083 INFO    MainThread:153844 [wandb_run.py:_atexit_cleanup():2128] got exitcode: 0
+2023-08-21 08:01:55,084 INFO    MainThread:153844 [wandb_run.py:_restore():2111] restore
+2023-08-21 08:01:55,084 INFO    MainThread:153844 [wandb_run.py:_restore():2117] restore done
+2023-08-21 08:02:00,004 INFO    MainThread:153844 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2023-08-21 08:02:00,005 INFO    MainThread:153844 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2023-08-21 08:02:00,016 INFO    MainThread:153844 [wandb_run.py:_footer_sync_info():3440] logging synced files

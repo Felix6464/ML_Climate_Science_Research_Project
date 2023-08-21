@@ -54,11 +54,11 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
 
 
 
-num_models = 20
-tau_list = [0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3]
-timesteps = 40000
+num_models = 1
+tau_list = [1]
+timesteps = 1000000
 
-generate_lim_data(timesteps, tau_list, len(tau_list), data, "lim_integration_200kXLimXTau.pt", time=False)
+generate_lim_data(timesteps, tau_list, len(tau_list), data, "lim_integration_1mil.pt", time=False)
 
 
 
