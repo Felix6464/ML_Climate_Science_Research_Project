@@ -1,4 +1,4 @@
-from models.LSTM_enc_dec import *
+from models.LSTM_enc_dec_input import *
 from torch.utils.data import DataLoader
 from utilities import *
 
@@ -12,25 +12,25 @@ from utilities import *
 #raw_data = normalize_tensor_individual(raw_data)
 
 
-data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
-print(min_max_values_per_slice(data))
-print("Data shape : {}".format(data.shape))
+data_ = torch.load("./synthetic_data/data/lim_integration_200kXLim.pt")
+print(min_max_values_per_slice(data_))
+print("Data shape : {}".format(data_.shape))
 
 lr = [0.0005, 0.0001, 0.00005]
 lr = [0.0001]
 
-windows = windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
+windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
            (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-#windows = [(2,12)]
+windows = [(2,12)]
 
 #cluster test
 #data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000,
-#              90000, 100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
+              #90000, 100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
 
-data_sizes = [100000]
+data_sizes = [200000]
 
-model_label = "ENC-DEC-30E-HORIZON"
-name = "lstm-enc-dec"
+model_label = "ENC-DEC-MODELS"
+name = "lstm_enc_dec_XLim"
 dt = "np"
 
 config = {
@@ -46,11 +46,11 @@ config = {
     "num_layers": 1,
     "num_epochs": 30,
     "batch_size": 128,
-    "train_data_len": len(data[0, :]),
-    "training_prediction": "recursive",
+    "train_data_len": len(data_[0, :]),
+    "training_prediction": "mixed_teacher_forcing",
     "loss_type": "MSE",
     "model_label": model_label,
-    "teacher_forcing_ratio": 0.6,
+    "teacher_forcing_ratio": 0.5,
     "dynamic_tf": True,
     "shuffle": True,
     "one_hot_month": False,
@@ -59,7 +59,8 @@ training_info_pth = "trained_models/training_info_lstm.txt"
 
 for window in windows:
     for data_len in data_sizes:
-        data = data[:, :data_len]
+        print("Data size : {} {}".format(data_len, type(data_len)))
+        data = data_[:, :data_len]
         data = normalize_data(data)
         print(data.shape)
 
@@ -123,6 +124,7 @@ for window in windows:
             config["learning_rate"] = l
 
             config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])+ str(data_len)
+            #config["name"] = str(window[0]) + "-" + str(window[1]) + str(data_len)
 
             print("Start training")
 

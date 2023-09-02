@@ -1,5 +1,5 @@
 import torch
-
+from scipy.linalg import expm
 from LIM.neural_networks import utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
@@ -179,6 +179,30 @@ class LIM:
             forecast_output[i] = forecast
 
         return forecast_output
+
+    def euler_method(self, L, Q, x0, dt, T):
+        """
+        Solve the SDE using the Euler method.
+
+        L: Linear Operator Matrix (n,n)
+        Q: Noise Covariance Matrix (n,n)
+        x0: Initial condition (n,)
+        dt: Time step
+        T: Total simulation time
+        """
+        num_steps = int(T/dt)
+        n = len(x0)
+
+        # Initialize solution
+        x = np.zeros((n, num_steps+1))
+        x[:, 0] = x0
+
+        # Iteratively apply the Euler method
+        for i in range(num_steps):
+            x[:, i+1] = x[:, i] + dt * np.dot(L, x[:, i])
+            x[:, i+1] += np.random.multivariate_normal(np.zeros(n), cov=Q) * np.sqrt(dt)
+
+        return x
 
     def noise_integration(self, input_data, timesteps, t_delta_=1, seed=None, num_comp=10):
 

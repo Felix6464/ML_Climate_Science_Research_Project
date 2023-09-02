@@ -53,12 +53,61 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
     print("saved model")
 
 
+def generate_lim_data2(timesteps, tau_list, num_models, data, save_name, time=False):
+
+
+    lim_integration_ = torch.zeros((30, timesteps))
+
+    amount_data = len(data[0, :])
+
+    for m in range(num_models):
+
+        tau = 1
+        model = LIM(tau)
+        model.fit(data[:, :amount_data].detach().cpu().numpy())
+
+        #lim_integration, times_ = model.noise_integration(data[:, amount_data-1],
+        #                                                  timesteps=timesteps,
+        #                                                  num_comp=30,
+        #                                                  t_delta_=tau_list[m])
+
+        lim_integration = model.euler_method(L=model.logarithmic_matrix,
+                                             Q=model.noise_covariance,
+                                             x0=data[:, amount_data-1],
+                                             dt=1,
+                                             T=timesteps
+                                             )
+
+        lim_integration = torch.from_numpy(lim_integration)
+
+
+        if time is True:
+            lim_integration = torch.zeros(lim_integration.shape[0]+1, lim_integration.shape[1])
+            count = 0
+            for t in range(int(timesteps / 12)):
+                for m in range(12):
+                    month = np.array(m+1)
+                    month = np.expand_dims(month, axis=0)
+                    lim = np.append(lim_integration[:, count + m], month, axis=0)
+                    lim_integration[:, count+m] = torch.from_numpy(lim)
+                count += 12
+
+
+        if amount_data == len(data[0, :]):
+            lim_integration_ = lim_integration
+        else:
+            lim_integration_ = torch.cat((lim_integration_, lim_integration), dim=1)
+
+        amount_data -= 1000
+
+    torch.save(lim_integration_, save_name)
+    print("saved model")
 
 num_models = 1
 tau_list = [1]
-timesteps = 1000000
+timesteps = 200000
 
-generate_lim_data(timesteps, tau_list, len(tau_list), data, "lim_integration_1mil.pt", time=False)
+generate_lim_data2(timesteps, tau_list, len(tau_list), data, "lim_integration_200k_new.pt", time=False)
 
 
 

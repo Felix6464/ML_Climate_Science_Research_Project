@@ -7,9 +7,9 @@ import torch.utils.data as datat
 import os
 
 #raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
-data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 #raw_data = torch.load("./raw_data/data_piControl.pt")
-data = data[:, :80000]
+data = data[:, :100000]
 data = normalize_data(data)
 
 
@@ -19,7 +19,7 @@ dt = "fnp"
 lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
 lr = [0.0001]
 
-model_label = "ENC-DEC-INPUT-2-6"
+model_label = "ENC-DEC-MODELS"
 name = "ffn"
 
 config = {

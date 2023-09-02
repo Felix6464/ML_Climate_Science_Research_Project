@@ -6,11 +6,11 @@ import json
 import torch
 import os
 
-import models.GRU_enc_dec as gru
-import models.LSTM_enc_dec_input as lstm_input
-import models.LSTM_enc_dec as lstm
-import models.FNN_model as ffn
-import models.LSTM as lstm_base
+#import models.GRU_enc_dec as gru
+#import models.LSTM_enc_dec_input as lstm_input
+#import models.LSTM_enc_dec as lstm
+#import models.FNN_model as ffn
+#import models.LSTM as lstm_base
 
 
 def reshape_xarray(input_data):
@@ -405,7 +405,7 @@ def normalize_tensor_individual(tensor):
         normalized_tensor[feature_idx, :] = (tensor[feature_idx, :] - min_value) / (max_value - min_value)
 
     return normalized_tensor
-
+'''
 def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn):
 
     # Load the saved models
@@ -468,7 +468,7 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     model_ffn = model_ffn.to(device)
 
     return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru
-
+'''
 
 def min_max_values_per_slice(tensor):
     """

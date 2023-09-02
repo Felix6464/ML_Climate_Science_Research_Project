@@ -137,7 +137,7 @@ class FeedforwardNetwork(nn.Module):
     def train_model(self, train_dataloader, eval_dataloader, optimizer, config):
 
         if config["wandb"] is True:
-            wandb.init(project=f"ML-Climate-SST-{config['model_label']}", name=config['name'])
+            wandb.init(project=f"SST-{config['model_label']}", name=config['name'])
 
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

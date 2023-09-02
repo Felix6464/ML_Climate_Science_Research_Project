@@ -1,7 +1,7 @@
-from models.LSTM_enc_dec import *
-import models.GRU_enc_dec as gru
-from LIM.neural_networks.plots.plots import *
-from utilities import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+import LIM.neural_networks.models.GRU_enc_dec as gru
+from LIM.neural_networks.plots import *
+from LIM.neural_networks.utilities import *
 from torch.utils.data import DataLoader
 
 
@@ -13,69 +13,35 @@ def main():
     horizon = True
 
     # Specify the model number of the model to be tested
-    # model_num = [("5723466np", "5-5"),
-    #              ("6807315np", "5-5-last"),
-    #              ("1986764np", "5-5-permute"),
-    #              ("2971989np", "5-5-last-only")]
-    # model num 2-6
-    model_num = [("5415593np", "0.00005_overfit"),
-                    ("3417220np", "0.00005_40k"),
-                    ("1967542np", "0.00005_60k"),
-                    #("7668078np", "0.00005_80k"),
-                    #("3737982np", "0.00005_80k_drop"),
-                    ("1319995np", "0.00008_control"),
-                    ("5797841np", "0.00008_80k")]
-                    #("9037420np", "0.00005_norm"),
-                    #("4386809np", "0.00005_norm_wod")]
-    # model_num = [("8389752np", "12-6"),
-    #              ("9177999np", "12-1"),
-    #              ("3212319np", "12-2"),
-    #              ("8364180np", "6-2"),
-    #              ("6113293np", "2-2"),
-    #              ("3650104np", "6-1"),
-    #              ("9670756np", "2-1"),
-    #              ("8221899np", "6-6"),
-    #              ("9388021np", "2-6")]
-    # #model num min max normalized
-    # model_num = [("3237362np", "12-6"),
-    #              ("8153371np", "12-1"),
-    #              ("1745540np", "12-2"),
-    #              ("6881306np", "6-2"),
-    #              ("8541071np", "2-2"),
-    #              ("9933030np", "6-1"),
-    #              ("7583665np", "2-1"),
-    #              ("9383950np", "6-6"),
-    #              ("6486631np", "2-6")]
-    model_num = [("6358986np", "2-6_128_wdecay3")]
-    model_num = [("2674237np", "2-6_lstm_64_")]
-    model_num = [("1814773np", "12-6"),
-                 ("3836957np", "12-1"),
-                 ("7623451np", "12-2"),
-                 ("7871629np", "6-12"),
-                 ("8207731np", "6-4"),
-                 ("8234712np", "4-6"),
-                 ("228620np", "6-2"),
-                 ("4255990np", "2-2"),
-                 ("7540476np", "6-1"),
-                 ("8087997np", "2-4"),
-                 ("2710934np", "2-12"),
-                 ("5254853np", "2-1"),
-                 ("9001583np", "6-6"),
-                 ("3063862np", "2-6")]
-    model_num = [("2617592np", "2-6"),
-                ("1321170np", "2-8"),
-                ("1911386np", "2-10"),
-                ("4324123np", "2-12")]
-    model_num = [("788373np", "2-10_30k"),
-                ("6859043np", "2-10-60k"),
-                ("6976427np", "2-10-80k"),
-                 ("1027275np", "2-10-XLIM_norm_before"),]
-    model_num = [("5390553np", "2-10_XLIM-80k"),
-                 ("6976427np", "2-10-80k"),
-                 ("9969766np", "2-10-XLIM_tau")]
-                 #("6859043np", "2-10-60k"),
-                 #("788373np", "2-10_30k")]
-    model_num = [("3561908np", "2-10-XLimXtau")]
+
+    model_num = [                 ("366124np", "6-1"),
+                                  ("6436104np", "6-2"),
+                                  ("5766124np", "6-4"),
+                                  ("1716158np", "6-6"),
+                                  ("4227347np", "6-8"),
+                                  ("6916466np", "6-10"),
+                                  ("6031523np", "6-12"),
+                                  ("1607761np", "12-1"),
+                                  ("3778713np", "12-2"),
+                                  ("5483003np", "12-4"),
+                                  ("3383730np", "12-6"),
+                                  ("36039np", "12-8"),
+                                  ("7361308np", "12-10"),
+                                  ("3031954np", "12-12")]
+    model_num = [("517928np", "2-1"),
+                 ("4716746np", "2-2"),
+                 ("2482928np", "2-4"),
+                 ("7125364np", "2-6"),
+                 ("4908365np", "2-10"),
+                 ("8049569np", "2-12"),
+                 ("791884np", "4-1"),
+                 ("5740785np", "4-2"),
+                 ("9099984np", "4-4"),
+                 ("4151419np", "4-6"),
+                 ("5460966np", "4-8"),
+                 ("65094np", "4-10"),
+                 ("2316936np", "4-12")]
+
 
     id = ["test-horizon"]
 
@@ -83,7 +49,7 @@ def main():
     loss_list_eval = []
 
     for m in range(len(model_num)):
-        saved_model = torch.load(f"./trained_models/lstm/model_{model_num[m][0]}.pt")
+        saved_model = torch.load(f"LIM/neural_networks/trained_models/lstm/model_{model_num[m][0]}.pt")
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
