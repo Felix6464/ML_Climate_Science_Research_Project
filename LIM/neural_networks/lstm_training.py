@@ -1,4 +1,4 @@
-from models.LSTM_enc_dec_input import *
+from models.LSTM_enc_dec import *
 from torch.utils.data import DataLoader
 from utilities import *
 
@@ -12,7 +12,7 @@ from utilities import *
 #raw_data = normalize_tensor_individual(raw_data)
 
 
-data_ = torch.load("./synthetic_data/data/lim_integration_200kXLim.pt")
+data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 print(min_max_values_per_slice(data_))
 print("Data shape : {}".format(data_.shape))
 
@@ -21,7 +21,8 @@ lr = [0.0001]
 
 windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
            (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-windows = [(2,12)]
+windows = [(2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12)]
+windows = [(2,8)]
 
 #cluster test
 #data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000,
@@ -29,8 +30,8 @@ windows = [(2,12)]
 
 data_sizes = [200000]
 
-model_label = "ENC-DEC-MODELS"
-name = "lstm_enc_dec_XLim"
+model_label = "ENC-DEC-30E-HORIZON"
+name = "lstm_enc_dec"
 dt = "np"
 
 config = {
@@ -47,7 +48,7 @@ config = {
     "num_epochs": 30,
     "batch_size": 128,
     "train_data_len": len(data_[0, :]),
-    "training_prediction": "mixed_teacher_forcing",
+    "training_prediction": "recursive",
     "loss_type": "MSE",
     "model_label": model_label,
     "teacher_forcing_ratio": 0.5,
@@ -162,7 +163,7 @@ for window in windows:
             torch.save({'hyperparameters': config,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict()},
-                       f'trained_models/lstm/model_{rand_identifier}.pt')
+                       f'trained_models_cluster_final/2_8/model_{rand_identifier}.pt')
 
             print(f"Model saved as model_{rand_identifier}.pt")
             print("Config : {}".format(config))
@@ -171,4 +172,4 @@ for window in windows:
             model_dict = {"training_params": config,
                           "models": (rand_identifier, l)}
 
-        save_dict(training_info_pth, model_dict)
+        #save_dict(training_info_pth, model_dict)

@@ -132,4 +132,4 @@ for l in lr:
     model_dict = {"training_params": config,
                   "models": (rand_identifier, learning_rate)}
 
-    save_dict(training_info_pth, model_dict)
+    #save_dict(training_info_pth, model_dict)
