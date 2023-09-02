@@ -103,9 +103,36 @@ def main():
                                   ("7932815np", "input")]
     model_num = [("2097898np", "teacher_forcing")]
 
+    ### FINAL PLOTS FOR REPORT
+
+    model_num = [("517928np", "2-1"),
+                 ("4716746np", "2-2"),
+                 ("2482928np", "2-4"),
+                 ("7125364np", "2-6"),
+                 ("1319079np", "2-8"),
+                 ("4908365np", "2-10"),
+                 ("8049569np", "2-12")]
+    model_num = [("517928np", "2-1"),
+                 ("791884np", "4-1"),
+                 ("4062133np", "6-1"),
+                 ("3436058np", "12-1")]
+    model_num = [("517928np", "2-1"),
+                 ("791884np", "4-1"),
+                 ("4062133np", "6-1"),
+                 ("3436058np", "12-1")]
+    model_num = [("7125364np", "2-6"),
+                 ("4151419np", "4-6"),
+                 ("7009385np", "6-6"),
+                 ("7693311np", "12-6")]
+    model_num = [("8049569np", "2-12"),
+                 ("2316936np", "4-12"),
+                 ("5286230np", "6-12"),
+                 ("254581np", "12-12")]
 
 
-    id = ["test-horizon"]
+
+
+    id = ["final-horizon"]
 
     loss_list = []
     loss_list_eval = []
@@ -116,7 +143,7 @@ def main():
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
         print("Hyperparameters of model {} : {}".format(model_num[m][0], params))
-        wandb.init(project=f"SST-{'Test-Horizon-BEST'}", config=params, name=params['name'])
+        wandb.init(project=f"SST-{'FINAL-Horizon'}", config=params, name=params['name'])
 
         hidden_size = params["hidden_size"]
         num_layers = params["num_layers"]
