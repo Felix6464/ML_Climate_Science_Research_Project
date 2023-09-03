@@ -1,0 +1,28 @@
+Output window: 1, Loss: 0.29753476807049345
+Output window: 2, Loss: 0.5098652906183686
+Output window: 3, Loss: 0.6334111110440322
+Output window: 4, Loss: 0.7149145007133484
+Output window: 5, Loss: 0.7730719037353992
+Output window: 6, Loss: 0.8169569697763238
+Output window: 7, Loss: 0.8521531862871987
+Output window: 8, Loss: 0.8778781560914857
+Output window: 9, Loss: 0.8957618666546685
+Output window: 10, Loss: 0.9085738914353507
+Traceback (most recent call last):
+  File "lstm_testing.py", line 199, in <module>
+    main()
+  File "lstm_testing.py", line 183, in main
+    loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
+  File "/mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/models/LSTM_enc_dec.py", line 377, in evaluate_model
+    for input, target, l in test_dataloader:
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 633, in __next__
+    data = self._next_data()
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 677, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/models/LSTM_enc_dec.py", line 69, in __getitem__
+    input = self.arr[idx:idx+self.input_window, :].float()
+KeyboardInterrupt

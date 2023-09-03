@@ -1,0 +1,34 @@
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Current SDK version is 0.15.8
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Configure stats pid to 193000
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Loading settings from /home/goswami/gkd235/.config/wandb/settings
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Loading settings from /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/settings
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-09-02 13:42:49,748 INFO    MainThread:193000 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'LIM/neural_networks/lstm_testing.py', 'program': 'lstm_testing.py'}
+2023-09-02 13:42:49,749 INFO    MainThread:193000 [wandb_init.py:_log_setup():507] Logging user logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230902_134249-vqwfinwi/logs/debug.log
+2023-09-02 13:42:49,750 INFO    MainThread:193000 [wandb_init.py:_log_setup():508] Logging internal logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230902_134249-vqwfinwi/logs/debug-internal.log
+2023-09-02 13:42:49,751 INFO    MainThread:193000 [wandb_init.py:init():547] calling init triggers
+2023-09-02 13:42:49,752 INFO    MainThread:193000 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {'wandb': True, 'name': 'lstm_enc_dec-0.0001-2-8200000-1319079np', 'num_features': 30, 'hidden_size': 128, 'dropout': 0, 'weight_decay': 0, 'input_window': 2, 'output_window': 8, 'learning_rate': 0.0001, 'num_layers': 1, 'num_epochs': 30, 'batch_size': 128, 'train_data_len': 200000, 'training_prediction': 'recursive', 'loss_type': 'MSE', 'model_label': 'ENC-DEC-30E-HORIZON', 'teacher_forcing_ratio': 0.19999999999999973, 'dynamic_tf': True, 'shuffle': True, 'one_hot_month': False, 'num_of_weigths': 1416, 'num_of_params': 217886, 'loss_train': [0.7716981743522882, 0.5812514357248361, 0.5420906545095017, 0.5224637587138086, 0.5101655866995058, 0.5025007494905076, 0.4972262155104425, 0.49332512395706946, 0.4904615145043725, 0.4883013759472996, 0.48673604520111047, 0.48549700113250266, 0.48452763189881193, 0.48374274179462107, 0.48316314751035233, 0.4826772033841045, 0.4822228545730308, 0.4818203628935731, 0.48148827719666604, 0.48120847055373234, 0.48092528384209554, 0.4807071373316528, 0.4804976648512175, 0.4803013162174469, 0.4801240939125487, 0.4799101534832102, 0.4797638350959666, 0.4795876972629516, 0.4794611188652094, 0.47931116238604526], 'loss_test': [0.9929093452982414, 0.6217178748204157, 0.5572956995322154, 0.5334864547237371, 0.518216501443814, 0.5093243171771368, 0.5031013952042812, 0.4987882576309718, 0.4958024380298761, 0.4932732807520108, 0.49157701537777215, 0.49038175885111857, 0.4894651961632264, 0.48872082193310445, 0.4879537446376605, 0.48763379120291805, 0.4874698943816699, 0.4871802653830785, 0.48703467253691113, 0.486542707738968, 0.4866563602326772, 0.48670003400781214, 0.4862183271310268, 0.48624129383227765, 0.48627628586613214, 0.4859405801846431, 0.4861533167079473, 0.48591085609335166, 0.4860913823239314, 0.4858116648900203], 'identifier': '1319079np'}
+2023-09-02 13:42:49,753 INFO    MainThread:193000 [wandb_init.py:init():596] starting backend
+2023-09-02 13:42:49,753 INFO    MainThread:193000 [wandb_init.py:init():600] setting up manager
+2023-09-02 13:42:49,770 INFO    MainThread:193000 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-09-02 13:42:49,770 INFO    MainThread:193000 [wandb_init.py:init():606] backend started and connected
+2023-09-02 13:42:49,838 INFO    MainThread:193000 [wandb_init.py:init():697] updated telemetry
+2023-09-02 13:42:50,012 INFO    MainThread:193000 [wandb_init.py:init():730] communicating run to backend with 60.0 second timeout
+2023-09-02 13:42:51,137 INFO    MainThread:193000 [wandb_run.py:_on_init():2180] communicating current version
+2023-09-02 13:42:51,215 INFO    MainThread:193000 [wandb_run.py:_on_init():2189] got version response upgrade_message: "wandb version 0.15.9 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-09-02 13:42:51,215 INFO    MainThread:193000 [wandb_init.py:init():781] starting run threads in backend
+2023-09-02 13:42:55,021 INFO    MainThread:193000 [wandb_run.py:_console_start():2159] atexit reg
+2023-09-02 13:42:55,023 INFO    MainThread:193000 [wandb_run.py:_redirect():2014] redirect: wrap_raw
+2023-09-02 13:42:55,023 INFO    MainThread:193000 [wandb_run.py:_redirect():2079] Wrapping output streams.
+2023-09-02 13:42:55,023 INFO    MainThread:193000 [wandb_run.py:_redirect():2104] Redirects installed.
+2023-09-02 13:42:55,025 INFO    MainThread:193000 [wandb_init.py:init():822] run started, returning control to user process
+2023-09-02 13:43:26,420 INFO    MainThread:193000 [wandb_run.py:_finish():1894] finishing run climate_ml/SST-FINAL-Horizon/vqwfinwi
+2023-09-02 13:43:26,422 INFO    MainThread:193000 [wandb_run.py:_atexit_cleanup():2128] got exitcode: 0
+2023-09-02 13:43:26,423 INFO    MainThread:193000 [wandb_run.py:_restore():2111] restore
+2023-09-02 13:43:26,423 INFO    MainThread:193000 [wandb_run.py:_restore():2117] restore done
+2023-09-02 13:43:31,466 INFO    MainThread:193000 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2023-09-02 13:43:31,466 INFO    MainThread:193000 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2023-09-02 13:43:31,481 INFO    MainThread:193000 [wandb_run.py:_footer_sync_info():3440] logging synced files

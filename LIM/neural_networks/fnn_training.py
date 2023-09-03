@@ -9,8 +9,8 @@ import os
 #raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
 data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 #raw_data = torch.load("./raw_data/data_piControl.pt")
-data = data[:, :100000]
 data = normalize_data(data)
+data = data[:, :200000]
 
 
 training_info_pth = "trained_models/training_info_ffn.txt"
@@ -126,7 +126,7 @@ for l in lr:
     torch.save({'hyperparameters': config,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./trained_models/ffn/model_{rand_identifier}.pt')
+               f'./final_models/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
     model_dict = {"training_params": config,
