@@ -143,7 +143,7 @@ def plot_loss_combined(loss_values, identifier, loss_type):
     plt.savefig(f'final_plots/loss_{loss_type}_combined_{identifier}_.png', dpi=300)
     plt.show()
 
-def plot_loss_horizon_combined(loss_values, identifier, loss_type):
+def plot_loss_horizon_combined(loss_values, identifier, loss_type, tau=None):
     """
     Plot the loss values over epochs.
 
@@ -159,6 +159,9 @@ def plot_loss_horizon_combined(loss_values, identifier, loss_type):
     for m in range(len(loss_values)):
         loss = loss_values[m][0]
         id = loss_values[m][1]
+        if tau is not None: 
+            loss = [loss[tau[0]], loss[tau[1]], loss[tau[2]]]
+            epochs = [tau[0]+1, tau[1]+1, tau[2]+1]
         plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss-{id}')
     plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
     plt.xlabel('Prediction Horizon', fontsize=12)
@@ -168,35 +171,7 @@ def plot_loss_horizon_combined(loss_values, identifier, loss_type):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=9)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots_cluster/xloss_{loss_type}_horizon_combined_{identifier}.png', dpi=300)
-    plt.show()
-
-def plot_loss_horizon_(loss_values, loss_type, id):
-    """
-    Plot the loss values over epochs.
-
-    Args:
-        loss_values (list): List of loss values.
-        identifier: Identifier for the plot.
-        loss_type (str): Type of loss (e.g., training loss, validation loss).
-
-    Returns:
-        None
-    """
-    epochs = range(1, len(loss_values[0][0]) + 1)
-    for m in range(len(loss_values)):
-        loss = loss_values[m][0]
-        identifier = loss_values[m][1]
-        plt.plot(epochs, loss, c=random.rand(3,), marker='o', markersize=5, linewidth=1, label=f'Loss-{identifier}')
-    plt.title(f'{loss_type} per Horizon Length on Test Set', fontsize=16, fontweight='bold')
-    plt.xlabel('Prediction Horizon', fontsize=12)
-    plt.ylabel('Test Loss', fontsize=12)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
-    plt.grid(True, linestyle='--', alpha=0.5)
-    plt.legend(fontsize=10)
-    plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots_cluster/loss_{loss_type}_horizon_{id}.png', dpi=300)
+    plt.savefig(f'final_plots_cluster/xloss_{loss_type}_horizon_combined_{identifier}_{tau}.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon(loss_values, loss_type, id, tau=None):
@@ -225,7 +200,7 @@ def plot_loss_horizon(loss_values, loss_type, id, tau=None):
     plt.xticks(epochs, fontsize=10)
     plt.yticks(fontsize=10)
     plt.grid(True, linestyle='--', alpha=0.5)
-    plt.legend(fontsize=10)
+    plt.legend(fontsize=12)
     plt.tight_layout()  # Adjust spacing and margins
     plt.savefig(f'final_plots_cluster/loss_{loss_type}_horizon_{id}_{tau}.png', dpi=300)
     plt.show()

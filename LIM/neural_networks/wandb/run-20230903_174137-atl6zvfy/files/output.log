@@ -1,0 +1,39 @@
+
+ 13%|█████████▏                                                           | 4/30 [00:01<00:09,  2.79it/s, loss_test=1.006]
+Epoch: 00, Training Loss: 0.9930, Test Loss: 1.0072
+Epoch: 01, Training Loss: 0.9948, Test Loss: 1.0074
+Epoch: 02, Training Loss: 0.9930, Test Loss: 1.0050
+Epoch: 03, Training Loss: 0.9907, Test Loss: 1.0063
+Epoch: 04, Training Loss: 0.9896, Test Loss: 1.0082
+
+ 33%|██████████████████████▋                                             | 10/30 [00:03<00:06,  2.88it/s, loss_test=0.968]
+Epoch: 06, Training Loss: 0.9866, Test Loss: 1.0077
+Epoch: 07, Training Loss: 0.9748, Test Loss: 1.0027
+Epoch: 08, Training Loss: 0.9578, Test Loss: 0.9886
+Epoch: 09, Training Loss: 0.9417, Test Loss: 0.9681
+
+ 53%|████████████████████████████████████▎                               | 16/30 [00:05<00:05,  2.73it/s, loss_test=0.896]
+Epoch: 11, Training Loss: 0.9080, Test Loss: 0.9384
+Epoch: 12, Training Loss: 0.8961, Test Loss: 0.9264
+Epoch: 13, Training Loss: 0.8852, Test Loss: 0.9167
+Epoch: 14, Training Loss: 0.8751, Test Loss: 0.9071
+
+ 70%|███████████████████████████████████████████████▌                    | 21/30 [00:07<00:03,  2.65it/s, loss_test=0.869]
+Epoch: 16, Training Loss: 0.8553, Test Loss: 0.8892
+Epoch: 17, Training Loss: 0.8497, Test Loss: 0.8815
+Epoch: 18, Training Loss: 0.8429, Test Loss: 0.8769
+Epoch: 19, Training Loss: 0.8380, Test Loss: 0.8740
+
+ 87%|██████████████████████████████████████████████████████████▉         | 26/30 [00:09<00:01,  2.59it/s, loss_test=0.849]
+Epoch: 21, Training Loss: 0.8279, Test Loss: 0.8674
+Epoch: 22, Training Loss: 0.8213, Test Loss: 0.8635
+Epoch: 23, Training Loss: 0.8163, Test Loss: 0.8591
+Epoch: 24, Training Loss: 0.8086, Test Loss: 0.8542
+Epoch: 25, Training Loss: 0.8034, Test Loss: 0.8491
+
+100%|████████████████████████████████████████████████████████████████████| 30/30 [00:10<00:00,  2.77it/s, loss_test=0.827]
+Epoch: 27, Training Loss: 0.7877, Test Loss: 0.8403
+Epoch: 28, Training Loss: 0.7783, Test Loss: 0.8355
+Epoch: 29, Training Loss: 0.7708, Test Loss: 0.8275
+Model saved as model_6057061np.pt
+Config : {'wandb': True, 'name': 'lstm_enc_dec-0.0001-2-124000-6057061np', 'num_features': 30, 'hidden_size': 128, 'dropout': 0, 'weight_decay': 0, 'input_window': 2, 'output_window': 12, 'learning_rate': 0.0001, 'num_layers': 1, 'num_epochs': 30, 'batch_size': 128, 'train_data_len': 200000, 'training_prediction': 'recursive', 'loss_type': 'MSE', 'model_label': 'ENC-DEC-50E-DATA', 'teacher_forcing_ratio': -3.0878077872387166e-16, 'dynamic_tf': True, 'shuffle': True, 'one_hot_month': False, 'num_of_weigths': 1932, 'num_of_params': 217886, 'loss_train': [0.9929809967676798, 0.9948330010686602, 0.9930476489521208, 0.9907415934971401, 0.9896214036714464, 0.9894036423592341, 0.9866394372213454, 0.9748322821798778, 0.9577825211343312, 0.9416611819040208, 0.9226436671756563, 0.90798058396294, 0.896090791338966, 0.8851537392252967, 0.8751343829291207, 0.8639756952013288, 0.8553099717412677, 0.8497265804381597, 0.8429076472918192, 0.8380053639411926, 0.8316155189559573, 0.8278629382451376, 0.8212817708651224, 0.8163024130321684, 0.8086490460804531, 0.8034194565954662, 0.7951573048319135, 0.7876614076750619, 0.778265274706341, 0.7707539995511373], 'loss_test': [1.0071981549263, 1.0073614219824474, 1.0050225953261058, 1.0062992970148723, 1.0082434316476185, 1.0079980790615082, 1.0076555808385212, 1.0026539862155914, 0.9886158506075541, 0.96806667248408, 0.953443686167399, 0.9383580485979716, 0.9264045357704163, 0.9166543583075205, 0.9070635239283243, 0.895507683356603, 0.8892373641331991, 0.8814564247926077, 0.8769215742746989, 0.8740009566148123, 0.8692032297452291, 0.8673996229966482, 0.8635334670543671, 0.8591384887695312, 0.8541724880536398, 0.8491351207097372, 0.8439217706521353, 0.8403095801671346, 0.8355229298273722, 0.8274804055690765], 'identifier': '6057061np'}

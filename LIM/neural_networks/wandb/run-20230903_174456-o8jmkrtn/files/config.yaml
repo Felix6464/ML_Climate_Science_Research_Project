@@ -1,0 +1,167 @@
+wandb_version: 1
+
+wandb:
+  desc: null
+  value: true
+name:
+  desc: null
+  value: lstm_enc_dec-0.0001-2-1220000-8120433np
+num_features:
+  desc: null
+  value: 30
+hidden_size:
+  desc: null
+  value: 128
+dropout:
+  desc: null
+  value: 0
+weight_decay:
+  desc: null
+  value: 0
+input_window:
+  desc: null
+  value: 2
+output_window:
+  desc: null
+  value: 12
+learning_rate:
+  desc: null
+  value: 0.0001
+num_layers:
+  desc: null
+  value: 1
+num_epochs:
+  desc: null
+  value: 30
+batch_size:
+  desc: null
+  value: 128
+train_data_len:
+  desc: null
+  value: 200000
+training_prediction:
+  desc: null
+  value: recursive
+loss_type:
+  desc: null
+  value: MSE
+model_label:
+  desc: null
+  value: ENC-DEC-50E-DATA
+teacher_forcing_ratio:
+  desc: null
+  value: -3.0878077872387166e-16
+dynamic_tf:
+  desc: null
+  value: true
+shuffle:
+  desc: null
+  value: true
+one_hot_month:
+  desc: null
+  value: false
+num_of_weigths:
+  desc: null
+  value: 1932
+num_of_params:
+  desc: null
+  value: 217886
+loss_train:
+  desc: null
+  value:
+  - 1.0037400490707822
+  - 1.0007052024205525
+  - 0.9950392378701104
+  - 0.9510976672172546
+  - 0.9129492419737356
+  - 0.8906556919769004
+  - 0.8674995060320254
+  - 0.8484158836029194
+  - 0.8315095592428137
+  - 0.814578589465883
+  - 0.7981612296016128
+  - 0.7829864477669751
+  - 0.769511772526635
+  - 0.7589785004103625
+  - 0.7489873667558035
+  - 0.7395094026018072
+  - 0.7308595103246195
+  - 0.7223821039553042
+  - 0.7142649679272263
+  - 0.7058555825992867
+  - 0.6977650799133159
+  - 0.6895439381952639
+  - 0.6819917504434232
+  - 0.6748449614754429
+  - 0.667933831612269
+  - 0.6620437425595743
+  - 0.6556358657501362
+  - 0.6498044089034751
+  - 0.6446737073085926
+  - 0.6399486550578365
+loss_test:
+  desc: null
+  value:
+  - 0.9880734999974569
+  - 0.9871168772379557
+  - 0.9858245452245077
+  - 0.973303218682607
+  - 0.9209520697593689
+  - 0.8957045992215474
+  - 0.8764195442199707
+  - 0.8590680042902629
+  - 0.846033251285553
+  - 0.8320603370666504
+  - 0.8218232194582621
+  - 0.8070783654848734
+  - 0.7958743611971537
+  - 0.7862347642580668
+  - 0.7780167102813721
+  - 0.7710107485453288
+  - 0.7672684192657471
+  - 0.7595049063364665
+  - 0.7538646976153056
+  - 0.7471657792727152
+  - 0.7407256523768108
+  - 0.7337448795636495
+  - 0.7292205095291138
+  - 0.7244586229324341
+  - 0.7189877311388652
+  - 0.7170540730158488
+  - 0.7131365497907003
+  - 0.7100911537806193
+  - 0.7055393656094869
+  - 0.7027291099230448
+identifier:
+  desc: null
+  value: 9816611np
+_wandb:
+  desc: null
+  value:
+    python_version: 3.8.13
+    cli_version: 0.15.8
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1693755896.312207
+    t:
+      1:
+      - 1
+      - 5
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 53
+      - 55
+      3:
+      - 1
+      - 2
+      - 13
+      - 16
+      - 23
+      4: 3.8.13
+      5: 0.15.8
+      8:
+      - 5
