@@ -20,11 +20,12 @@ def main():
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested
-    model_num_lstm_base = "5528071np"
-    model_num_lstm = "8049569np"
-    model_num_gru = "9949347np"
-    model_num_lstm_input = "2684868np"
-    model_num_fnn = "7686032fnp"
+    model_num_lstm_base = "1122600np"
+    model_num_lstm = "6405080np"
+    model_num_gru = "1570307np"
+    model_num_lstm_input = "2666612np"
+    model_num_lstm_input_tf = "42951np"
+    model_num_fnn = "6899415fnp"
 
     # Specify the number of features and the stride for generating timeseries raw_data
     input_window = 2
@@ -32,11 +33,12 @@ def main():
     batch_size = 128
     loss_type = "MSE"
 
-    model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru = load_models_testing(model_num_lstm_base,
+    model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru, model_lstm_inp_tf = load_models_testing(model_num_lstm_base,
                                                                                             model_num_lstm,
                                                                                             model_num_lstm_input,
                                                                                             model_num_gru,
-                                                                                            model_num_fnn)
+                                                                                            model_num_fnn,
+                                                                                            model_num_lstm_input_tf)
 
     # original fit of LIM
     tau = 1
@@ -78,6 +80,7 @@ def main():
         loss_lstm_base = model_lstm_base.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
         loss_lstm = model_lstm.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
         loss_lstm_inp = model_lstm_inp.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
+        loss_lstm_inp_tf = model_lstm_inp_tf.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
         loss_ffn = model_ffn.evaluate_model(test_dataloader_ffn, output_window, batch_size, loss_type)
         print(loss_ffn)
 
@@ -85,8 +88,8 @@ def main():
         loss_lim = 0
         sample_size = len(data[1]) - output_window
 
-        forecast_output = model_org.forecast(data, [output_window])
-        forecast_output = torch.from_numpy(forecast_output[0, :, :])
+        forecast_output = model_org.forecast_mean(data, output_window)
+        forecast_output = torch.from_numpy(forecast_output[:, :])
 
         for datapoint in range(sample_size):
 
@@ -96,18 +99,19 @@ def main():
 
         loss_lim /= sample_size
 
-        loss_list_temp.append([loss_gru, loss_lstm_base, loss_lstm, loss_lstm_inp, loss_ffn, loss_lim])
+        loss_list_temp.append([loss_gru, loss_lstm_base, loss_lstm, loss_lstm_inp, loss_lstm_inp_tf, loss_ffn, loss_lim])
         #wandb.log({"Loss-Horizon": loss_list_temp})
 
     loss_list.append(([lst[0] for lst in loss_list_temp], f"{'GRU'}"))
     loss_list.append(([lst[1] for lst in loss_list_temp], f"{'LSTM-Base'}"))
     loss_list.append(([lst[2] for lst in loss_list_temp], f"{'LSTM-Enc-Dec'}"))
     loss_list.append(([lst[3] for lst in loss_list_temp], f"{'LSTM-Enc-Dec-Input'}"))
-    loss_list.append(([lst[4] for lst in loss_list_temp], f"{'FFN'}"))
-    loss_list.append(([lst[5] for lst in loss_list_temp], f"{'LIM'}"))
+    loss_list.append(([lst[4] for lst in loss_list_temp], f"{'LSTM-Enc-Dec-Input-TF'}"))
+    loss_list.append(([lst[5] for lst in loss_list_temp], f"{'FFN'}"))
+    loss_list.append(([lst[6] for lst in loss_list_temp], f"{'LIM'}"))
 
-    model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_fnn, model_num_lim])
-    plot_loss_horizon_combined(loss_list, model_nums, loss_type)
+    model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_lstm_input_tf, model_num_fnn, model_num_lim])
+    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[21, 22, 23])
 
 
 

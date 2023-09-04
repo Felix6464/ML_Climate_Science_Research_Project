@@ -1,0 +1,64 @@
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Current SDK version is 0.15.8
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Configure stats pid to 129579
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Loading settings from /home/goswami/gkd235/.config/wandb/settings
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Loading settings from /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/settings
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-09-03 13:54:24,272 INFO    MainThread:129579 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'LIM/neural_networks/lstm_training.py', 'program': 'lstm_training.py'}
+2023-09-03 13:54:24,273 INFO    MainThread:129579 [wandb_init.py:_log_setup():507] Logging user logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230903_135424-5bd2e1qs/logs/debug.log
+2023-09-03 13:54:24,273 INFO    MainThread:129579 [wandb_init.py:_log_setup():508] Logging internal logs to /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230903_135424-5bd2e1qs/logs/debug-internal.log
+2023-09-03 13:54:24,274 INFO    MainThread:129579 [wandb_init.py:init():547] calling init triggers
+2023-09-03 13:54:24,275 INFO    MainThread:129579 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {'wandb': True, 'name': 'lstm_enc_dec-0.0001-12-1200000-6818638np', 'num_features': 30, 'hidden_size': 128, 'dropout': 0, 'weight_decay': 0, 'input_window': 12, 'output_window': 1, 'learning_rate': 0.0001, 'num_layers': 1, 'num_epochs': 30, 'batch_size': 128, 'train_data_len': 200000, 'training_prediction': 'recursive', 'loss_type': 'MSE', 'model_label': 'ENC-DEC-30E-HORIZON', 'teacher_forcing_ratio': -3.0878077872387166e-16, 'dynamic_tf': True, 'shuffle': True, 'one_hot_month': False, 'num_of_weigths': 1025, 'num_of_params': 217886, 'loss_train': [0.4693421169856439, 0.15145276042429112, 0.10914255401216727, 0.09921856544918678, 0.09524106852580731, 0.09302051034087122, 0.09143941043744039, 0.09017728327723239, 0.08926105130487696, 0.08861377314482931, 0.08813278103027448, 0.08779727393541441, 0.08751877428655327, 0.08727434162333376, 0.08707779772027523, 0.08693570900650495, 0.08675776948267892, 0.08662123184000148, 0.08653272510474685, 0.08642814859188923, 0.0863159814711459, 0.08624249405661309, 0.08616981665584218, 0.08608905998316797, 0.08604075619908287, 0.0859753597469801, 0.08591327585164059, 0.08587769517114374, 0.08582165299455506, 0.08576211587535278], 'loss_test': [0.9933774593548897, 0.20510543171220866, 0.12017808147729972, 0.10254173675695291, 0.09692765368769567, 0.09401659454959325, 0.0923974635795905, 0.09095844012709, 0.08983372746465298, 0.08906458425693788, 0.08851257174347456, 0.08820625556967197, 0.0880793707493024, 0.08772592041163872, 0.08747772382906614, 0.08731091184875904, 0.08714810808977255, 0.08725114658665963, 0.08730438743264247, 0.0868470433812875, 0.08672727957272376, 0.08687440241472079, 0.08669995521314633, 0.08650540130642745, 0.08653229689941956, 0.08656002280230705, 0.08635411745844743, 0.08633854443159623, 0.08634627913721861, 0.08655935891259176], 'identifier': '4832095np'}
+2023-09-03 13:54:24,276 INFO    MainThread:129579 [wandb_init.py:init():596] starting backend
+2023-09-03 13:54:24,276 INFO    MainThread:129579 [wandb_init.py:init():600] setting up manager
+2023-09-03 13:54:24,286 INFO    MainThread:129579 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-09-03 13:54:24,287 INFO    MainThread:129579 [wandb_init.py:init():606] backend started and connected
+2023-09-03 13:54:24,330 INFO    MainThread:129579 [wandb_init.py:init():697] updated telemetry
+2023-09-03 13:54:24,446 INFO    MainThread:129579 [wandb_init.py:init():730] communicating run to backend with 60.0 second timeout
+2023-09-03 13:54:26,846 INFO    MainThread:129579 [wandb_run.py:_on_init():2180] communicating current version
+2023-09-03 13:54:26,917 INFO    MainThread:129579 [wandb_run.py:_on_init():2189] got version response upgrade_message: "wandb version 0.15.9 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-09-03 13:54:26,917 INFO    MainThread:129579 [wandb_init.py:init():781] starting run threads in backend
+2023-09-03 13:54:29,450 INFO    MainThread:129579 [wandb_run.py:_console_start():2159] atexit reg
+2023-09-03 13:54:29,452 INFO    MainThread:129579 [wandb_run.py:_redirect():2014] redirect: wrap_raw
+2023-09-03 13:54:29,452 INFO    MainThread:129579 [wandb_run.py:_redirect():2079] Wrapping output streams.
+2023-09-03 13:54:29,452 INFO    MainThread:129579 [wandb_run.py:_redirect():2104] Redirects installed.
+2023-09-03 13:54:29,454 INFO    MainThread:129579 [wandb_init.py:init():822] run started, returning control to user process
+2023-09-03 13:54:36,896 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:54:44,351 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:54:51,799 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:54:59,244 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:06,673 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:14,126 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:21,612 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:29,100 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:36,585 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:44,070 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:51,555 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:55:59,073 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:06,562 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:14,034 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:21,483 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:28,938 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:36,400 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:43,840 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:51,290 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:56:58,765 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:06,263 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:13,748 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:21,217 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:28,688 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:36,189 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:43,649 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:51,130 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:57:58,573 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:58:06,054 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:58:13,540 INFO    MainThread:129579 [wandb_watch.py:watch():51] Watching
+2023-09-03 13:58:13,565 INFO    MainThread:129579 [wandb_run.py:_finish():1894] finishing run climate_ml/SST-ENC-DEC-30E-HORIZON/5bd2e1qs
+2023-09-03 13:58:13,566 INFO    MainThread:129579 [wandb_run.py:_atexit_cleanup():2128] got exitcode: 0
+2023-09-03 13:58:13,567 INFO    MainThread:129579 [wandb_run.py:_restore():2111] restore
+2023-09-03 13:58:13,567 INFO    MainThread:129579 [wandb_run.py:_restore():2117] restore done
+2023-09-03 13:58:18,700 INFO    MainThread:129579 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2023-09-03 13:58:18,700 INFO    MainThread:129579 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2023-09-03 13:58:18,712 INFO    MainThread:129579 [wandb_run.py:_footer_sync_info():3440] logging synced files

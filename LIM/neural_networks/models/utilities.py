@@ -406,12 +406,13 @@ def normalize_tensor_individual(tensor):
 
     return normalized_tensor
 
-def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn):
+def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn, num_lstm_input_tf):
 
     # Load the saved models
     saved_model_lstm_base = torch.load(f"./final_models/model_{num_lstm_base}.pt")
     saved_model_lstm = torch.load(f"./final_models/model_{num_lstm}.pt")
     saved_model_lstm_input = torch.load(f"./final_models/model_{num_lstm_input}.pt")
+    saved_model_lstm_input_tf = torch.load(f"./final_models/model_{num_lstm_input_tf}.pt")
     saved_model_fnn = torch.load(f"./final_models/model_{num_ffn}.pt")
     saved_model_gru = torch.load(f"./final_models/model_{num_gru}.pt")
 
@@ -423,6 +424,9 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
 
     # Load the hyperparameters of the lstm_input_model_enc_dec
     params_li = saved_model_lstm_input["hyperparameters"]
+
+    # Load the hyperparameters of the lstm_input_model_enc_dec with teacher_forcing
+    params_li_tf = saved_model_lstm_input_tf["hyperparameters"]
 
     # Load the hyperparameters of the fnn_model
     params_f = saved_model_fnn["hyperparameters"]
@@ -445,6 +449,10 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     model_lstm_inp = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
                                                          hidden_size=params_li["hidden_size"],
                                                          num_layers=params_li["num_layers"])
+    
+    model_lstm_inp_tf = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
+                                                         hidden_size=params_li_tf["hidden_size"],
+                                                         num_layers=params_li_tf["num_layers"])
 
     model_ffn = FeedforwardNetwork(input_size=params_lb["num_features"],
                                        hidden_size=params_f["hidden_size"],
@@ -464,10 +472,12 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     model_lstm = model_lstm.to(device)
     model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
     model_lstm_inp = model_lstm_inp.to(device)
+    model_lstm_inp_tf.load_state_dict(saved_model_lstm_input["model_state_dict"])
+    model_lstm_inp_tf = model_lstm_inp.to(device)
     model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
     model_ffn = model_ffn.to(device)
 
-    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru
+    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru, model_lstm_inp_tf
 
 
 def min_max_values_per_slice(tensor):

@@ -1,0 +1,36 @@
+
+ 30%|████████████████████▋                                                | 9/30 [00:01<00:03,  5.30it/s, loss_test=0.986]
+Epoch: 00, Training Loss: 1.0258, Test Loss: 0.9821
+Epoch: 01, Training Loss: 1.0158, Test Loss: 0.9825
+Epoch: 02, Training Loss: 1.0176, Test Loss: 0.9829
+Epoch: 03, Training Loss: 1.0232, Test Loss: 0.9832
+Epoch: 04, Training Loss: 1.0211, Test Loss: 0.9837
+Epoch: 05, Training Loss: 1.0236, Test Loss: 0.9842
+Epoch: 06, Training Loss: 1.0187, Test Loss: 0.9847
+Epoch: 07, Training Loss: 1.0167, Test Loss: 0.9852
+
+ 67%|█████████████████████████████████████████████▎                      | 20/30 [00:03<00:01,  5.43it/s, loss_test=0.920]
+Epoch: 09, Training Loss: 1.0122, Test Loss: 0.9859
+Epoch: 10, Training Loss: 1.0143, Test Loss: 0.9862
+Epoch: 11, Training Loss: 1.0149, Test Loss: 0.9859
+Epoch: 12, Training Loss: 1.0158, Test Loss: 0.9849
+Epoch: 13, Training Loss: 1.0108, Test Loss: 0.9836
+Epoch: 14, Training Loss: 1.0081, Test Loss: 0.9811
+Epoch: 15, Training Loss: 0.9994, Test Loss: 0.9760
+Epoch: 16, Training Loss: 0.9832, Test Loss: 0.9647
+Epoch: 17, Training Loss: 0.9655, Test Loss: 0.9478
+Epoch: 18, Training Loss: 0.9570, Test Loss: 0.9319
+Epoch: 19, Training Loss: 0.9448, Test Loss: 0.9196
+Epoch: 20, Training Loss: 0.9368, Test Loss: 0.9107
+Epoch: 21, Training Loss: 0.9227, Test Loss: 0.9032
+Epoch: 22, Training Loss: 0.9200, Test Loss: 0.8966
+Epoch: 23, Training Loss: 0.9097, Test Loss: 0.8918
+Epoch: 24, Training Loss: 0.9045, Test Loss: 0.8867
+Epoch: 25, Training Loss: 0.8988, Test Loss: 0.8825
+Epoch: 26, Training Loss: 0.8927, Test Loss: 0.8788
+Epoch: 27, Training Loss: 0.8907, Test Loss: 0.8760
+Epoch: 28, Training Loss: 0.8817, Test Loss: 0.8731
+Epoch: 29, Training Loss: 0.8742, Test Loss: 0.8694
+Model saved as model_5385785np.pt
+
+100%|████████████████████████████████████████████████████████████████████| 30/30 [00:05<00:00,  5.43it/s, loss_test=0.869]

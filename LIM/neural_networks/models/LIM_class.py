@@ -1,5 +1,6 @@
 import torch
 from scipy.linalg import expm
+import scipy.linalg as linalg
 import utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
@@ -179,6 +180,26 @@ class LIM:
             forecast_output[i] = forecast
 
         return forecast_output
+    
+    def forecast_mean(self, x, lag=1):
+        """Forecasting data using the time-evolution operator L.
+
+            x(t+tau) = exp(L tau) x(t)
+
+        Args:
+            x (np.ndarray): Input data to estimate Green's function from.
+                Dimensions (n_components, n_time).
+
+        Returns:
+            x_frcst (np.ndarray): Forecast.
+                Dimensions (n_components, n_time).
+        """
+        n_components, n_times = x.shape
+        x_frcst = np.zeros((n_components, n_times))
+        for i in range(n_times):
+            x_frcst[:, i] = np.dot(linalg.expm(self.logarithmic_matrix * lag), x[:, i])
+
+        return x_frcst
 
     def euler_method(self, L, Q, x0, dt, T):
         """
