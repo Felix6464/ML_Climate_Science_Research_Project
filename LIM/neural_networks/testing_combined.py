@@ -1,34 +1,35 @@
-from LIM.neural_networks.models.LSTM_enc_dec import *
-from LIM.neural_networks.plots.plots import *
-from utilities import *
+from models.LSTM_enc_dec import *
+from plots import *
+from models.utilities import *
 import torch.utils.data as datat
 from torch.utils.data import DataLoader
-from LIM.neural_networks.models.LIM_class import *
+from models.LIM_class import *
 import torch.nn as nn
 
 
 
 def main():
 
-    data_lim = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-    data = torch.load("./synthetic_data/lim_integration_TEST_20k[-1]p.pt")
-    data = data_lim[:, 80000:90000]
+    data_lim = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+    data_lim = normalize_data(data_lim)
+    data = torch.load("data_piControl.pt")
+    data = normalize_data(data)
 
     # Calculate the mean and standard deviation along the feature dimension
     #raw_data = data_lim[:, 80000:90000]
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested
-    model_num_lstm_base = "7315929np"
-    model_num_lstm = "8365852np"
-    model_num_gru = "5492161np"
-    model_num_lstm_input = "5322765np"
-    model_num_fnn = "905019fnp"
+    model_num_lstm_base = "5528071np"
+    model_num_lstm = "8049569np"
+    model_num_gru = "9949347np"
+    model_num_lstm_input = "2684868np"
+    model_num_fnn = "7686032fnp"
 
     # Specify the number of features and the stride for generating timeseries raw_data
     input_window = 2
     input_window_ffn = 6
-    batch_size = 64
+    batch_size = 128
     loss_type = "MSE"
 
     model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru = load_models_testing(model_num_lstm_base,
@@ -40,21 +41,21 @@ def main():
     # original fit of LIM
     tau = 1
     model_org = LIM(tau)
-    model_org.fit(data_lim[:, :80000].numpy(), eps=0.01)
+    model_org.fit(data_lim[:, :100000].numpy())
     model_num_lim = "LIM"
     criterion = nn.MSELoss()
 
     loss_list = []
     loss_list_temp = []
 
-    wandb.init(project=f"ML-Climate-SST-{'Horizon-Combined'}", name="model_comparison")
+    #wandb.init(project=f"ML-Climate-SST-{'Horizon-Combined'}", name="model_comparison")
 
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 
     for output_window in x:
         print("Output window : {}".format(output_window))
 
-        test_dataset = lstm.TimeSeriesLSTMnp(data.permute(1, 0),
+        test_dataset = TimeSeriesLSTMnp(data.permute(1, 0),
                                         input_window,
                                         output_window)
 
@@ -63,7 +64,7 @@ def main():
                                      shuffle=True,
                                      drop_last=True)
 
-        test_dataset_ffn = lstm.TimeSeriesLSTMnp(data.permute(1, 0),
+        test_dataset_ffn = TimeSeriesLSTMnp(data.permute(1, 0),
                                              input_window_ffn,
                                              output_window)
 
@@ -78,25 +79,25 @@ def main():
         loss_lstm = model_lstm.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
         loss_lstm_inp = model_lstm_inp.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
         loss_ffn = model_ffn.evaluate_model(test_dataloader_ffn, output_window, batch_size, loss_type)
-
+        print(loss_ffn)
 
         # LIM mean forecast for comparison
         loss_lim = 0
-        sample_size = len(data[1]) - output_window*2
+        sample_size = len(data[1]) - output_window
 
         forecast_output = model_org.forecast(data, [output_window])
         forecast_output = torch.from_numpy(forecast_output[0, :, :])
 
         for datapoint in range(sample_size):
 
-            target = data[:, datapoint+output_window-1]
+            target = data[:, datapoint+output_window]
             loss_l = criterion(forecast_output[:, datapoint], target)
             loss_lim += loss_l.item()
 
         loss_lim /= sample_size
 
         loss_list_temp.append([loss_gru, loss_lstm_base, loss_lstm, loss_lstm_inp, loss_ffn, loss_lim])
-        wandb.log({"Loss-Horizon": loss_list_temp})
+        #wandb.log({"Loss-Horizon": loss_list_temp})
 
     loss_list.append(([lst[0] for lst in loss_list_temp], f"{'GRU'}"))
     loss_list.append(([lst[1] for lst in loss_list_temp], f"{'LSTM-Base'}"))

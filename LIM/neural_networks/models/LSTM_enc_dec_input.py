@@ -225,7 +225,7 @@ class RMSELoss(torch.nn.Module):
         loss = torch.sqrt(criterion(x, y) + eps)
         return loss
 
-class LSTM_Sequence_Prediction(nn.Module):
+class LSTM_Sequence_Prediction_Input(nn.Module):
     """
     train LSTM encoder-decoder and make predictions
     """
@@ -238,7 +238,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         : param num_layers:     number of recurrent layers
         '''
 
-        super(LSTM_Sequence_Prediction, self).__init__()
+        super(LSTM_Sequence_Prediction_Input, self).__init__()
 
         self.input_size = input_size
         self.hidden_size = hidden_size

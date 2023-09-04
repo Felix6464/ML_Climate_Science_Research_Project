@@ -21,11 +21,11 @@ lr = [0.0001]
 
 windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
            (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-windows = [(2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12), (2,12)]
-windows = [(2,8)]
+windows = [(4,6), (6,6), (12, 6)]
 
 #cluster test
-#data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000,
+#data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000]
+              # , 40000, 50000, 60000, 70000, 80000,
               #90000, 100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
 
 data_sizes = [200000]
@@ -142,6 +142,7 @@ for window in windows:
             # Save the model and hyperparameters to a file
             rand_identifier = str(np.random.randint(0, 10000000)) + dt
             config["name"] = config["name"] + "-" + rand_identifier
+            print(config["name"])
 
 
             loss, loss_test = model.train_model(train_dataloader,
@@ -163,7 +164,7 @@ for window in windows:
             torch.save({'hyperparameters': config,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict()},
-                       f'trained_models_cluster_final/2_8/model_{rand_identifier}.pt')
+                       f'final_models/model_{rand_identifier}.pt')
 
             print(f"Model saved as model_{rand_identifier}.pt")
             print("Config : {}".format(config))
