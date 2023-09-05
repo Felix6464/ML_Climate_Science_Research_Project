@@ -1,0 +1,458 @@
+2023-09-05 08:52:09,233 INFO    StreamThr :281322 [internal.py:wandb_internal():86] W&B internal server running at pid: 281322, started at: 2023-09-05 08:52:09.230841
+2023-09-05 08:52:09,234 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status
+2023-09-05 08:52:09,235 INFO    WriterThread:281322 [datastore.py:open_for_write():85] open: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/run-2hx4sa0r.wandb
+2023-09-05 08:52:09,238 DEBUG   SenderThread:281322 [sender.py:send():379] send: header
+2023-09-05 08:52:09,238 DEBUG   SenderThread:281322 [sender.py:send():379] send: run
+2023-09-05 08:52:09,706 INFO    SenderThread:281322 [dir_watcher.py:__init__():211] watching files in: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files
+2023-09-05 08:52:09,706 INFO    SenderThread:281322 [sender.py:_start_run_threads():1121] run started: 2hx4sa0r with start time 1693896728.438977
+2023-09-05 08:52:09,738 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:09,748 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:09,784 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: check_version
+2023-09-05 08:52:09,785 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: check_version
+2023-09-05 08:52:09,874 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: run_start
+2023-09-05 08:52:09,875 DEBUG   HandlerThread:281322 [system_info.py:__init__():31] System info init
+2023-09-05 08:52:09,875 DEBUG   HandlerThread:281322 [system_info.py:__init__():46] System info init done
+2023-09-05 08:52:09,876 INFO    HandlerThread:281322 [system_monitor.py:start():181] Starting system monitor
+2023-09-05 08:52:09,876 INFO    SystemMonitor:281322 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-09-05 08:52:09,876 INFO    HandlerThread:281322 [system_monitor.py:probe():201] Collecting system info
+2023-09-05 08:52:09,877 INFO    SystemMonitor:281322 [interfaces.py:start():190] Started cpu monitoring
+2023-09-05 08:52:09,877 INFO    SystemMonitor:281322 [interfaces.py:start():190] Started disk monitoring
+2023-09-05 08:52:09,878 INFO    SystemMonitor:281322 [interfaces.py:start():190] Started gpu monitoring
+2023-09-05 08:52:09,879 INFO    SystemMonitor:281322 [interfaces.py:start():190] Started memory monitoring
+2023-09-05 08:52:09,879 INFO    SystemMonitor:281322 [interfaces.py:start():190] Started network monitoring
+2023-09-05 08:52:09,897 DEBUG   HandlerThread:281322 [system_info.py:probe():195] Probing system
+2023-09-05 08:52:09,907 DEBUG   HandlerThread:281322 [system_info.py:_probe_git():180] Probing git
+2023-09-05 08:52:09,971 DEBUG   HandlerThread:281322 [system_info.py:_probe_git():188] Probing git done
+2023-09-05 08:52:09,972 DEBUG   HandlerThread:281322 [system_info.py:probe():240] Probing system done
+2023-09-05 08:52:09,972 DEBUG   HandlerThread:281322 [system_monitor.py:probe():210] {'os': 'Linux-3.10.0-1160.76.1.el7.x86_64-x86_64-with-glibc2.17', 'python': '3.8.13', 'heartbeatAt': '2023-09-05T06:52:09.897866', 'startedAt': '2023-09-05T06:52:08.404430', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': 'lstm_training.py', 'codePath': 'LIM/neural_networks/lstm_training.py', 'git': {'remote': 'https://github.com/Felix6464/ML_Climate_Science_Research_Project.git', 'commit': '80ea0d387c8a0512b2666f4dfeb8210756a930e4'}, 'email': 'felix.boette@student.uni-tuebingen.de', 'root': '/mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project', 'host': 'slurm-bm-20.novalocal', 'username': 'gkd235', 'executable': '/mnt/qb/work/goswami/gkd235/path/to/conda/envs/felix_c/bin/python3', 'cpu_count': 36, 'cpu_count_logical': 72, 'cpu_freq': {'current': 3354.195736111111, 'min': 1000.0, 'max': 3900.0}, 'cpu_freq_per_core': [{'current': 3649.267, 'min': 1000.0, 'max': 3900.0}, {'current': 3599.755, 'min': 1000.0, 'max': 3900.0}, {'current': 3479.15, 'min': 1000.0, 'max': 3900.0}, {'current': 3600.39, 'min': 1000.0, 'max': 3900.0}, {'current': 3584.838, 'min': 1000.0, 'max': 3900.0}, {'current': 3497.558, 'min': 1000.0, 'max': 3900.0}, {'current': 3462.646, 'min': 1000.0, 'max': 3900.0}, {'current': 3429.479, 'min': 1000.0, 'max': 3900.0}, {'current': 3178.271, 'min': 1000.0, 'max': 3900.0}, {'current': 3368.542, 'min': 1000.0, 'max': 3900.0}, {'current': 3504.699, 'min': 1000.0, 'max': 3900.0}, {'current': 2938.647, 'min': 1000.0, 'max': 3900.0}, {'current': 2969.75, 'min': 1000.0, 'max': 3900.0}, {'current': 3044.177, 'min': 1000.0, 'max': 3900.0}, {'current': 2860.729, 'min': 1000.0, 'max': 3900.0}, {'current': 3248.095, 'min': 1000.0, 'max': 3900.0}, {'current': 2909.289, 'min': 1000.0, 'max': 3900.0}, {'current': 3303.002, 'min': 1000.0, 'max': 3900.0}, {'current': 3366.32, 'min': 1000.0, 'max': 3900.0}, {'current': 3263.806, 'min': 1000.0, 'max': 3900.0}, {'current': 3403.295, 'min': 1000.0, 'max': 3900.0}, {'current': 3266.821, 'min': 1000.0, 'max': 3900.0}, {'current': 3550.561, 'min': 1000.0, 'max': 3900.0}, {'current': 3383.776, 'min': 1000.0, 'max': 3900.0}, {'current': 3226.037, 'min': 1000.0, 'max': 3900.0}, {'current': 3446.301, 'min': 1000.0, 'max': 3900.0}, {'current': 3344.262, 'min': 1000.0, 'max': 3900.0}, {'current': 3372.033, 'min': 1000.0, 'max': 3900.0}, {'current': 2954.516, 'min': 1000.0, 'max': 3900.0}, {'current': 3476.611, 'min': 1000.0, 'max': 3900.0}, {'current': 3440.27, 'min': 1000.0, 'max': 3900.0}, {'current': 3593.408, 'min': 1000.0, 'max': 3900.0}, {'current': 3218.261, 'min': 1000.0, 'max': 3900.0}, {'current': 3074.645, 'min': 1000.0, 'max': 3900.0}, {'current': 3541.674, 'min': 1000.0, 'max': 3900.0}, {'current': 3448.046, 'min': 1000.0, 'max': 3900.0}, {'current': 3600.231, 'min': 1000.0, 'max': 3900.0}, {'current': 3596.899, 'min': 1000.0, 'max': 3900.0}, {'current': 2971.972, 'min': 1000.0, 'max': 3900.0}, {'current': 3616.101, 'min': 1000.0, 'max': 3900.0}, {'current': 3591.186, 'min': 1000.0, 'max': 3900.0}, {'current': 3416.149, 'min': 1000.0, 'max': 3900.0}, {'current': 3347.595, 'min': 1000.0, 'max': 3900.0}, {'current': 3351.721, 'min': 1000.0, 'max': 3900.0}, {'current': 3368.859, 'min': 1000.0, 'max': 3900.0}, {'current': 3525.805, 'min': 1000.0, 'max': 3900.0}, {'current': 3582.141, 'min': 1000.0, 'max': 3900.0}, {'current': 3587.377, 'min': 1000.0, 'max': 3900.0}, {'current': 3159.545, 'min': 1000.0, 'max': 3900.0}, {'current': 3270.312, 'min': 1000.0, 'max': 3900.0}, {'current': 3076.232, 'min': 1000.0, 'max': 3900.0}, {'current': 3261.108, 'min': 1000.0, 'max': 3900.0}, {'current': 3306.811, 'min': 1000.0, 'max': 3900.0}, {'current': 3573.095, 'min': 1000.0, 'max': 3900.0}, {'current': 3378.54, 'min': 1000.0, 'max': 3900.0}, {'current': 3455.187, 'min': 1000.0, 'max': 3900.0}, {'current': 3402.343, 'min': 1000.0, 'max': 3900.0}, {'current': 3449.951, 'min': 1000.0, 'max': 3900.0}, {'current': 3454.235, 'min': 1000.0, 'max': 3900.0}, {'current': 3430.59, 'min': 1000.0, 'max': 3900.0}, {'current': 2991.809, 'min': 1000.0, 'max': 3900.0}, {'current': 3408.056, 'min': 1000.0, 'max': 3900.0}, {'current': 3566.906, 'min': 1000.0, 'max': 3900.0}, {'current': 3338.708, 'min': 1000.0, 'max': 3900.0}, {'current': 3370.446, 'min': 1000.0, 'max': 3900.0}, {'current': 3360.925, 'min': 1000.0, 'max': 3900.0}, {'current': 3276.501, 'min': 1000.0, 'max': 3900.0}, {'current': 3503.906, 'min': 1000.0, 'max': 3900.0}, {'current': 3272.216, 'min': 1000.0, 'max': 3900.0}, {'current': 3410.913, 'min': 1000.0, 'max': 3900.0}, {'current': 3214.294, 'min': 1000.0, 'max': 3900.0}, {'current': 3414.88, 'min': 1000.0, 'max': 3900.0}], 'disk': {'total': 1676.225757598877, 'used': 317.41907119750977}, 'gpu': 'NVIDIA GeForce RTX 2080 Ti', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 2080 Ti', 'memory_total': 11811160064}], 'memory': {'total': 376.36460876464844}}
+2023-09-05 08:52:09,972 INFO    HandlerThread:281322 [system_monitor.py:probe():211] Finished collecting system info
+2023-09-05 08:52:09,972 INFO    HandlerThread:281322 [system_monitor.py:probe():214] Publishing system info
+2023-09-05 08:52:09,972 DEBUG   HandlerThread:281322 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-09-05 08:52:09,976 DEBUG   HandlerThread:281322 [system_info.py:_save_pip():67] Saving pip packages done
+2023-09-05 08:52:09,977 DEBUG   HandlerThread:281322 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-09-05 08:52:10,711 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_created():271] file/dir created: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/requirements.txt
+2023-09-05 08:52:10,712 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_created():271] file/dir created: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/conda-environment.yaml
+2023-09-05 08:52:10,713 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_created():271] file/dir created: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:13,035 DEBUG   HandlerThread:281322 [system_info.py:_save_conda():86] Saving conda packages done
+2023-09-05 08:52:13,047 INFO    HandlerThread:281322 [system_monitor.py:probe():216] Finished publishing system info
+2023-09-05 08:52:13,048 DEBUG   SenderThread:281322 [sender.py:send():379] send: files
+2023-09-05 08:52:13,049 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-metadata.json with policy now
+2023-09-05 08:52:13,065 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:52:13,066 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:52:13,301 DEBUG   SenderThread:281322 [sender.py:send():379] send: telemetry
+2023-09-05 08:52:13,662 INFO    wandb-upload_0:281322 [upload_job.py:push():131] Uploaded file /tmp/tmpo3gmqa3fwandb/hfs5a6gu-wandb-metadata.json
+2023-09-05 08:52:13,724 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/conda-environment.yaml
+2023-09-05 08:52:13,724 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_created():271] file/dir created: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-metadata.json
+2023-09-05 08:52:13,725 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_created():271] file/dir created: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:14,306 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:15,729 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:19,306 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:20,885 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:20,895 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:20,895 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:20,903 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:20,903 DEBUG   SenderThread:281322 [sender.py:send():379] send: telemetry
+2023-09-05 08:52:21,751 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:21,751 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:23,762 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:24,904 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:28,065 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:52:28,068 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:52:28,970 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:28,971 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:28,971 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:28,998 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:29,783 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:29,783 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:29,999 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:31,795 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:35,000 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:36,739 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:36,740 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:36,741 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:36,748 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:36,815 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:37,817 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:40,753 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:41,832 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/config.yaml
+2023-09-05 08:52:43,065 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:52:43,068 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:52:44,298 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:44,299 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:44,300 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:44,328 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:44,845 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:45,848 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:46,330 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:51,331 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:51,970 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:51,972 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:51,972 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:51,980 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:52,882 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:52:53,885 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:52:56,982 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:52:58,065 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:52:58,088 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:52:59,653 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:52:59,654 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:52:59,655 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:52:59,716 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:52:59,921 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:01,929 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:02,718 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:07,507 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:07,510 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:07,514 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:07,522 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:07,962 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:08,523 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:08,965 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:09,880 DEBUG   SystemMonitor:281322 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-09-05 08:53:09,882 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:53:09,968 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:13,065 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:53:13,066 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:53:14,312 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:14,650 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:14,652 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:14,653 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:14,660 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:14,993 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:14,993 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:15,996 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:19,662 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:22,148 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:22,151 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:22,152 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:22,158 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:23,031 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:23,031 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:24,033 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:25,159 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:28,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:53:28,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:53:29,934 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:29,938 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:29,939 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:29,945 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:30,062 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:30,945 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:31,066 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:32,069 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:35,946 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:37,710 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:37,712 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:37,713 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:37,781 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:38,101 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:39,104 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:39,885 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:53:40,107 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:41,886 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:43,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:53:43,066 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:53:44,893 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:44,896 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:44,896 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:44,958 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:45,128 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:45,129 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:46,131 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:46,959 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:48,142 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:51,960 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:52,449 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:52,451 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:52,451 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:52,476 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:53:53,169 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:53:53,170 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:53:57,478 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:53:58,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:53:58,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:53:59,943 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:53:59,948 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:53:59,948 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:53:59,954 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:00,210 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:01,213 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:02,955 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:07,376 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:07,379 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:07,380 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:07,387 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:08,251 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:08,252 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:08,388 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:09,256 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:09,886 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:54:13,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:54:13,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:54:14,301 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:14,752 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:14,758 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:14,758 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:14,764 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:15,284 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:15,285 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:19,765 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:22,251 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:22,254 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:22,254 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:22,262 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:22,319 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:23,325 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:25,263 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:28,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:54:28,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:54:29,635 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:29,637 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:29,638 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:29,644 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:30,360 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:30,644 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:31,366 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:35,645 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:37,161 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:37,163 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:37,163 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:37,170 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:37,398 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:38,403 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:39,408 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:39,887 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:54:40,888 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:43,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:54:43,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:54:44,520 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:44,526 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:44,527 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:44,532 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:45,438 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:45,438 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:46,533 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:51,534 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:52,030 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:52,033 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:52,034 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:52,041 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:54:52,478 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:54:53,483 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:54:57,042 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:54:58,066 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:54:58,069 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:54:59,587 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:54:59,588 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:54:59,589 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:54:59,594 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:00,521 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:01,527 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:02,596 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:06,896 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:06,901 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:06,901 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:06,909 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:07,560 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:07,561 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:07,910 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:09,888 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:55:13,067 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:55:13,075 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:55:13,268 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:14,310 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:14,311 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:14,311 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:14,319 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:14,593 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:15,596 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:18,320 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:21,948 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:21,951 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:21,951 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:21,957 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:22,628 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:23,631 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:23,958 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:28,067 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:55:28,070 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:55:29,308 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:29,471 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:29,472 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:29,472 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:29,478 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:29,657 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:29,657 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:31,664 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:34,480 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:37,093 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:37,095 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:37,096 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:37,103 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:37,691 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:37,692 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:39,889 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:55:39,890 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:43,067 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:55:43,067 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:55:44,148 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:44,151 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:44,152 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:44,158 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:44,724 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:45,159 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:45,728 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:50,160 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:51,458 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:51,460 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:51,460 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:51,468 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:51,756 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:51,757 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:53,764 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:55,470 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:58,067 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: stop_status
+2023-09-05 08:55:58,069 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: stop_status
+2023-09-05 08:55:58,916 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: partial_history
+2023-09-05 08:55:58,917 DEBUG   SenderThread:281322 [sender.py:send():379] send: history
+2023-09-05 08:55:58,917 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: summary_record
+2023-09-05 08:55:58,923 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:58,942 DEBUG   SenderThread:281322 [sender.py:send():379] send: telemetry
+2023-09-05 08:55:58,942 DEBUG   SenderThread:281322 [sender.py:send():379] send: exit
+2023-09-05 08:55:58,942 INFO    SenderThread:281322 [sender.py:send_exit():584] handling exit code: 0
+2023-09-05 08:55:58,942 INFO    SenderThread:281322 [sender.py:send_exit():586] handling runtime: 229
+2023-09-05 08:55:58,946 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:58,947 INFO    SenderThread:281322 [sender.py:send_exit():592] send defer
+2023-09-05 08:55:58,947 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,947 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 0
+2023-09-05 08:55:58,947 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,947 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 0
+2023-09-05 08:55:58,947 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 1
+2023-09-05 08:55:58,947 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,948 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 1
+2023-09-05 08:55:58,948 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,948 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 1
+2023-09-05 08:55:58,948 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 2
+2023-09-05 08:55:58,948 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,948 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 2
+2023-09-05 08:55:58,948 INFO    HandlerThread:281322 [system_monitor.py:finish():190] Stopping system monitor
+2023-09-05 08:55:58,948 DEBUG   SystemMonitor:281322 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2023-09-05 08:55:58,949 INFO    HandlerThread:281322 [interfaces.py:finish():202] Joined cpu monitor
+2023-09-05 08:55:58,949 DEBUG   SystemMonitor:281322 [system_monitor.py:_start():170] Publishing last batch of metrics
+2023-09-05 08:55:58,949 INFO    HandlerThread:281322 [interfaces.py:finish():202] Joined disk monitor
+2023-09-05 08:55:58,960 INFO    HandlerThread:281322 [interfaces.py:finish():202] Joined gpu monitor
+2023-09-05 08:55:58,960 INFO    HandlerThread:281322 [interfaces.py:finish():202] Joined memory monitor
+2023-09-05 08:55:58,960 INFO    HandlerThread:281322 [interfaces.py:finish():202] Joined network monitor
+2023-09-05 08:55:58,961 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,961 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 2
+2023-09-05 08:55:58,961 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 3
+2023-09-05 08:55:58,961 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,961 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 3
+2023-09-05 08:55:58,961 DEBUG   SenderThread:281322 [sender.py:send():379] send: stats
+2023-09-05 08:55:58,962 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,962 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 3
+2023-09-05 08:55:58,962 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 4
+2023-09-05 08:55:58,962 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,963 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 4
+2023-09-05 08:55:58,963 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,963 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 4
+2023-09-05 08:55:58,963 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 5
+2023-09-05 08:55:58,963 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,963 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 5
+2023-09-05 08:55:58,963 DEBUG   SenderThread:281322 [sender.py:send():379] send: summary
+2023-09-05 08:55:58,967 INFO    SenderThread:281322 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2023-09-05 08:55:58,968 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,968 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 5
+2023-09-05 08:55:58,968 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 6
+2023-09-05 08:55:58,968 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:58,968 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 6
+2023-09-05 08:55:58,968 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:58,968 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 6
+2023-09-05 08:55:58,972 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: status_report
+2023-09-05 08:55:59,208 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 7
+2023-09-05 08:55:59,208 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:55:59,208 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 7
+2023-09-05 08:55:59,209 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:55:59,209 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 7
+2023-09-05 08:55:59,792 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/config.yaml
+2023-09-05 08:55:59,793 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:55:59,793 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:55:59,942 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: poll_exit
+2023-09-05 08:56:01,200 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 8
+2023-09-05 08:56:01,201 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: poll_exit
+2023-09-05 08:56:01,201 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:01,201 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 8
+2023-09-05 08:56:01,201 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:01,201 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 8
+2023-09-05 08:56:01,202 INFO    SenderThread:281322 [job_builder.py:build():281] Attempting to build job artifact
+2023-09-05 08:56:01,204 INFO    SenderThread:281322 [job_builder.py:_get_source_type():400] is repo sourced job
+2023-09-05 08:56:01,205 INFO    SenderThread:281322 [job_builder.py:build():374] adding wandb-job metadata file
+2023-09-05 08:56:01,230 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 9
+2023-09-05 08:56:01,231 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:01,231 DEBUG   SenderThread:281322 [sender.py:send():379] send: artifact
+2023-09-05 08:56:01,231 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 9
+2023-09-05 08:56:01,800 INFO    Thread-25 :281322 [dir_watcher.py:_on_file_modified():288] file/dir modified: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:56:02,339 INFO    wandb-upload_0:281322 [upload_job.py:push():86] Skipped uploading /home/goswami/gkd235/.local/share/wandb/artifacts/staging/tmp566t9dv6
+2023-09-05 08:56:02,692 INFO    wandb-upload_1:281322 [upload_job.py:push():89] Uploaded file /home/goswami/gkd235/.local/share/wandb/artifacts/staging/tmpepssjbk0
+2023-09-05 08:56:04,090 INFO    SenderThread:281322 [sender.py:send_artifact():1475] sent artifact job-https___github.com_Felix6464_ML_Climate_Science_Research_Project.git_LIM_neural_networks_lstm_training.py - {'id': 'QXJ0aWZhY3Q6NTU5NTEyNTQ4', 'digest': 'c187219f23b90b89aed43c9564cf5e83', 'state': 'PENDING', 'aliases': [], 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjkxNzU2MTgz', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6NTU4NzIzODcx', 'versionIndex': 11}}, 'version': 'latest'}
+2023-09-05 08:56:04,092 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:04,093 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 9
+2023-09-05 08:56:04,093 INFO    SenderThread:281322 [dir_watcher.py:finish():358] shutting down directory watcher
+2023-09-05 08:56:04,807 INFO    SenderThread:281322 [dir_watcher.py:finish():388] scan: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files
+2023-09-05 08:56:04,807 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/conda-environment.yaml conda-environment.yaml
+2023-09-05 08:56:04,808 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/config.yaml config.yaml
+2023-09-05 08:56:04,811 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log output.log
+2023-09-05 08:56:04,814 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/requirements.txt requirements.txt
+2023-09-05 08:56:04,818 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-metadata.json wandb-metadata.json
+2023-09-05 08:56:04,818 INFO    SenderThread:281322 [dir_watcher.py:finish():402] scan save: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json wandb-summary.json
+2023-09-05 08:56:04,821 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 10
+2023-09-05 08:56:04,822 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:04,822 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 10
+2023-09-05 08:56:04,824 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:04,824 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 10
+2023-09-05 08:56:04,825 INFO    SenderThread:281322 [file_pusher.py:finish():159] shutting down file pusher
+2023-09-05 08:56:04,943 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: keepalive
+2023-09-05 08:56:05,217 INFO    wandb-upload_0:281322 [upload_job.py:push():131] Uploaded file /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/conda-environment.yaml
+2023-09-05 08:56:05,267 INFO    wandb-upload_2:281322 [upload_job.py:push():131] Uploaded file /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/output.log
+2023-09-05 08:56:05,273 INFO    wandb-upload_1:281322 [upload_job.py:push():131] Uploaded file /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/config.yaml
+2023-09-05 08:56:05,274 INFO    wandb-upload_3:281322 [upload_job.py:push():131] Uploaded file /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/requirements.txt
+2023-09-05 08:56:05,283 INFO    wandb-upload_4:281322 [upload_job.py:push():131] Uploaded file /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/files/wandb-summary.json
+2023-09-05 08:56:05,483 INFO    Thread-24 :281322 [sender.py:transition_state():612] send defer: 11
+2023-09-05 08:56:05,484 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:05,484 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 11
+2023-09-05 08:56:05,484 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:05,485 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 11
+2023-09-05 08:56:05,485 INFO    SenderThread:281322 [file_pusher.py:join():164] waiting for file pusher
+2023-09-05 08:56:05,485 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 12
+2023-09-05 08:56:05,485 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:05,485 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 12
+2023-09-05 08:56:05,485 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:05,485 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 12
+2023-09-05 08:56:05,485 INFO    SenderThread:281322 [file_stream.py:finish():593] file stream finish called
+2023-09-05 08:56:05,677 INFO    SenderThread:281322 [file_stream.py:finish():597] file stream finish is done
+2023-09-05 08:56:05,677 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 13
+2023-09-05 08:56:05,678 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:05,678 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 13
+2023-09-05 08:56:05,678 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:05,678 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 13
+2023-09-05 08:56:05,678 INFO    SenderThread:281322 [sender.py:transition_state():612] send defer: 14
+2023-09-05 08:56:05,679 DEBUG   SenderThread:281322 [sender.py:send():379] send: final
+2023-09-05 08:56:05,679 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: defer
+2023-09-05 08:56:05,679 DEBUG   SenderThread:281322 [sender.py:send():379] send: footer
+2023-09-05 08:56:05,679 INFO    HandlerThread:281322 [handler.py:handle_request_defer():170] handle defer: 14
+2023-09-05 08:56:05,679 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: defer
+2023-09-05 08:56:05,679 INFO    SenderThread:281322 [sender.py:send_request_defer():608] handle sender defer: 14
+2023-09-05 08:56:05,680 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: poll_exit
+2023-09-05 08:56:05,680 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: server_info
+2023-09-05 08:56:05,680 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: get_summary
+2023-09-05 08:56:05,680 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: sampled_history
+2023-09-05 08:56:05,681 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: poll_exit
+2023-09-05 08:56:05,681 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: job_info
+2023-09-05 08:56:05,681 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: server_info
+2023-09-05 08:56:05,834 DEBUG   SenderThread:281322 [sender.py:send_request():406] send_request: job_info
+2023-09-05 08:56:05,835 DEBUG   HandlerThread:281322 [handler.py:handle_request():144] handle_request: shutdown
+2023-09-05 08:56:05,836 INFO    HandlerThread:281322 [handler.py:finish():857] shutting down handler
+2023-09-05 08:56:06,682 INFO    WriterThread:281322 [datastore.py:close():294] close: /mnt/qb/home/goswami/gkd235/ML_Climate_Science_Research_Project/LIM/neural_networks/wandb/run-20230905_085208-2hx4sa0r/run-2hx4sa0r.wandb
+2023-09-05 08:56:06,835 INFO    SenderThread:281322 [sender.py:finish():1552] shutting down sender
+2023-09-05 08:56:06,835 INFO    SenderThread:281322 [file_pusher.py:finish():159] shutting down file pusher
+2023-09-05 08:56:06,836 INFO    SenderThread:281322 [file_pusher.py:join():164] waiting for file pusher
