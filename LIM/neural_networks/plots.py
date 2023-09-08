@@ -200,9 +200,9 @@ def plot_loss_horizon(loss_values, loss_type, id, tau=None):
     plt.xticks(epochs, fontsize=10)
     plt.yticks(fontsize=10)
     plt.grid(True, linestyle='--', alpha=0.5)
-    plt.legend(fontsize=12)
+    plt.legend(bbox_to_anchor=(1, 0.5) ,fontsize=12, loc="center left")
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots_cluster/loss_{loss_type}_horizon_{id}_{tau}.png', dpi=300)
+    plt.savefig(f'final_plots_cluster/loss_{loss_type}_horizon_{id}_{tau}_data.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon_spread(loss_values, loss_type, id, tau=None):
