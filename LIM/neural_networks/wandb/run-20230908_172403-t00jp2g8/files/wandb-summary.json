@@ -1,1 +1,1 @@
-{"Epoch": 31, "Training Loss": 0.5714901735931089, "Test Loss": 0.5883972705938877, "_timestamp": 1694186933.631515, "_runtime": 290.3260660171509, "_step": 31}
+{"Epoch": 149, "Training Loss": 0.5398348613536401, "Test Loss": 0.6177932658256629, "_timestamp": 1694188002.980549, "_runtime": 1359.6751000881195, "_step": 149, "_wandb": {"runtime": 1358}}
