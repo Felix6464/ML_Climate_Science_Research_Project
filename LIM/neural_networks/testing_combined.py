@@ -111,7 +111,7 @@ def main():
     loss_list.append(([lst[6] for lst in loss_list_temp], f"{'LIM'}"))
 
     model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_lstm_input_tf, model_num_fnn, model_num_lim])
-    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[21, 22, 23])
+    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[0, 1, 2])
 
 
 

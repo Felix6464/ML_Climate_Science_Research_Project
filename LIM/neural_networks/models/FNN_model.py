@@ -244,15 +244,14 @@ class FeedforwardNetwork(nn.Module):
                     Y_test_pred = Y_test_pred.to(device)
 
                     #print(Y_test_pred.shape)
-                    #print(input.shape)
                     input = torch.cat((input, Y_test_pred), dim=1)
                     input = input[:, 30:]
 
+
             #print(input.shape)
-            #print(target.shape)
-            #print(Y_test_pred.shape)
+
             last_idx = (target_len-1) * input_batch.shape[2]
-            loss_test = criterion(Y_test_pred[:, last_idx:], target[:, -1, last_idx:].float())
+            loss_test = criterion(Y_test_pred[:, :], target[:, -1, :].float())
             batch_loss_test += loss_test.item()
 
         batch_loss_test /= eval_len

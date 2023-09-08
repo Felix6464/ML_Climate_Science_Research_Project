@@ -49,3 +49,16 @@ config: {'wandb': True, 'name': 'lstm_enc_dec_02drop_2l-0.0001-2-12200000-860227
 2023-09-04 08:53:52,497 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
 2023-09-04 08:54:21,950 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
 2023-09-04 08:54:52,164 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:55:22,442 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:55:52,172 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:56:21,862 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:56:51,223 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:57:20,752 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:57:50,328 INFO    MainThread:270824 [wandb_watch.py:watch():51] Watching
+2023-09-04 08:57:50,366 INFO    MainThread:270824 [wandb_run.py:_finish():1894] finishing run climate_ml/SST-ENC-DEC-30E-HORIZON/o97337ha
+2023-09-04 08:57:50,366 INFO    MainThread:270824 [wandb_run.py:_atexit_cleanup():2128] got exitcode: 0
+2023-09-04 08:57:50,368 INFO    MainThread:270824 [wandb_run.py:_restore():2111] restore
+2023-09-04 08:57:50,368 INFO    MainThread:270824 [wandb_run.py:_restore():2117] restore done
+2023-09-04 08:57:58,577 INFO    MainThread:270824 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2023-09-04 08:57:58,577 INFO    MainThread:270824 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2023-09-04 08:57:58,589 INFO    MainThread:270824 [wandb_run.py:_footer_sync_info():3440] logging synced files
