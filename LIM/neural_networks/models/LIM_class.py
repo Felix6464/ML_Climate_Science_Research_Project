@@ -1,7 +1,7 @@
 import torch
 from scipy.linalg import expm
 import scipy.linalg as linalg
-import utilities as ut
+import LIM.neural_networks.utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
 import matplotlib.pyplot as plt
@@ -201,7 +201,7 @@ class LIM:
 
         return x_frcst
 
-    def euler_method(self, L, Q, x0, dt, T):
+    def euler_method(self, L, Q, x0, dt, T, num_samples=1):
         """
         Solve the SDE using the Euler method.
 
@@ -215,15 +215,20 @@ class LIM:
         n = len(x0)
 
         # Initialize solution
-        x = np.zeros((n, num_steps+1))
-        x[:, 0] = x0
+        x = np.zeros((num_samples, num_steps+1, n))
+        x[:, 0, :] = x0
 
-        # Iteratively apply the Euler method
-        for i in range(num_steps):
-            x[:, i+1] = x[:, i] + dt * np.dot(L, x[:, i])
-            x[:, i+1] += np.random.multivariate_normal(np.zeros(n), cov=Q) * np.sqrt(dt)
+        for samples in range(num_samples):
+            # Initialize solution
+            x[samples, 0, :] = x0
 
-        return x
+            # Iteratively apply the Euler method
+            for i in range(num_steps):
+                x[samples, i+1, :] = x[samples, i, :] + dt * np.dot(L, x[samples, i, :])
+                x[samples, i+1, :] += np.random.multivariate_normal(np.zeros(n), cov=Q) * np.sqrt(dt)
+
+        times = np.arange(0, T + dt, dt)
+        return x, times
 
     def noise_integration(self, input_data, timesteps, t_delta_=1, seed=None, num_comp=10):
 

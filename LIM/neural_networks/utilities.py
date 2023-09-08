@@ -6,11 +6,11 @@ import json
 import torch
 import os
 
-#import models.GRU_enc_dec as gru
-#import models.LSTM_enc_dec_input as lstm_input
-#import models.LSTM_enc_dec as lstm
-#import models.FNN_model as ffn
-#import models.LSTM as lstm_base
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+from LIM.neural_networks.models.FNN_model import *
+from LIM.neural_networks.models.LSTM import *
+from LIM.neural_networks.models.GRU_enc_dec import *
 
 
 def reshape_xarray(input_data):
@@ -23,6 +23,7 @@ def reshape_xarray(input_data):
 
     return reshaped_data
 
+
 def apply_mask(mask, array):
     # Create a masked array using the where function
     masked_array = xr.where(mask == 100, np.nan, array)
@@ -31,7 +32,6 @@ def apply_mask(mask, array):
 
 
 def calculate_monthly_anomalies(data):
-
     # Calculate the climatological mean for each month
     climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
     # Calculate the anomalies by subtracting the climatological mean for each month
@@ -39,8 +39,8 @@ def calculate_monthly_anomalies(data):
 
     return anomalies
 
-def crop_xarray_lat(input_data):
 
+def crop_xarray_lat(input_data):
     cropped_ds = input_data.sel(lat=slice(-30, 30))
 
     return cropped_ds
@@ -48,14 +48,13 @@ def crop_xarray_lat(input_data):
 
 def crop_xarray(lon_start, lon_end, input_data):
     if lon_start > lon_end:
-        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start-2, 180))
+        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start - 2, 180))
         new_scale_left = np.linspace(-180, -119, 52)
         cropped_dataset_left["lon"] = new_scale_left
 
-        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end+2))
+        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end + 2))
         new_scale_right = np.linspace(-121, -10, 112)
         cropped_dataset_right["lon"] = new_scale_right
-
 
         cropped_dataset = xr.concat(
             [
@@ -70,13 +69,13 @@ def crop_xarray(lon_start, lon_end, input_data):
 
     return cropped_dataset
 
-def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
 
+def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
     if data_type == "xr":
-        #Concatenate along a specified dimension
+        # Concatenate along a specified dimension
         concatenated_xarray = xr.concat([pc_ts, pc_zos], dim='eof')
 
-        #Save the xarray to a NetCDF file
+        # Save the xarray to a NetCDF file
         concatenated_xarray.to_netcdf(filename + '.nc')
     else:
         ts_20 = torch.from_numpy(pc_ts.data)
@@ -86,6 +85,7 @@ def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
         data = torch.cat((ts_20, zos_10), dim=0)
         print(data.shape)
         torch.save(data, filename + '.pt')
+
 
 def map2flatten(x_map: xr.Dataset) -> list:
     """Flatten dataset/dataarray and remove NaNs.
@@ -247,6 +247,7 @@ def matrix_decomposition(A):
 
     return w, U, V
 
+
 def calculate_percentage(value, percentage):
     """
     Calculate the value of a percentage from a given value.
@@ -297,9 +298,7 @@ def normalize_data(data):
     for i in range(len(mean)):
         normalized_data[i, :] = (data[i, :] - mean[i]) / std[i]
 
-
     return normalized_data
-
 
 
 def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
@@ -336,7 +335,6 @@ def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
     return X, Y
 
 
-
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
@@ -356,8 +354,6 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     Y_test = torch.from_numpy(Ytest).type(torch.Tensor)
 
     return X_train, Y_train, X_test, Y_test
-
-
 
 
 def save_dict(file_path, dictionary):
@@ -389,10 +385,9 @@ def dict_merge(dicts_list):
 
 
 def normalize_tensor_individual(tensor):
-
     normalized_tensor = torch.zeros(tensor.size())
 
-    for feature_idx in range(len(tensor[:,0])):
+    for feature_idx in range(len(tensor[:, 0])):
         # Calculate the minimum and maximum values of the tensor
         min_value = torch.min(tensor[feature_idx, :])
         max_value = torch.max(tensor[feature_idx, :])
@@ -405,15 +400,16 @@ def normalize_tensor_individual(tensor):
         normalized_tensor[feature_idx, :] = (tensor[feature_idx, :] - min_value) / (max_value - min_value)
 
     return normalized_tensor
-'''
-def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn):
 
+
+def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn, num_lstm_input_tf):
     # Load the saved models
-    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{num_lstm_base}.pt")
-    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{num_lstm}.pt")
-    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{num_lstm_input}.pt")
-    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{num_ffn}.pt")
-    saved_model_gru = torch.load(f"./trained_models/lstm/model_{num_gru}.pt")
+    saved_model_lstm_base = torch.load(f"./final_models/model_{num_lstm_base}.pt")
+    saved_model_lstm = torch.load(f"./final_models/model_{num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"./final_models/model_{num_lstm_input}.pt")
+    saved_model_lstm_input_tf = torch.load(f"./final_models/model_{num_lstm_input_tf}.pt")
+    saved_model_fnn = torch.load(f"./final_models/model_{num_ffn}.pt")
+    saved_model_gru = torch.load(f"./final_models/model_{num_gru}.pt")
 
     # Load the hyperparameters of the lstm_model base
     params_lb = saved_model_lstm_base["hyperparameters"]
@@ -424,36 +420,42 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     # Load the hyperparameters of the lstm_input_model_enc_dec
     params_li = saved_model_lstm_input["hyperparameters"]
 
+    # Load the hyperparameters of the lstm_input_model_enc_dec with teacher_forcing
+    params_li_tf = saved_model_lstm_input_tf["hyperparameters"]
+
     # Load the hyperparameters of the fnn_model
     params_f = saved_model_fnn["hyperparameters"]
 
     # Load the hyperparameters of the fnn_model
     params_g = saved_model_gru["hyperparameters"]
 
-
     # Specify the device to be used for testing
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                                         hidden_size=params_lb["hidden_size"],
-                                                         num_layers=params_lb["num_layers"])
+    model_lstm_base = LSTM_Sequence_Prediction_Base(input_size=params_lb["num_features"],
+                                                    hidden_size=params_lb["hidden_size"],
+                                                    num_layers=params_lb["num_layers"])
 
-    model_lstm = lstm.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                               hidden_size=params_l["hidden_size"],
-                                               num_layers=params_l["num_layers"])
+    model_lstm = LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
+                                          hidden_size=params_l["hidden_size"],
+                                          num_layers=params_l["num_layers"])
 
-    model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                                         hidden_size=params_li["hidden_size"],
-                                                         num_layers=params_li["num_layers"])
+    model_lstm_inp = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
+                                                    hidden_size=params_li["hidden_size"],
+                                                    num_layers=params_li["num_layers"])
 
-    model_ffn = ffn.FeedforwardNetwork(input_size=params_lb["num_features"],
-                                       hidden_size=params_f["hidden_size"],
-                                       output_size=params_lb["num_features"],
-                                       input_window=params_f["input_window"])
+    model_lstm_inp_tf = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
+                                                       hidden_size=params_li_tf["hidden_size"],
+                                                       num_layers=params_li_tf["num_layers"])
 
-    model_gru = gru.GRU_Sequence_Prediction(input_size=params_lb["num_features"],
-                                            hidden_size=params_g["hidden_size"],
-                                            num_layers=params_g["num_layers"])
+    model_ffn = FeedforwardNetwork(input_size=params_lb["num_features"],
+                                   hidden_size=params_f["hidden_size"],
+                                   output_size=params_lb["num_features"],
+                                   input_window=params_f["input_window"])
+
+    model_gru = GRU_Sequence_Prediction(input_size=params_lb["num_features"],
+                                        hidden_size=params_g["hidden_size"],
+                                        num_layers=params_g["num_layers"])
 
     # Load the saved models
     model_gru.load_state_dict(saved_model_gru["model_state_dict"])
@@ -464,11 +466,13 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     model_lstm = model_lstm.to(device)
     model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
     model_lstm_inp = model_lstm_inp.to(device)
+    model_lstm_inp_tf.load_state_dict(saved_model_lstm_input["model_state_dict"])
+    model_lstm_inp_tf = model_lstm_inp.to(device)
     model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
     model_ffn = model_ffn.to(device)
 
-    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru
-'''
+    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru, model_lstm_inp_tf
+
 
 def min_max_values_per_slice(tensor):
     """
