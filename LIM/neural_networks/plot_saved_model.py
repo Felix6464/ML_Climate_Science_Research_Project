@@ -1,11 +1,11 @@
-from LIM.neural_networks.models.GRU_enc_dec import  *
-from LIM.neural_networks.utilities import *
+from models.LSTM_enc_dec import  *
+from utilities import *
 from plots import *
 
 
 # Create the DataLoader for first principal component
-data = torch.load("./synthetic_data/data/lim_integration_multipleLim_XL_160k.pt")
-model_num = "8905460np"
+data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+model_num = "4683225np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
@@ -14,7 +14,7 @@ data = data[:, 70000:85000]
 num_features = 30
 
 
-saved_model = torch.load(f"./trained_models/lstm/model_{model_num}.pt")
+saved_model = torch.load(f"./final_models/model_{model_num}.pt")
 
 params = saved_model["hyperparameters"]
 hidden_size = params["hidden_size"]
@@ -44,7 +44,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # convert windowed raw_data from np.array to PyTorch tensor
 X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
-model = GRU_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
+model = LSTM_Sequence_Prediction(input_size = num_features, hidden_size = hidden_size, num_layers=num_layers)
 
 model.load_state_dict(saved_model["model_state_dict"])
 model.to(device)

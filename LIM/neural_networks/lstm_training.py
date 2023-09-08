@@ -21,7 +21,7 @@ lr = [0.0001]
 
 windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
            (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
-windows = [(1,12), (2,12), (4,12), (6,12), (8,12), (12,12)]
+windows = [(2,12)]
 
 #cluster test
 #data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000]
@@ -30,8 +30,8 @@ windows = [(1,12), (2,12), (4,12), (6,12), (8,12), (12,12)]
 
 data_sizes = [100000]
 
-model_label = "ENC-DEC-30E-HORIZON-DATA"
-name = "lstm_enc_dec"
+model_label = "ENC-DEC-30E-HORIZON"
+name = "lstm_enc_dec_150e"
 dt = "np"
 
 config = {
@@ -45,7 +45,7 @@ config = {
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 30,
+    "num_epochs": 150,
     "batch_size": 128,
     "train_data_len": len(data_[0, :]),
     "training_prediction": "recursive",
