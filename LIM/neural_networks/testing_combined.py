@@ -1,6 +1,6 @@
 from models.LSTM_enc_dec import *
 from plots import *
-from models.utilities import *
+from utilities import *
 import torch.utils.data as datat
 from torch.utils.data import DataLoader
 from models.LIM_class import *
@@ -107,11 +107,11 @@ def main():
     loss_list.append(([lst[2] for lst in loss_list_temp], f"{'LSTM-Enc-Dec'}"))
     loss_list.append(([lst[3] for lst in loss_list_temp], f"{'LSTM-Enc-Dec-Input'}"))
     loss_list.append(([lst[4] for lst in loss_list_temp], f"{'LSTM-Enc-Dec-Input-TF'}"))
-    loss_list.append(([lst[5] for lst in loss_list_temp], f"{'FFN'}"))
+    #loss_list.append(([lst[5] for lst in loss_list_temp], f"{'FFN'}"))
     loss_list.append(([lst[6] for lst in loss_list_temp], f"{'LIM'}"))
 
-    model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_lstm_input_tf, model_num_fnn, model_num_lim])
-    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[0, 1, 2])
+    model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_lstm_input_tf, model_num_lim])
+    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[21, 22, 23])
 
 
 

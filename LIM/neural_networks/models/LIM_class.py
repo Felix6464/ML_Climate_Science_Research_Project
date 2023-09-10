@@ -1,7 +1,6 @@
 import torch
 from scipy.linalg import expm
 import scipy.linalg as linalg
-import LIM.neural_networks.utilities as ut
 import numpy as np
 from numpy.linalg import pinv, eigvals, eig, eigh
 import matplotlib.pyplot as plt
@@ -93,7 +92,7 @@ class LIM:
         #print("Min of G:", np.min(self.green_function))
 
         # Compute Logarithmic Matrix = ln(green_function)/tau
-        eigenvalues, eigenvectors, _ = ut.matrix_decomposition(self.green_function)
+        eigenvalues, eigenvectors, _ = self.matrix_decomposition(self.green_function)
         self.g_eigenvalues = eigenvalues
         #print("Min eigenvalue of G:", np.min(self.g_eigenvalues))
 
@@ -143,7 +142,7 @@ class LIM:
 
         # Check for Nyquist mode
         # If the imaginary part of the largest eigenvalue of Q is too large, print a warning message
-        eigenvalues_noise, _, _ = ut.matrix_decomposition(noise_covariance)
+        eigenvalues_noise, _, _ = self.matrix_decomposition(noise_covariance)
 
         return noise_covariance
 
@@ -338,7 +337,7 @@ class LIM:
         """
 
         # Compute the matrix decomposition of G.
-        eigenvalues, eigenvectors_left, eigenvectors_right = ut.matrix_decomposition(self.green_function)
+        eigenvalues, eigenvectors_left, eigenvectors_right = self.matrix_decomposition(self.green_function)
 
         # Sort the eigenvalues in decreasing order of decay time.
         decay_times = -self.tau / np.log(eigenvalues)
@@ -381,6 +380,28 @@ class LIM:
             print("Negative eigenvalues detected.")
         if max(eigenvalues.real) > 1:
             print("Eigenvalues greater than 1 detected.")
+
+    def matrix_decomposition(self, A):
+        """Decompose square matrix:
+
+            A = U D V.T
+        Args:
+            A (np.ndarray): Square matrix
+        Returns:
+            w (np.ndarray): Sorted eigenvalues
+            U (np.ndarray): Matrix of sorted eigenvectors of A
+            V (np.ndarray): Matrix of sorted eigenvectors of A.T
+        """
+        w, U = np.linalg.eig(A)
+        idx_sort = np.argsort(w)[::-1]
+        w = w[idx_sort]
+        U = U[:, idx_sort]
+
+        w_transpose, V = np.linalg.eig(A.T)
+        idx_sort = np.argsort(w_transpose)[::-1]
+        V = V[:, idx_sort]
+
+        return w, U, V
 
 
 
