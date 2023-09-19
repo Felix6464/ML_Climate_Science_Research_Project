@@ -2,31 +2,13 @@ from models.LSTM_enc_dec import *
 from torch.utils.data import DataLoader
 from utilities import *
 
-#raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_20k[-1]j.nc")
-#raw_data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#data_control = torch.load("./raw_data/data_piControl.pt")
-#data_control = normalize_data(data_control)
-#raw_data.raw_data = normalize_data(torch.from_numpy(raw_data.raw_data)).numpy()
-#print(data_control[0, :10])
-#raw_data = torch.cat((data_control, raw_data), 1)
-#raw_data = normalize_tensor_individual(raw_data)
-
 
 data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
-print(min_max_values_per_slice(data_))
 print("Data shape : {}".format(data_.shape))
 
-lr = [0.0005, 0.0001, 0.00005]
 lr = [0.0001]
 
-windows = [(2,1), (2,2), (2, 4), (2,6), (2, 10), (2, 12), (4,1), (4, 2), (4, 4), (4, 6), (4, 8), (4, 10), (4, 12),
-           (6,1), (6,2), (6,4), (6, 6), (6, 8), (6, 10), (6, 12), (12, 1), (12,2), (12, 6), (12, 8), (12, 10), (12, 12)]
 windows = [(2,12)]
-
-#cluster test
-#data_sizes = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000]
-              #70000, 80000,
-              #90000, 100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000]
 
 data_sizes = [100000]
 
