@@ -4,8 +4,6 @@ import cftime
 
 # Load control data
 data = torch.load("./data/data_piControl.pt")
-#print("Data shape : {}".format(data.shape))
-#print(min_max_values_per_slice(data))
 
 
 
@@ -53,7 +51,7 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
     print("saved model")
 
 
-def generate_lim_data2(timesteps, tau_list, num_models, data, save_name, time=False):
+def generate_lim_data_euler_method(timesteps, tau_list, num_models, data, save_name, time=False):
 
 
     lim_integration_ = torch.zeros((30, timesteps))
@@ -65,11 +63,6 @@ def generate_lim_data2(timesteps, tau_list, num_models, data, save_name, time=Fa
         tau = 1
         model = LIM(tau)
         model.fit(data[:, :amount_data].detach().cpu().numpy())
-
-        #lim_integration, times_ = model.noise_integration(data[:, amount_data-1],
-        #                                                  timesteps=timesteps,
-        #                                                  num_comp=30,
-        #                                                  t_delta_=tau_list[m])
 
         lim_integration = model.euler_method(L=model.logarithmic_matrix,
                                              Q=model.noise_covariance,
@@ -107,7 +100,7 @@ num_models = 1
 tau_list = [1]
 timesteps = 200000
 
-generate_lim_data2(timesteps, tau_list, len(tau_list), data, "lim_integration_200k_new.pt", time=False)
+generate_lim_data_euler_method(timesteps, tau_list, len(tau_list), data, "lim_integration_200k_new.pt", time=False)
 
 
 

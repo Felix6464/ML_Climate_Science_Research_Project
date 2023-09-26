@@ -11,6 +11,7 @@ def main():
     data = normalize_data(data)
 
     horizon = True
+    id = ["final-horizon"]
 
     # Specify the model number of the model to be tested
 
@@ -57,9 +58,6 @@ def main():
                  ("8602276np", "0.2 dropout +2l")
                  ]
 
-
-
-    id = ["final-horizon"]
 
     loss_list = []
     loss_list_eval = []

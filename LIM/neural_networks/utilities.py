@@ -6,14 +6,37 @@ import json
 import torch
 import os
 
-from models.LSTM_enc_dec_input import *
-from models.LSTM_enc_dec import *
-from models.FNN_model import *
-from models.LSTM import *
-from models.GRU_enc_dec import *
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+from LIM.neural_networks.models.FNN_model import *
+from LIM.neural_networks.models.LSTM import *
+from LIM.neural_networks.models.GRU_enc_dec import *
 
 
 def reshape_xarray(input_data):
+    """
+    Reshape an xarray object to a target latitude and longitude grid using linear interpolation.
+
+    Parameters
+    ----------
+    input_data : xarray.DataArray
+        The input xarray object to be reshaped.
+
+    Returns
+    -------
+    xarray.DataArray
+        The reshaped xarray object with the target latitude and longitude dimensions.
+
+    Notes
+    -----
+    This function assumes that the input xarray object has 'lat' and 'lon' dimensions.
+
+    The target latitude and longitude dimensions are defined as follows:
+    - target_lat: a DataArray with 192 points linearly spaced between -90 and 90 degrees, with dimension 'lat'.
+    - target_lon: a DataArray with 360 points linearly spaced between -180 and 180 degrees, with dimension 'lon'.
+
+    The input xarray object is reshaped using the xr.interp() method with the 'nearest' interpolation method.
+    """
     # Define the target latitude and longitude dimensions
     target_lat = xr.DataArray(np.linspace(-90, 90, 192), dims='lat')
     target_lon = xr.DataArray(np.linspace(-180, 180, 360), dims='lon')
@@ -23,8 +46,22 @@ def reshape_xarray(input_data):
 
     return reshaped_data
 
-
 def apply_mask(mask, array):
+    """
+    Apply a mask to an xarray object using linear interpolation.
+
+    Parameters
+    ----------
+    mask : xarray.DataArray
+        The mask to be applied to the input array.
+    array : xarray.DataArray
+        The input xarray object to be masked.
+
+    Returns
+    -------
+    xarray.DataArray
+        The masked xarray object with NaN values where the mask is 100.
+    """
     # Create a masked array using the where function
     masked_array = xr.where(mask == 100, np.nan, array)
 
@@ -32,18 +69,28 @@ def apply_mask(mask, array):
 
 
 def calculate_monthly_anomalies(data):
+    """
+    Calculate monthly anomalies of an xarray object.
+
+    Parameters
+    ----------
+    data : xarray.DataArray
+        The input xarray object to calculate anomalies for.
+
+    Returns
+    -------
+    xarray.DataArray
+        The xarray object with monthly anomalies calculated.
+    """
     # Calculate the climatological mean for each month
     climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
+
     # Calculate the anomalies by subtracting the climatological mean for each month
     anomalies = data.groupby('time.month') - climatological_mean
 
     return anomalies
 
 
-def crop_xarray_lat(input_data):
-    cropped_ds = input_data.sel(lat=slice(-30, 30))
-
-    return cropped_ds
 
 
 def crop_xarray(lon_start, lon_end, input_data):
