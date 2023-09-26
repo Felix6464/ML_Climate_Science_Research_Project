@@ -9,7 +9,7 @@ model_num = "7865955np"
 
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
-data = data[:, 70000:85000]
+data = data[:, 180000:200000]
 num_features = 30
 
 
