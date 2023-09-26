@@ -94,32 +94,66 @@ def calculate_monthly_anomalies(data):
 
 
 def crop_xarray(lon_start, lon_end, input_data):
+    """
+    Crop a given xarray dataset along the longitude dimension and return the cropped dataset.
+
+    Parameters:
+        lon_start (float): The starting longitude for cropping.
+        lon_end (float): The ending longitude for cropping.
+        input_data (xarray.Dataset or xarray.DataArray): The input xarray dataset to be cropped.
+
+    Returns:
+        xarray.Dataset or xarray.DataArray: The cropped xarray dataset.
+
+    Raises:
+        ValueError: If lon_start is greater than lon_end, indicating an invalid input range.
+    """
     if lon_start > lon_end:
+        # Crop the left portion of the dataset
         cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start - 2, 180))
         new_scale_left = np.linspace(-180, -119, 52)
         cropped_dataset_left["lon"] = new_scale_left
 
+        # Crop the right portion of the dataset
         cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end + 2))
         new_scale_right = np.linspace(-121, -10, 112)
         cropped_dataset_right["lon"] = new_scale_right
 
+        # Concatenate the left and right portions to create the cropped dataset
         cropped_dataset = xr.concat(
             [
                 cropped_dataset_left,
                 cropped_dataset_right
-
             ],
             dim='lon'
         ).sortby('lon')
     else:
+        # Crop the dataset along the specified longitude range
         cropped_dataset = input_data.sel(lon=slice(lon_start, lon_end))
 
     return cropped_dataset
 
 
 def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
+    """
+    Concatenate two datasets and save the result to a file.
+
+    Parameters:
+        pc_ts (xarray.DataArray or torch.Tensor): The first dataset, either as an xarray DataArray
+                                                  (if data_type is "xr") or as a torch Tensor.
+        pc_zos (xarray.DataArray or torch.Tensor): The second dataset, either as an xarray DataArray
+                                                   (if data_type is "xr") or as a torch Tensor.
+        data_type (str): The type of data provided, either "xr" (xarray) or another format.
+        filename (str): The name of the file to save the concatenated data to.
+
+    Returns:
+        None: The function saves the concatenated data to a file and does not return any values.
+
+    Raises:
+        ValueError: If data_type is not "xr" or any other value, indicating an unsupported data type.
+    """
     if data_type == "xr":
-        # Concatenate along a specified dimension
+        # Concatenate along a specified dimension (eof)
         concatenated_xarray = xr.concat([pc_ts, pc_zos], dim='eof')
 
         # Save the xarray to a NetCDF file
@@ -127,10 +161,9 @@ def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
     else:
         ts_20 = torch.from_numpy(pc_ts.data)
         zos_10 = torch.from_numpy(pc_zos.data)
-        print(ts_20.shape)
-        print(zos_10.shape)
         data = torch.cat((ts_20, zos_10), dim=0)
-        print(data.shape)
+
+        # Save the torch Tensor to a file with the given filename
         torch.save(data, filename + '.pt')
 
 
@@ -451,12 +484,12 @@ def normalize_tensor_individual(tensor):
 
 def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn, num_lstm_input_tf):
     # Load the saved models
-    saved_model_lstm_base = torch.load(f"./final_models/model_{num_lstm_base}.pt")
-    saved_model_lstm = torch.load(f"./final_models/model_{num_lstm}.pt")
-    saved_model_lstm_input = torch.load(f"./final_models/model_{num_lstm_input}.pt")
-    saved_model_lstm_input_tf = torch.load(f"./final_models/model_{num_lstm_input_tf}.pt")
-    saved_model_fnn = torch.load(f"./final_models/model_{num_ffn}.pt")
-    saved_model_gru = torch.load(f"./final_models/model_{num_gru}.pt")
+    saved_model_lstm_base = torch.load(f"./final_models_trained/model_{num_lstm_base}.pt")
+    saved_model_lstm = torch.load(f"./final_models_trained/model_{num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"./final_models_trained/model_{num_lstm_input}.pt")
+    saved_model_lstm_input_tf = torch.load(f"./final_models_trained/model_{num_lstm_input_tf}.pt")
+    saved_model_fnn = torch.load(f"./final_models_trained/model_{num_ffn}.pt")
+    saved_model_gru = torch.load(f"./final_models_trained/model_{num_gru}.pt")
 
     # Load the hyperparameters of the lstm_model base
     params_lb = saved_model_lstm_base["hyperparameters"]

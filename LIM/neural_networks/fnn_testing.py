@@ -1,6 +1,6 @@
 import utilities as ut
 from models.FNN_model import *
-from LIM.neural_networks.plots.plots import *
+from LIM.neural_networks.plots import *
 from utilities import *
 import torch.utils.data as datat
 from torch.utils.data import DataLoader
@@ -8,16 +8,20 @@ from torch.utils.data import DataLoader
 
 
 def main():
-
+    # Load a PyTorch tensor from a file located at "./synthetic_data/lim_integration_130k[-1].pt"
     data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
 
-    # Calculate the mean and standard deviation along the feature dimension
+    # Calculate the mean and standard deviation along the feature dimension using a function called 'normalize_data'
     data = ut.normalize_data(data)
+
+    # Keep only the first 30,000 columns of the data tensor
     data = data[:, :30000]
     print("Data shape : {}".format(data.shape))
 
-
+    # Calculate the index for splitting the data into training and test sets
     index_train = int(0.9 * len(data[0, :]))
+
+    # Update the 'data' tensor to contain only the data for training (last 10% is used for testing)
     data = data[:, index_train:]
 
     model_num = ["762324fnp"]

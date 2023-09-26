@@ -3,21 +3,30 @@ from torch.utils.data import DataLoader
 from utilities import *
 
 
+# Load data from a file and store it in 'data_'
 data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
 
+# Define learning rate(s)
 lr = [0.0001]
 
-windows = [(2,12)]
+# Define time window(s)
+windows = [(2, 12)]
 
+# Define data size(s)
 data_sizes = [100000]
 
+# Define a model label for saving using wandb
 model_label = "ENC-DEC-30E-HORIZON"
+
+# Define a name or identifier for the model when using wandb
 name = "lstm_enc_dec_150e"
+
+# Define a variable 'dt' which specifies either "np" array or "xr" array
 dt = "np"
 
 config = {
-    "wandb": True,
+    "wandb": False,
     "name": name,
     "num_features": 30,
     "hidden_size": 128,

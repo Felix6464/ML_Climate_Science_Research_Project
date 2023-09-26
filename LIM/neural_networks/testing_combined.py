@@ -16,7 +16,6 @@ def main():
     data = normalize_data(data)
 
     # Calculate the mean and standard deviation along the feature dimension
-    #raw_data = data_lim[:, 80000:90000]
     print("Data shape : {}".format(data.shape))
 
     # Specify the model number of the model to be tested

@@ -63,7 +63,7 @@ def main():
     loss_list_eval = []
 
     for m in range(len(model_num)):
-        saved_model = torch.load(f"./final_models/model_{model_num[m][0]}.pt")
+        saved_model = torch.load(f"./final_models_trained/model_{model_num[m][0]}.pt")
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]

@@ -10,11 +10,10 @@ model_num = "7865955np"
 # Calculate the mean and standard deviation along the feature dimension
 data = normalize_data(data)
 data = data[:, 70000:85000]
-#raw_data = normalize_tensor_individual(raw_data)
 num_features = 30
 
 
-saved_model = torch.load(f"./final_models/model_{model_num}.pt")
+saved_model = torch.load(f"./final_models_trained/model_{model_num}.pt")
 
 params = saved_model["hyperparameters"]
 hidden_size = params["hidden_size"]
