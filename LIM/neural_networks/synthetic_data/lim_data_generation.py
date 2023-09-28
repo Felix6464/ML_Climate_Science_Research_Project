@@ -1,6 +1,5 @@
-from LIM.neural_networks.models.LIM_class import *
+from LIM.LIM_class import *
 from LIM.neural_networks.utilities import *
-import cftime
 
 # Load control data
 data = torch.load("./data/data_piControl.pt")

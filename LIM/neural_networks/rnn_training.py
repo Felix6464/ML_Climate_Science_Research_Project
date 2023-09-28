@@ -22,7 +22,7 @@ model_label = "ENC-DEC-30E-HORIZON"
 # Define a name or identifier for the model when using wandb
 name = "lstm_enc_dec_150e"
 
-# Define a variable 'dt' which specifies either "np" array or "xr" array     
+# Define a variable 'dt' which specifies either "np" array or "xr" array
 dt = "np"
 
 config = {

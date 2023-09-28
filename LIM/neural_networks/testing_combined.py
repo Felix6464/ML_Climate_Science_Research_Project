@@ -1,9 +1,7 @@
-from models.LSTM_enc_dec import *
 from plots import *
 from utilities import *
-import torch.utils.data as datat
 from torch.utils.data import DataLoader
-from models.LIM_class import *
+from LIM.LIM_class import *
 import torch.nn as nn
 
 

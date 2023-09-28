@@ -269,7 +269,7 @@ class LIM:
         t_decay = [-(1 / np.log(eigenvalue.real)) for eigenvalue in self.g_eigenvalues]
         t_decay = min(t_decay) -1e-4
 
-        print("t_decay: {}".format(t_decay))
+        #print("t_decay: {}".format(t_decay))
 
         if 2 < t_decay:
             if t_delta_ is not None:
@@ -279,7 +279,7 @@ class LIM:
         else:
             t_delta_int = t_decay
 
-        print("t_delta: {}".format(t_delta_int))
+        #print("t_delta: {}".format(t_delta_int))
 
 
         for t in range(timesteps):
