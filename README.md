@@ -83,8 +83,4 @@ To get started, refer to the documentation and python files within the respectiv
 
 ## Dependencies
 
-Make sure you have the required Python libraries and packages installed. You can find the dependencies listed in the individual Python scripts and notebooks.
-
-## License
-
-This repository is licensed under [LICENSE NAME]. See the [LICENSE](LICENSE) file for details.
+Make sure you have the required Python libraries and packages installed. You can find the dependencies listed in the `requirements.txt` file
