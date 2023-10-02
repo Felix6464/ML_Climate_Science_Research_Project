@@ -67,4 +67,3 @@ urllib3==1.26.16
 wandb==0.15.8
 wheel==0.38.4
 xarray==0.20.1
-xgboost==0.71
