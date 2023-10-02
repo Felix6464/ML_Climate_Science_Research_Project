@@ -18,7 +18,7 @@ dt = "fnp"
 lr = [0.0001]
 
 # Define a string variable for wandb runs
-model_label = "ENC-DEC-MODELS"
+model_label = "FFN-MODELS"
 name = "ffn"
 
 config = {
@@ -30,7 +30,7 @@ config = {
     "output_window": 1,
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 50,
+    "num_epochs": 10,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
@@ -125,7 +125,7 @@ for l in lr:
     torch.save({'hyperparameters': config,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./final_models/model_{rand_identifier}.pt')
+               f'./final_models_trained/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
     model_dict = {"training_params": config,

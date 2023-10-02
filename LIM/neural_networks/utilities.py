@@ -134,6 +134,24 @@ def crop_xarray(lon_start, lon_end, input_data):
     return cropped_dataset
 
 
+def crop_xarray_lat(input_data):
+    """
+    Crop a given xarray Dataset or DataArray along the latitude dimension.
+
+    Parameters:
+    - input_data (xarray.Dataset or xarray.DataArray): The input xarray data containing latitude dimension.
+
+    Returns:
+    - xarray.Dataset or xarray.DataArray: A cropped xarray object containing data within the latitude range [-30, 30].
+
+    This function slices the input xarray object along the latitude dimension to retain only the data within the range
+    from -30 degrees to 30 degrees latitude, inclusive.
+
+    """
+    cropped_ds = input_data.sel(lat=slice(-30, 30))
+
+    return cropped_ds
+
 def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
     """
     Concatenate two datasets and save the result to a file.

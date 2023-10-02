@@ -3,7 +3,8 @@
 ## How much Data do S2S-Neural-Networks need? An ENSO Showcase
 
 ## Description
-This Python machine learning repository focuses on predicting the time evolution of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures. It also incorporates the "Linear Inverse Model" (LIM) to enhance ENSO forecasts by integrating additional data points and aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
+This Python machine learning repository focuses on predicting the time evolution of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
+It also incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by integrating additional data points, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
 ## Download Raw Data
 
 ### CESM2 piControl Data 
@@ -17,8 +18,7 @@ First, install dependencies
 git clone https://github.com/Felix6464/ML_Climate_Science_Research_Project.git
 
 # install project   
-cd ML_Climate_Science_Research_Project
-pip install -e .   
+cd ML_Climate_Science_Research_Project  
 pip install -r requirements.txt
 
  ```   
@@ -28,7 +28,7 @@ Next, navigate to any file and run it.
 
 - **Linear Inverse Model**: In the directory `LIM`, you'll find:
   - **LIM_implementation_1994.pdf** - The base paper for the LIM implementation.
-  - **LIM_class.py** - contains the implementation of the LIM
+  - **LIM_class.py** - contains the implementation of the Liner Inverse Model (LIM).
   - **lim_integration_plots.ipynb** - A Jupyter Notebook that:
     - Loads raw data
     - Computes principal components
@@ -51,13 +51,13 @@ Next, navigate to any file and run it.
 - **Raw Data**: The `raw_data` folder contains the CESM2 piControl data for sea surface height and sea surface temperature, as well as the sea-land mask. Put the raw data here for consequently loading it
 
 
-- **Final Models Trained**: The `final_models_trained` folder contains trained PyTorch models used for evaluation. Model names are represented by randomly generated integers for identification.
+- **Final Models Trained**: The `final_models_trained` folder contains trained PyTorch models used for evaluation. Model names are represented by randomly generated integers for identification aswell as "np" (numpy) or "xr" (xarray) to identify on which type of data it was trained
 
 
 - **Synthetic Data**: The `synthetic_data/data` folder contains files for generating synthetic data based on the CESM2 piControl data, as well as the final multidimensional NumPy data used for training.
   - `checking_timeseries.ipynb` - checks shape of timeseries of data and compares it to piControl data
   - `lim_data_generation.py` - generates synthetic data by integration of the LIM using the euler method and save the new data to the `data` folder
-  - `testing_lim_integration.ipynb` - verifys the integration of the LIM and plots the resulting time series
+  - `testing_lim_integration.ipynb` - verifys the integration of the LIM for stationarity and plots the resulting time series
 
 
 - **Training**: The following scripts contain scripts for training various models using synthetic data. These include:

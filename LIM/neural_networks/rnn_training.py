@@ -1,5 +1,3 @@
-from models.LSTM_enc_dec import *
-from torch.utils.data import DataLoader
 from utilities import *
 
 
@@ -17,10 +15,8 @@ windows = [(2, 12)]
 data_sizes = [100000]
 
 # Define a model label for saving using wandb
-model_label = "ENC-DEC-30E-HORIZON"
-
-# Define a name or identifier for the model when using wandb
-name = "lstm_enc_dec_150e"
+model_label = "LSTM-ENC-DEC"
+name = "lstm_enc_dec"
 
 # Define a variable 'dt' which specifies either "np" array or "xr" array
 dt = "np"
@@ -36,7 +32,7 @@ config = {
     "output_window": windows[0][1],
     "learning_rate": lr[0],
     "num_layers": 1,
-    "num_epochs": 150,
+    "num_epochs": 10,
     "batch_size": 128,
     "train_data_len": len(data_[0, :]),
     "training_prediction": "recursive",
@@ -155,7 +151,7 @@ for window in windows:
             torch.save({'hyperparameters': config,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict()},
-                       f'final_models/model_{rand_identifier}.pt')
+                       f'final_models_trained/model_{rand_identifier}.pt')
 
             print(f"Model saved as model_{rand_identifier}.pt")
             print("Config : {}".format(config))

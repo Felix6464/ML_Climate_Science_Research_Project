@@ -8,13 +8,13 @@ from torch.utils.data import DataLoader
 
 
 def main():
-    # Load a PyTorch tensor from a file located at "./synthetic_data/lim_integration_130k[-1].pt"
-    data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
+    # Load a PyTorch tensor from a file located at ./synthetic_data/data/lim_integration_200k.pt
+    data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 
     # Calculate the mean and standard deviation along the feature dimension using a function called 'normalize_data'
     data = ut.normalize_data(data)
 
-    # Keep only the first 30,000 columns of the data tensor
+    # Keep only the first 30,000 rows of the data tensor
     data = data[:, :30000]
     print("Data shape : {}".format(data.shape))
 
@@ -24,13 +24,13 @@ def main():
     # Update the 'data' tensor to contain only the data for training (last 10% is used for testing)
     data = data[:, index_train:]
 
-    model_num = ["762324fnp"]
+    model_num = ["5111061fnp"]
     id = ["FNN"]
 
     loss_list = []
 
     for m in model_num:
-        saved_model = torch.load(f"./trained_models/ffn/model_{m}.pt")
+        saved_model = torch.load(f"./final_models_trained/model_{m}.pt")
 
         # Load the hyperparameters of the model
         params = saved_model["hyperparameters"]
@@ -51,20 +51,18 @@ def main():
         for output_window in x:
 
 
-            input_data_test, target_data_test = dataloader_seq2seq_feat(data,
-                                                                        input_window=input_window,
-                                                                        output_window=output_window,
-                                                                        num_features=num_features)
+            test_dataset_ffn = TimeSeriesLSTMnp(data.permute(1, 0),
+                                                input_window,
+                                                output_window)
+
+            test_dataloader = DataLoader(test_dataset_ffn,
+                                             batch_size=batch_size,
+                                             shuffle=True,
+                                             drop_last=True)
 
 
             # Specify the device to be used for testing
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-            input_data_test = torch.from_numpy(input_data_test)
-            target_data_test = torch.from_numpy(target_data_test)
-
-            test_dataloader = DataLoader(
-                datat.TensorDataset(input_data_test, target_data_test), batch_size=batch_size, shuffle=True, drop_last=True)
 
             # Initialize the model and load the saved state dict
             model = FeedforwardNetwork(input_size = num_features, hidden_size = hidden_size, output_size=num_features, input_window=input_window)
