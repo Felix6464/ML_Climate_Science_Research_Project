@@ -6,14 +6,37 @@ import json
 import torch
 import os
 
-import LIM.neural_networks.models.GRU_enc_dec as gru
-import LIM.neural_networks.models.LSTM_enc_dec_input as lstm_input
-import LIM.neural_networks.models.LSTM_enc_dec as lstm
-import LIM.neural_networks.models.FNN_model as ffn
-import LIM.neural_networks.models.LSTM as lstm_base
+from LIM.neural_networks.models.LSTM_enc_dec_input import *
+from LIM.neural_networks.models.LSTM_enc_dec import *
+from LIM.neural_networks.models.FNN_model import *
+from LIM.neural_networks.models.LSTM import *
+from LIM.neural_networks.models.GRU_enc_dec import *
 
 
 def reshape_xarray(input_data):
+    """
+    Reshape an xarray object to a target latitude and longitude grid using linear interpolation.
+
+    Parameters
+    ----------
+    input_data : xarray.DataArray
+        The input xarray object to be reshaped.
+
+    Returns
+    -------
+    xarray.DataArray
+        The reshaped xarray object with the target latitude and longitude dimensions.
+
+    Notes
+    -----
+    This function assumes that the input xarray object has 'lat' and 'lon' dimensions.
+
+    The target latitude and longitude dimensions are defined as follows:
+    - target_lat: a DataArray with 192 points linearly spaced between -90 and 90 degrees, with dimension 'lat'.
+    - target_lon: a DataArray with 360 points linearly spaced between -180 and 180 degrees, with dimension 'lon'.
+
+    The input xarray object is reshaped using the xr.interp() method with the 'nearest' interpolation method.
+    """
     # Define the target latitude and longitude dimensions
     target_lat = xr.DataArray(np.linspace(-90, 90, 192), dims='lat')
     target_lon = xr.DataArray(np.linspace(-180, 180, 360), dims='lon')
@@ -24,6 +47,21 @@ def reshape_xarray(input_data):
     return reshaped_data
 
 def apply_mask(mask, array):
+    """
+    Apply a mask to an xarray object using linear interpolation.
+
+    Parameters
+    ----------
+    mask : xarray.DataArray
+        The mask to be applied to the input array.
+    array : xarray.DataArray
+        The input xarray object to be masked.
+
+    Returns
+    -------
+    xarray.DataArray
+        The masked xarray object with NaN values where the mask is 100.
+    """
     # Create a masked array using the where function
     masked_array = xr.where(mask == 100, np.nan, array)
 
@@ -31,61 +69,103 @@ def apply_mask(mask, array):
 
 
 def calculate_monthly_anomalies(data):
+    """
+    Calculate monthly anomalies of an xarray object.
 
+    Parameters
+    ----------
+    data : xarray.DataArray
+        The input xarray object to calculate anomalies for.
+
+    Returns
+    -------
+    xarray.DataArray
+        The xarray object with monthly anomalies calculated.
+    """
     # Calculate the climatological mean for each month
     climatological_mean = data.groupby('time.month').mean(dim='time', keep_attrs=True)
+
     # Calculate the anomalies by subtracting the climatological mean for each month
     anomalies = data.groupby('time.month') - climatological_mean
 
     return anomalies
 
-def crop_xarray_lat(input_data):
 
-    cropped_ds = input_data.sel(lat=slice(-30, 30))
-
-    return cropped_ds
 
 
 def crop_xarray(lon_start, lon_end, input_data):
+    """
+    Crop a given xarray dataset along the longitude dimension and return the cropped dataset.
+
+    Parameters:
+        lon_start (float): The starting longitude for cropping.
+        lon_end (float): The ending longitude for cropping.
+        input_data (xarray.Dataset or xarray.DataArray): The input xarray dataset to be cropped.
+
+    Returns:
+        xarray.Dataset or xarray.DataArray: The cropped xarray dataset.
+
+    Raises:
+        ValueError: If lon_start is greater than lon_end, indicating an invalid input range.
+    """
     if lon_start > lon_end:
-        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start-2, 180))
+        # Crop the left portion of the dataset
+        cropped_dataset_left = input_data.sel(lat=slice(-30, 30), lon=slice(lon_start - 2, 180))
         new_scale_left = np.linspace(-180, -119, 52)
         cropped_dataset_left["lon"] = new_scale_left
 
-        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end+2))
+        # Crop the right portion of the dataset
+        cropped_dataset_right = input_data.sel(lat=slice(-30, 30), lon=slice(-180, lon_end + 2))
         new_scale_right = np.linspace(-121, -10, 112)
         cropped_dataset_right["lon"] = new_scale_right
 
-
+        # Concatenate the left and right portions to create the cropped dataset
         cropped_dataset = xr.concat(
             [
                 cropped_dataset_left,
                 cropped_dataset_right
-
             ],
             dim='lon'
         ).sortby('lon')
     else:
+        # Crop the dataset along the specified longitude range
         cropped_dataset = input_data.sel(lon=slice(lon_start, lon_end))
 
     return cropped_dataset
 
-def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
 
+def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
+    """
+    Concatenate two datasets and save the result to a file.
+
+    Parameters:
+        pc_ts (xarray.DataArray or torch.Tensor): The first dataset, either as an xarray DataArray
+                                                  (if data_type is "xr") or as a torch Tensor.
+        pc_zos (xarray.DataArray or torch.Tensor): The second dataset, either as an xarray DataArray
+                                                   (if data_type is "xr") or as a torch Tensor.
+        data_type (str): The type of data provided, either "xr" (xarray) or another format.
+        filename (str): The name of the file to save the concatenated data to.
+
+    Returns:
+        None: The function saves the concatenated data to a file and does not return any values.
+
+    Raises:
+        ValueError: If data_type is not "xr" or any other value, indicating an unsupported data type.
+    """
     if data_type == "xr":
-        #Concatenate along a specified dimension
+        # Concatenate along a specified dimension (eof)
         concatenated_xarray = xr.concat([pc_ts, pc_zos], dim='eof')
 
-        #Save the xarray to a NetCDF file
+        # Save the xarray to a NetCDF file
         concatenated_xarray.to_netcdf(filename + '.nc')
     else:
         ts_20 = torch.from_numpy(pc_ts.data)
         zos_10 = torch.from_numpy(pc_zos.data)
-        print(ts_20.shape)
-        print(zos_10.shape)
         data = torch.cat((ts_20, zos_10), dim=0)
-        print(data.shape)
+
+        # Save the torch Tensor to a file with the given filename
         torch.save(data, filename + '.pt')
+
 
 def map2flatten(x_map: xr.Dataset) -> list:
     """Flatten dataset/dataarray and remove NaNs.
@@ -247,6 +327,7 @@ def matrix_decomposition(A):
 
     return w, U, V
 
+
 def calculate_percentage(value, percentage):
     """
     Calculate the value of a percentage from a given value.
@@ -297,9 +378,7 @@ def normalize_data(data):
     for i in range(len(mean)):
         normalized_data[i, :] = (data[i, :] - mean[i]) / std[i]
 
-
     return normalized_data
-
 
 
 def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
@@ -336,7 +415,6 @@ def dataloader_seq2seq_feat(y, input_window, output_window, num_features):
     return X, Y
 
 
-
 def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     '''
     convert numpy array to PyTorch tensor
@@ -356,8 +434,6 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
     Y_test = torch.from_numpy(Ytest).type(torch.Tensor)
 
     return X_train, Y_train, X_test, Y_test
-
-
 
 
 def save_dict(file_path, dictionary):
@@ -389,10 +465,9 @@ def dict_merge(dicts_list):
 
 
 def normalize_tensor_individual(tensor):
-
     normalized_tensor = torch.zeros(tensor.size())
 
-    for feature_idx in range(len(tensor[:,0])):
+    for feature_idx in range(len(tensor[:, 0])):
         # Calculate the minimum and maximum values of the tensor
         min_value = torch.min(tensor[feature_idx, :])
         max_value = torch.max(tensor[feature_idx, :])
@@ -406,14 +481,15 @@ def normalize_tensor_individual(tensor):
 
     return normalized_tensor
 
-def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn):
 
+def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn, num_lstm_input_tf):
     # Load the saved models
-    saved_model_lstm_base = torch.load(f"./trained_models/lstm/model_{num_lstm_base}.pt")
-    saved_model_lstm = torch.load(f"./trained_models/lstm/model_{num_lstm}.pt")
-    saved_model_lstm_input = torch.load(f"./trained_models/lstm/model_{num_lstm_input}.pt")
-    saved_model_fnn = torch.load(f"./trained_models/ffn/model_{num_ffn}.pt")
-    saved_model_gru = torch.load(f"./trained_models/lstm/model_{num_gru}.pt")
+    saved_model_lstm_base = torch.load(f"./final_models_trained/model_{num_lstm_base}.pt")
+    saved_model_lstm = torch.load(f"./final_models_trained/model_{num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"./final_models_trained/model_{num_lstm_input}.pt")
+    saved_model_lstm_input_tf = torch.load(f"./final_models_trained/model_{num_lstm_input_tf}.pt")
+    saved_model_fnn = torch.load(f"./final_models_trained/model_{num_ffn}.pt")
+    saved_model_gru = torch.load(f"./final_models_trained/model_{num_gru}.pt")
 
     # Load the hyperparameters of the lstm_model base
     params_lb = saved_model_lstm_base["hyperparameters"]
@@ -424,36 +500,42 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     # Load the hyperparameters of the lstm_input_model_enc_dec
     params_li = saved_model_lstm_input["hyperparameters"]
 
+    # Load the hyperparameters of the lstm_input_model_enc_dec with teacher_forcing
+    params_li_tf = saved_model_lstm_input_tf["hyperparameters"]
+
     # Load the hyperparameters of the fnn_model
     params_f = saved_model_fnn["hyperparameters"]
 
     # Load the hyperparameters of the fnn_model
     params_g = saved_model_gru["hyperparameters"]
 
-
     # Specify the device to be used for testing
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model_lstm_base = lstm_base.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                                         hidden_size=params_lb["hidden_size"],
-                                                         num_layers=params_lb["num_layers"])
+    model_lstm_base = LSTM_Sequence_Prediction_Base(input_size=params_lb["num_features"],
+                                                    hidden_size=params_lb["hidden_size"],
+                                                    num_layers=params_lb["num_layers"])
 
-    model_lstm = lstm.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                               hidden_size=params_l["hidden_size"],
-                                               num_layers=params_l["num_layers"])
+    model_lstm = LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
+                                          hidden_size=params_l["hidden_size"],
+                                          num_layers=params_l["num_layers"])
 
-    model_lstm_inp = lstm_input.LSTM_Sequence_Prediction(input_size=params_lb["num_features"],
-                                                         hidden_size=params_li["hidden_size"],
-                                                         num_layers=params_li["num_layers"])
+    model_lstm_inp = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
+                                                    hidden_size=params_li["hidden_size"],
+                                                    num_layers=params_li["num_layers"])
 
-    model_ffn = ffn.FeedforwardNetwork(input_size=params_lb["num_features"],
-                                       hidden_size=params_f["hidden_size"],
-                                       output_size=params_lb["num_features"],
-                                       input_window=params_f["input_window"])
+    model_lstm_inp_tf = LSTM_Sequence_Prediction_Input(input_size=params_lb["num_features"],
+                                                       hidden_size=params_li_tf["hidden_size"],
+                                                       num_layers=params_li_tf["num_layers"])
 
-    model_gru = gru.GRU_Sequence_Prediction(input_size=params_lb["num_features"],
-                                            hidden_size=params_g["hidden_size"],
-                                            num_layers=params_g["num_layers"])
+    model_ffn = FeedforwardNetwork(input_size=params_lb["num_features"],
+                                   hidden_size=params_f["hidden_size"],
+                                   output_size=params_lb["num_features"],
+                                   input_window=params_f["input_window"])
+
+    model_gru = GRU_Sequence_Prediction(input_size=params_lb["num_features"],
+                                        hidden_size=params_g["hidden_size"],
+                                        num_layers=params_g["num_layers"])
 
     # Load the saved models
     model_gru.load_state_dict(saved_model_gru["model_state_dict"])
@@ -464,10 +546,12 @@ def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ff
     model_lstm = model_lstm.to(device)
     model_lstm_inp.load_state_dict(saved_model_lstm_input["model_state_dict"])
     model_lstm_inp = model_lstm_inp.to(device)
+    model_lstm_inp_tf.load_state_dict(saved_model_lstm_input["model_state_dict"])
+    model_lstm_inp_tf = model_lstm_inp.to(device)
     model_ffn.load_state_dict(saved_model_fnn["model_state_dict"])
     model_ffn = model_ffn.to(device)
 
-    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru
+    return model_lstm_base, model_lstm, model_lstm_inp, model_ffn, model_gru, model_lstm_inp_tf
 
 
 def min_max_values_per_slice(tensor):

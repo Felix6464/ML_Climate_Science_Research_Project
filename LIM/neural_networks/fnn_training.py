@@ -1,29 +1,28 @@
-from models.FNN_model import *
-import xarray as xr
-import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, Dataset
 from utilities import *
-import torch.utils.data as datat
-import os
 
-#raw_data = xr.open_dataarray("./synthetic_data/lim_integration_xarray_130k[-1]q.nc")
-data = torch.load("./synthetic_data/lim_integration_130k[-1].pt")
-#raw_data = torch.load("./raw_data/data_piControl.pt")
-data = data[:, :80000]
+
+# Load a PyTorch tensor from a file located at "./synthetic_data/data/lim_integration_200k.pt"
+data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+
+# Normalize the loaded data using a function called 'normalize_data'
 data = normalize_data(data)
 
+# Keep only the first 200,000 columns of the data tensor
+data = data[:, :200000]
 
-training_info_pth = "trained_models/training_info_ffn.txt"
+# Define the file path for saving training information
+training_info_pth = "final_models_trained/training_info_ffn.txt"
 dt = "fnp"
 
-lr = [0.01, 0.001, 0.005, 0.0001, 0.0005, 0.00001]
+# Define a list 'lr' with a single learning rate value of 0.0001
 lr = [0.0001]
 
-model_label = "ENC-DEC-INPUT-2-6"
+# Define a string variable for wandb runs
+model_label = "ENC-DEC-MODELS"
 name = "ffn"
 
 config = {
-    "wandb": True,
+    "wandb": False,
     "name": name,
     "num_features": 30,
     "hidden_size": 128,
@@ -126,10 +125,10 @@ for l in lr:
     torch.save({'hyperparameters': config,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()},
-               f'./trained_models/ffn/model_{rand_identifier}.pt')
+               f'./final_models/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
     model_dict = {"training_params": config,
                   "models": (rand_identifier, learning_rate)}
 
-    save_dict(training_info_pth, model_dict)
+    #save_dict(training_info_pth, model_dict)

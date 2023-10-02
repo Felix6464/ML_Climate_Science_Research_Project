@@ -184,14 +184,15 @@ class LSTM_Decoder(nn.Module):
             for t in range(target_len):
                 for i in range(self.num_layers):
                     lstm_out, decoder_hidden = self.lstms[i](decoder_input, decoder_hidden)
+                    decoder_output = self.linear(lstm_out.squeeze(0))
                     decoder_input = decoder_hidden[0].permute(1, 0, 2)
 
-                decoder_output = self.linear(lstm_out.squeeze(0))
+
                 outputs[:, t, :] = decoder_output[:, 0, :]
 
                 # Predict with teacher forcing
                 if random.random() < teacher_forcing_ratio:
-                    decoder_input = target_batch[:, t, :]
+                    decoder_input = target_batch[:, t, :].unsqueeze(1)
 
                 # Predict recursively
                 else:
@@ -224,7 +225,7 @@ class RMSELoss(torch.nn.Module):
         loss = torch.sqrt(criterion(x, y) + eps)
         return loss
 
-class LSTM_Sequence_Prediction(nn.Module):
+class LSTM_Sequence_Prediction_Input(nn.Module):
     """
     train LSTM encoder-decoder and make predictions
     """
@@ -237,7 +238,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         : param num_layers:     number of recurrent layers
         '''
 
-        super(LSTM_Sequence_Prediction, self).__init__()
+        super(LSTM_Sequence_Prediction_Input, self).__init__()
 
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -269,7 +270,7 @@ class LSTM_Sequence_Prediction(nn.Module):
         :return losses:                   Array of loss function for each epoch
         """
 
-        wandb.init(project=f"ML-Climate-SST-{config['model_label']}", config=config, name=config['name'])
+        wandb.init(project=f"SST-{config['model_label']}", config=config, name=config['name'])
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #print(device)
@@ -343,7 +344,9 @@ class LSTM_Sequence_Prediction(nn.Module):
                                                            encoder_hidden,
                                                            outputs=outputs,
                                                            training_prediction=config["training_prediction"],
-                                                           target_len=config["output_window"])
+                                                           target_len=config["output_window"],
+                                                           teacher_forcing_ratio=config["teacher_forcing_ratio"],
+                                                           target_batch=target_batch)
 
 
                     loss = criterion(outputs, target_batch)
