@@ -3,8 +3,8 @@
 ## How much Data do S2S-Neural-Networks need? An ENSO Showcase
 
 ## Description
-This Python machine learning repository focuses on forecasting the time evolution of the principal components of sea-surface-temperature/height of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
-It incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by utilizing additional data points through integration of the LIM, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
+This Python machine learning repository focuses on predicting the time evolution of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
+It also incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by integrating additional data points, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
 ## Download Raw Data
 
 ### CESM2 piControl Data 
@@ -19,8 +19,8 @@ git clone https://github.com/Felix6464/ML_Climate_Science_Research_Project.git
 
 # install project   
 cd ML_Climate_Science_Research_Project  
-pip install -r requirements.txt
-
+conda create --name <env> --file requirements.txt
+conda activate <env>
  ```   
 Next, navigate to any file and run it.
 
@@ -83,8 +83,4 @@ To get started, refer to the documentation and python files within the respectiv
 
 ## Dependencies
 
-Make sure you have the required Python libraries and packages installed. You can find the dependencies listed in the individual Python scripts and notebooks.
-
-## License
-
-This repository is licensed under [LICENSE NAME]. See the [LICENSE](LICENSE) file for details.
+Make sure you have the required Python libraries and packages installed. You can find the dependencies listed in the `requirements.txt` file

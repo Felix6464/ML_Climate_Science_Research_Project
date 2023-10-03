@@ -5,8 +5,14 @@ from utilities import *
 data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
 
+<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
+data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+print(min_max_values_per_slice(data))
+print("Data shape : {}".format(data.shape))
+=======
 # Define learning rate(s)
 lr = [0.0001]
+>>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 
 # Define time window(s)
 windows = [(2, 12)]
@@ -18,7 +24,14 @@ data_sizes = [100000]
 model_label = "LSTM-ENC-DEC"
 name = "lstm_enc_dec"
 
+<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
+data_sizes = [100000]
+
+model_label = "MODEL-DIFF"
+name = "lstm-enc-dec"
+=======
 # Define a variable 'dt' which specifies either "np" array or "xr" array
+>>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 dt = "np"
 
 config = {
@@ -111,8 +124,12 @@ for window in windows:
 
             config["learning_rate"] = l
 
+<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
+            config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])
+=======
             config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])+ str(data_len)
             #config["name"] = str(window[0]) + "-" + str(window[1]) + str(data_len)
+>>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 
             print("Start training")
 
