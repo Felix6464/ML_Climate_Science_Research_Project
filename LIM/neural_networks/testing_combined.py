@@ -93,7 +93,7 @@ def main():
     model_nums = str([model_num_gru, model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_lstm_input_tf, model_num_lim])
 
     # Plot loss for different models and output windows
-    plot_loss_horizon_combined(loss_list, model_nums, loss_type, tau=[21, 22, 23])
+    plot_loss_horizon_combined(loss_list, model_nums, loss_type)
 
 if __name__ == "__main__":
     main()

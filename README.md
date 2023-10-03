@@ -3,13 +3,22 @@
 ## How much Data do S2S-Neural-Networks need? An ENSO Showcase
 
 ## Description
-This Python machine learning repository focuses on predicting the time evolution of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
-It also incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by integrating additional data points, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
+This Python machine learning repository focuses on forecasting the time evolution of the principical componenets of the sea-surface-temperature/height of the El Niño-Southern Oscillation (ENSO) phenonmena with respect to the Community Earth System Model 2 (CESM2) data. Various sequence-to-sequence (S2S) neural network architectures are being deployed
+and it incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by integrating additional data points, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
 ## Download Raw Data
 
 ### CESM2 piControl Data 
 
+The data should be found here: https://csegweb.cgd.ucar.edu/experiments/public/
 
+#### Sea-Land-Mask
+ - sftlf_fx_CESM2_historical_r1i1p1f1.nc
+
+#### Sea Surface Temperature
+ - ts_Amon_CESM2_piControl_r1i1p1f1.nc
+
+#### Sea Surface Height
+ - zos_Amon_CESM2_piControl_r1i1p1f1.nc
 
 ## How to run
 First, install dependencies
@@ -69,10 +78,10 @@ Next, navigate to any file and run it.
   - `fnn_testing.py`: Loads a pretrained feedforward neural network model from file and evaluates it for prediction horizons ranging from 1 to 24. It calculates the loss for each prediction horizon over the test set and plots the loss distribution curve.
   - `rnn_testing.py`: Evaluates a pretrained RNN model over prediction horizons of 1 to 24. The type of recurrent model used can be changed by importing the respective class from the `models` folder.
   - `plot_saved_model.py`: Loads a pretrained model from file and evaluates it on both the test and train sets for the chosen horizon during training. It also plots the timeseries forecast of the first principal component (can be varied) and the training loss curve of the model.
-  - `testing_combined.py`: Loads multiple pretrained models, as well as the LIM, with different architectures and evaluates them simultaneously to create a plot that compares the performance of different architectures at once.
+  - `testing_combined.py`: Loads multiple pretrained models, as well as the LIM, with different architectures and evaluates them simultaneously to create a plot that compares the performance of different models at once.
 
 
-- **Utilities**: The `utilities` folder contains multiple utility functions for data preprocessing, cropping, eigenvalue decomposition, principal component analysis, and small helper tools.
+- **Utilities**: The `utilities.py` file contains multiple utility functions for data preprocessing, cropping, eigenvalue decomposition, principal component analysis, and small helper tools.
 
 
 - **Plots**: The `plots.py` file contains different functions for plotting the prediction horizons and loss curves.
@@ -84,3 +93,4 @@ To get started, refer to the documentation and python files within the respectiv
 ## Dependencies
 
 Make sure you have the required Python libraries and packages installed. You can find the dependencies listed in the `requirements.txt` file
+

@@ -1,9 +1,3 @@
+/LIM/wandb/
+/LIM/neural_networks/models/LSTM_enc_dec_try.py
 /LIM/neural_networks/raw_data/
-/LIM/neural_networks/trained_models/
-/LIM/plots/
-/LIM/testing/
-/tutorials-jakob/
-/LIM/neural_networks/wandb/
-/LIM/neural_networks/final_plots_cluster
-/LIM/neural_networks/final_plots
-/LIM/neural_networks/final_models_trained

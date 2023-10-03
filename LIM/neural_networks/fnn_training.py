@@ -44,91 +44,88 @@ config = {
 
 
 if dt == "xr":
-
+    # If using xarray data
     idx_train = int(len(data['time']) * 0.7)
     idx_val = int(len(data['time']) * 0.2)
     print(idx_train, idx_val)
 
-    train_data = data[: :,  :idx_train]
-    val_data = data[: :, idx_train: idx_train+idx_val]
-    test_data = data[: :, idx_train+idx_val: ]
+    # Split the data into train, validation, and test sets
+    train_data = data[:, :, :idx_train]
+    val_data = data[:, :, idx_train: idx_train+idx_val]
+    test_data = data[:, :, idx_train+idx_val:]
 
+    # Extract the numpy data from xarray
     train_datan = train_data.data
     val_datan = val_data.data
     test_datan = test_data.data
 
+    # Create DataLoader objects for train and validation datasets
     train_dataset = TimeSeries(train_data, config["input_window"], config["output_window"])
-    train_dataloader = DataLoader(
-        train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
     val_dataset = TimeSeries(val_data, config["input_window"], config["output_window"])
-    val_dataloader = DataLoader(
-        val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
-
+    val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 else:
-
+    # If using numpy data
     idx_train = int(len(data[0, :]) * 0.7)
     idx_val = int(len(data[0, :]) * 0.2)
 
+    # Split the data into train, validation, and test sets
     train_data = data[:, :idx_train]
     val_data = data[:, idx_train: idx_train+idx_val]
-    test_data = data[:, idx_train+idx_val: ]
+    test_data = data[:, idx_train+idx_val:]
 
+    # Create DataLoader objects for train and validation datasets
     train_dataset = TimeSeriesnp(train_data.permute(1, 0), config["input_window"])
-    train_dataloader = DataLoader(train_dataset,
-                                  batch_size=config["batch_size"],
-                                  shuffle=config["shuffle"],
-                                  drop_last=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
     val_dataset = TimeSeriesnp(val_data.permute(1, 0), config["input_window"])
-    val_dataloader = DataLoader(val_dataset,
-                                batch_size=config["batch_size"],
-                                shuffle=config["shuffle"],
-                                drop_last=True)
-
-
+    val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
 for l in lr:
+    # Loop through different learning rates
 
-    # Setting hyperparameters for training
+    # Set the learning rate for this training run
     learning_rate = l
 
     print("Start training")
 
-    # Specify the device to be used for training
+    # Specify the device to be used for training (GPU if available, otherwise CPU)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = FeedforwardNetwork(input_size = config["num_features"], hidden_size = config["hidden_size"], output_size=config["num_features"], input_window=config["input_window"])
+    # Initialize the Feedforward Network model and move it to the selected device
+    model = FeedforwardNetwork(input_size=config["num_features"], hidden_size=config["hidden_size"],
+                               output_size=config["num_features"], input_window=config["input_window"])
     model.to(device)
 
+    # Initialize the Adam optimizer with the selected learning rate
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    # Save the model and hyperparameters to a file
+    # Generate a random identifier for this run
     rand_identifier = str(np.random.randint(0, 10000000)) + dt
     config["name"] = config["name"] + "-" + rand_identifier
 
-    loss, loss_test = model.train_model(train_dataloader,
-                                        val_dataloader,
-                                        optimizer,
-                                        config)
+    # Train the model and obtain training and testing losses
+    loss, loss_test = model.train_model(train_dataloader, val_dataloader, optimizer, config)
 
-
-    num_of_weigths = (config["input_window"]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*config["output_window"] + config["output_window"])
+    # Calculate the number of weights and parameters in the model
+    num_of_weights = (config["input_window"]*config["hidden_size"] + config["hidden_size"] +
+                      config["hidden_size"]*config["output_window"] + config["output_window"])
     num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-    config["num_of_weigths"] = num_of_weigths
+    # Update configuration with training results
+    config["num_of_weights"] = num_of_weights
     config["num_of_params"] = num_of_params
     config["loss_train"] = loss.tolist()
     config["loss_test"] = loss_test.tolist()
     config["identifier"] = rand_identifier
 
-    torch.save({'hyperparameters': config,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict()},
-               f'./final_models_trained/model_{rand_identifier}.pt')
+    # Save the trained model, hyperparameters, and optimizer state
+    torch.save({'hyperparameters': config, 'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict()}, f'./final_models_trained/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
-    model_dict = {"training_params": config,
-                  "models": (rand_identifier, learning_rate)}
+    # Store model information in a dictionary
+    model_dict = {"training_params": config, "models": (rand_identifier, learning_rate)}
 
     #save_dict(training_info_pth, model_dict)

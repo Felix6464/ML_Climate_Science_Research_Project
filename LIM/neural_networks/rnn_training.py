@@ -5,14 +5,8 @@ from utilities import *
 data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
 
-<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
-data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
-print(min_max_values_per_slice(data))
-print("Data shape : {}".format(data.shape))
-=======
 # Define learning rate(s)
 lr = [0.0001]
->>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 
 # Define time window(s)
 windows = [(2, 12)]
@@ -24,14 +18,7 @@ data_sizes = [100000]
 model_label = "LSTM-ENC-DEC"
 name = "lstm_enc_dec"
 
-<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
-data_sizes = [100000]
-
-model_label = "MODEL-DIFF"
-name = "lstm-enc-dec"
-=======
 # Define a variable 'dt' which specifies either "np" array or "xr" array
->>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 dt = "np"
 
 config = {
@@ -61,120 +48,102 @@ training_info_pth = "trained_models/training_info_lstm.txt"
 for window in windows:
     for data_len in data_sizes:
         print("Data size : {} {}".format(data_len, type(data_len)))
+
+        # Slice the data to the specified length and normalize it
         data = data_[:, :data_len]
         data = normalize_data(data)
         print(data.shape)
 
+        # Configure input and output window sizes based on the 'window' tuple
         config["input_window"] = window[0]
         config["output_window"] = window[1]
 
         if dt == "xr":
-
+            # If using xarray data
             idx_train = int(len(data['time']) * 0.7)
             idx_val = int(len(data['time']) * 0.2)
             print(idx_train, idx_val)
 
+            # Split the data into train, validation, and test sets
             train_data = data[: :,  :idx_train]
             val_data = data[: :, idx_train: idx_train+idx_val]
             test_data = data[: :, idx_train+idx_val: ]
 
-
+            # Create DataLoader objects for train and validation datasets
             train_dataset = TimeSeriesLSTM(train_data, window[0], window[1])
-            train_dataloader = DataLoader(train_dataset,
-                                          batch_size=config["batch_size"],
-                                          shuffle=config["shuffle"],
-                                          drop_last=True)
+            train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
             val_dataset = TimeSeriesLSTM(val_data, window[0], window[1])
-            val_dataloader = DataLoader(val_dataset,
-                                        batch_size=config["batch_size"],
-                                        shuffle=config["shuffle"],
-                                        drop_last=True)
+            val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
         else:
-
+            # If using numpy data
             idx_train = int(len(data[0, :]) * 0.7)
             idx_val = int(len(data[0, :]) * 0.2)
 
+            # Split the data into train, validation, and test sets
             train_data = data[:, :idx_train]
             val_data = data[:, idx_train: idx_train+idx_val]
             test_data = data[:, idx_train+idx_val: ]
 
+            # Create DataLoader objects for train and validation datasets
+            train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0), window[0], window[1])
+            train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-            train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0),
-                                             window[0],
-                                             window[1])
-
-            train_dataloader = DataLoader(train_dataset,
-                                          batch_size=config["batch_size"],
-                                          shuffle=config["shuffle"],
-                                          drop_last=True)
-
-            val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0),
-                                           window[0],
-                                           window[1])
-
-            val_dataloader = DataLoader(val_dataset,
-                                        batch_size=config["batch_size"],
-                                        shuffle=config["shuffle"],
-                                        drop_last=True)
-
+            val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0), window[0], window[1])
+            val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
         for l in lr:
+            # Loop through different learning rates
 
             config["learning_rate"] = l
 
-<<<<<<< HEAD:LIM/neural_networks/lstm_training.py
+            # Define a unique identifier for this training run
             config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])
-=======
-            config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])+ str(data_len)
-            #config["name"] = str(window[0]) + "-" + str(window[1]) + str(data_len)
->>>>>>> 9c8f940dab9f99c7c10c6d2229fe8de334bb3142:LIM/neural_networks/rnn_training.py
 
             print("Start training")
 
+            # Determine the computing device (GPU if available, otherwise CPU)
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-            model = LSTM_Sequence_Prediction(input_size=config["num_features"],
-                                             hidden_size=config["hidden_size"],
-                                             num_layers=config["num_layers"],
-                                             dropout=config["dropout"])
+            # Initialize the LSTM model and move it to the selected device
+            model = LSTM_Sequence_Prediction(input_size=config["num_features"], hidden_size=config["hidden_size"],
+                                             num_layers=config["num_layers"], dropout=config["dropout"])
             model.to(device)
 
+            # Initialize the Adam optimizer with the selected learning rate
             optimizer = torch.optim.Adam(model.parameters(), lr=l, weight_decay=config["weight_decay"])
 
-            # Save the model and hyperparameters to a file
+            # Generate a random identifier for this run
             rand_identifier = str(np.random.randint(0, 10000000)) + dt
             config["name"] = config["name"] + "-" + rand_identifier
             print(config["name"])
 
+            # Train the model and obtain training and testing losses
+            loss, loss_test = model.train_model(train_dataloader, val_dataloader, optimizer, config)
 
-            loss, loss_test = model.train_model(train_dataloader,
-                                                val_dataloader,
-                                                optimizer,
-                                                config)
-
-
-            num_of_weigths = (window[0]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*window[1] + window[1])
+            # Calculate the number of weights and parameters in the model
+            num_of_weights = (window[0]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*window[1] + window[1])
             num_of_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-            config["num_of_weigths"] = num_of_weigths
+            # Update configuration with training results
+            config["num_of_weights"] = num_of_weights
             config["num_of_params"] = num_of_params
             config["loss_train"] = loss.tolist()
             config["loss_test"] = loss_test.tolist()
             config["identifier"] = rand_identifier
 
-
-            torch.save({'hyperparameters': config,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict()},
-                       f'final_models_trained/model_{rand_identifier}.pt')
+            # Save the trained model, hyperparameters, and optimizer state
+            torch.save({'hyperparameters': config, 'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict()}, f'final_models_trained/model_{rand_identifier}.pt')
 
             print(f"Model saved as model_{rand_identifier}.pt")
             print("Config : {}".format(config))
+
+            # Finish logging training results (if using a logging framework like Wandb)
             wandb.finish()
 
-            model_dict = {"training_params": config,
-                          "models": (rand_identifier, l)}
+            # Store model information in a dictionary
+            model_dict = {"training_params": config, "models": (rand_identifier, l)}
 
         #save_dict(training_info_pth, model_dict)
