@@ -3,8 +3,8 @@
 ## How much Data do S2S-Neural-Networks need? An ENSO Showcase
 
 ## Description
-This Python machine learning repository focuses on predicting the time evolution of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
-It also incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by integrating additional data points, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
+This Python machine learning repository focuses on forecasting the time evolution of the principal components of sea-surface-temperature/height of the El Niño-Southern Oscillation (ENSO) using various sequence-to-sequence (S2S) neural network architectures.
+It incorporates the "Linear Inverse Model" (LIM) as a baseline comparison and to enhance ENSO forecasts by utilizing additional data points through integration of the LIM, aiming to examine whether additional data shows signfiicant improvement to the forecasting task. 
 ## Download Raw Data
 
 ### CESM2 piControl Data 
