@@ -1,31 +1,31 @@
 from LIM.LIM_class import *
-from LIM.neural_networks.utilities import *
+from LIM.utilities.utilities import *
 
-# Load control data
-data = torch.load("./data/data_piControl.pt")
+# Load control data_generated
+data = torch.load("../data_piControl.pt")
 
 
 
 def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=False):
     """
-    Generate LIM (Linear Inverse Modeling) data integration and save it to a file.
+    Generate LIM (Linear Inverse Modeling) data_generated integration and save it to a file.
 
     Parameters:
-        timesteps (int): The number of time steps for data integration.
+        timesteps (int): The number of time steps for data_generated integration.
         tau_list (list): List of time constants for LIM modeling.
-        num_models (int): Number of LIM models to generate data.
-        data (torch.Tensor): Input data for LIM modeling.
-        save_name (str): Name of the file to save the generated data.
-        time (bool, optional): Whether to include time information in the generated data.
+        num_models (int): Number of LIM models to generate data_generated.
+        data (torch.Tensor): Input data_generated for LIM modeling.
+        save_name (str): Name of the file to save the generated data_generated.
+        time (bool, optional): Whether to include time information in the generated data_generated.
                               Defaults to False.
 
     Returns:
-        None: The function saves the generated data and does not return any values.
+        None: The function saves the generated data_generated and does not return any values.
     """
-    # Initialize a zero tensor for LIM data integration
+    # Initialize a zero tensor for LIM data_generated integration
     lim_integration_ = torch.zeros((30, timesteps))
 
-    # Determine the amount of data available
+    # Determine the amount of data_generated available
     amount_data = len(data[0, :])
 
     # Loop through each LIM model
@@ -36,7 +36,7 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
         # Create a LIM model with the specified tau
         model = LIM(tau)
 
-        # Fit the LIM model to the input data
+        # Fit the LIM model to the input data_generated
         model.fit(data[:, :amount_data].detach().cpu().numpy())
 
         # Perform noise integration with the LIM model
@@ -48,7 +48,7 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
         # Convert the integration result to a PyTorch tensor
         lim_integration = torch.from_numpy(lim_integration.T)
 
-        # If 'time' is True, add time information to the data
+        # If 'time' is True, add time information to the data_generated
         if time is True:
             lim_integration = torch.zeros(lim_integration.shape[0]+1, lim_integration.shape[1])
             count = 0
@@ -66,7 +66,7 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
         else:
             lim_integration_ = torch.cat((lim_integration_, lim_integration), dim=1)
 
-        # Reduce the amount of available data for the next iteration
+        # Reduce the amount of available data_generated for the next iteration
         amount_data -= 1000
 
     # Save the final 'lim_integration_' tensor to a file
@@ -76,23 +76,23 @@ def generate_lim_data(timesteps, tau_list, num_models, data, save_name, time=Fal
 
 def generate_lim_data_euler_method(timesteps, num_models, data, save_name, time=False):
     """
-    Generate LIM (Linear Inverse Modeling) data integration using Euler's method and save it to a file.
+    Generate LIM (Linear Inverse Modeling) data_generated integration using Euler's method and save it to a file.
 
     Parameters:
-        timesteps (int): The number of time steps for data integration.
-        num_models (int): Number of LIM models to generate data.
-        data (torch.Tensor): Input data for LIM modeling.
-        save_name (str): Name of the file to save the generated data.
-        time (bool, optional): Whether to include time information in the generated data.
+        timesteps (int): The number of time steps for data_generated integration.
+        num_models (int): Number of LIM models to generate data_generated.
+        data (torch.Tensor): Input data_generated for LIM modeling.
+        save_name (str): Name of the file to save the generated data_generated.
+        time (bool, optional): Whether to include time information in the generated data_generated.
                               Defaults to False.
 
     Returns:
-        None: The function saves the generated data and does not return any values.
+        None: The function saves the generated data_generated and does not return any values.
     """
-    # Initialize a zero tensor for LIM data integration
+    # Initialize a zero tensor for LIM data_generated integration
     lim_integration_ = torch.zeros((30, timesteps))
 
-    # Determine the amount of data available
+    # Determine the amount of data_generated available
     amount_data = len(data[0, :])
 
     # Loop through each LIM model
@@ -103,10 +103,10 @@ def generate_lim_data_euler_method(timesteps, num_models, data, save_name, time=
         # Create a LIM model with the specified tau
         model = LIM(tau)
 
-        # Fit the LIM model to the input data
+        # Fit the LIM model to the input data_generated
         model.fit(data[:, :amount_data].detach().cpu().numpy())
 
-        # Perform data integration using Euler's method
+        # Perform data_generated integration using Euler's method
         lim_integration = model.euler_method(L=model.logarithmic_matrix,
                                              Q=model.noise_covariance,
                                              x0=data[:, amount_data-1],
@@ -117,7 +117,7 @@ def generate_lim_data_euler_method(timesteps, num_models, data, save_name, time=
         # Convert the integration result to a PyTorch tensor
         lim_integration = torch.from_numpy(lim_integration)
 
-        # If 'time' is True, add time information to the data
+        # If 'time' is True, add time information to the data_generated
         if time is True:
             lim_integration = torch.zeros(lim_integration.shape[0]+1, lim_integration.shape[1])
             count = 0
@@ -135,7 +135,7 @@ def generate_lim_data_euler_method(timesteps, num_models, data, save_name, time=
         else:
             lim_integration_ = torch.cat((lim_integration_, lim_integration), dim=1)
 
-        # Reduce the amount of available data for the next iteration
+        # Reduce the amount of available data_generated for the next iteration
         amount_data -= 1000
 
     # Save the final 'lim_integration_' tensor to a file
@@ -146,7 +146,7 @@ num_models = 1
 tau_list = [1]
 timesteps = 200000
 
-generate_lim_data_euler_method(timesteps, len(tau_list), data, "lim_integration_200k_new.pt", time=False)
+generate_lim_data_euler_method(timesteps, len(tau_list), data, "lim_integration_200k_new_.pt", time=False)
 
 
 

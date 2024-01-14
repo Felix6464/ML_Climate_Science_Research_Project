@@ -1,16 +1,16 @@
-from models.LSTM_enc_dec import *
+from LIM.models.LSTM_enc_dec import *
 from utilities import *
 from plots import *
 
 
-# Load the synthetic data and specify the model number for identification
-data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+# Load the synthetic data_generated and specify the model number for identification
+data = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 model_num = "6126861np"
 
 # Calculate the mean and standard deviation along the feature dimension
-data = normalize_data(data)  # Normalize the loaded data
-data = data[:, 180000:200000]  # Slice the data to a specific range along the feature dimension
-num_features = 30  # Specify the number of features in the data
+data = normalize_data(data)  # Normalize the loaded data_generated
+data = data[:, 180000:200000]  # Slice the data_generated to a specific range along the feature dimension
+num_features = 30  # Specify the number of features in the data_generated
 
 # Load a saved model and its hyperparameters
 saved_model = torch.load(f"./final_models_trained/model_{model_num}.pt")  # Load a trained model
@@ -23,12 +23,12 @@ loss_type = params["loss_type"]  # Extract the loss type from hyperparameters
 loss = params["loss_train"]  # Extract training loss from hyperparameters
 loss_test = params["loss_test"]  # Extract test loss from hyperparameters
 
-# Split the data into training and testing sets
-index_train = int(0.8 * len(data[0, :]))  # Calculate the index for splitting the data
-data_train = data[:, :index_train]  # Split the data into a training set
-data_test = data[:, index_train:]  # Split the data into a testing set
+# Split the data_generated into training and testing sets
+index_train = int(0.8 * len(data[0, :]))  # Calculate the index for splitting the data_generated
+data_train = data[:, :index_train]  # Split the data_generated into a training set
+data_test = data[:, index_train:]  # Split the data_generated into a testing set
 
-# Prepare data for training and testing
+# Prepare data_generated for training and testing
 input_data, target_data = dataloader_seq2seq_feat(data_train, input_window=input_window,
                                                   output_window=output_window, num_features=num_features)
 input_data_test, target_data_test = dataloader_seq2seq_feat(data_test, input_window=input_window,
@@ -39,7 +39,7 @@ print("Data loaded")
 # Determine the computing device (CPU or GPU)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Convert data from NumPy arrays to PyTorch tensors
+# Convert data_generated from NumPy arrays to PyTorch tensors
 X_train, Y_train, X_test, Y_test = numpy_to_torch(input_data, target_data, input_data_test, target_data_test)
 
 # Create an LSTM sequence prediction model

@@ -1,8 +1,8 @@
-from utilities import *
+from LIM.utilities.utilities import *
 
 
-# Load data from a file and store it in 'data_'
-data_ = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+# Load data_generated from a file and store it in 'data_'
+data_ = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
 
 # Define learning rate(s)
@@ -11,7 +11,7 @@ lr = [0.0001]
 # Define time window(s)
 windows = [(2, 12)]
 
-# Define data size(s)
+# Define data_generated size(s)
 data_sizes = [100000]
 
 # Define a model label for saving using wandb
@@ -43,13 +43,13 @@ config = {
     "shuffle": True,
     "one_hot_month": False,
 }
-training_info_pth = "trained_models/training_info_lstm.txt"
+training_info_pth = "results/final_models_trained/training_info_lstm.txt"
 
 for window in windows:
     for data_len in data_sizes:
         print("Data size : {} {}".format(data_len, type(data_len)))
 
-        # Slice the data to the specified length and normalize it
+        # Slice the data_generated to the specified length and normalize it
         data = data_[:, :data_len]
         data = normalize_data(data)
         print(data.shape)
@@ -59,12 +59,12 @@ for window in windows:
         config["output_window"] = window[1]
 
         if dt == "xr":
-            # If using xarray data
+            # If using xarray data_generated
             idx_train = int(len(data['time']) * 0.7)
             idx_val = int(len(data['time']) * 0.2)
             print(idx_train, idx_val)
 
-            # Split the data into train, validation, and test sets
+            # Split the data_generated into train, validation, and test sets
             train_data = data[: :,  :idx_train]
             val_data = data[: :, idx_train: idx_train+idx_val]
             test_data = data[: :, idx_train+idx_val: ]
@@ -77,15 +77,14 @@ for window in windows:
             val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
         else:
-            # If using numpy data
+            # If using numpy data_generated
             idx_train = int(len(data[0, :]) * 0.7)
             idx_val = int(len(data[0, :]) * 0.2)
 
-            # Split the data into train, validation, and test sets
+            # Split the data_generated into train, validation, and test sets
             train_data = data[:, :idx_train]
             val_data = data[:, idx_train: idx_train+idx_val]
             test_data = data[:, idx_train+idx_val: ]
-
             # Create DataLoader objects for train and validation datasets
             train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0), window[0], window[1])
             train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
@@ -135,7 +134,7 @@ for window in windows:
 
             # Save the trained model, hyperparameters, and optimizer state
             torch.save({'hyperparameters': config, 'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict()}, f'final_models_trained/model_{rand_identifier}.pt')
+                        'optimizer_state_dict': optimizer.state_dict()}, f'results/final_models_trained/model_{rand_identifier}.pt')
 
             print(f"Model saved as model_{rand_identifier}.pt")
             print("Config : {}".format(config))

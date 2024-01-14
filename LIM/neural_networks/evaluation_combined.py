@@ -1,5 +1,5 @@
-from plots import *
-from utilities import *
+from LIM.utilities.plots import *
+from LIM.utilities.utilities import *
 from torch.utils.data import DataLoader
 from LIM.LIM_class import *
 import torch.nn as nn
@@ -7,8 +7,8 @@ import torch.nn as nn
 
 
 def main():
-    # Load and normalize data
-    data_lim = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+    # Load and normalize data_generated
+    data_lim = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
     data_lim = normalize_data(data_lim)
     data = torch.load("data_piControl.pt")
     data = normalize_data(data)
@@ -24,7 +24,7 @@ def main():
     model_num_lstm_input_tf = "42951np"
     model_num_fnn = "6899415fnp"
 
-    # Specify parameters for generating time series data
+    # Specify parameters for generating time series data_generated
     input_window = 2
     input_window_ffn = 6
     batch_size = 128
@@ -35,7 +35,7 @@ def main():
         model_num_lstm_base, model_num_lstm, model_num_lstm_input, model_num_gru, model_num_fnn, model_num_lstm_input_tf
     )
 
-    # Original fit of LIM to synthetic data
+    # Original fit of LIM to synthetic data_generated
     tau = 1
     model_org = LIM(tau)
     model_org.fit(data_lim[:, :100000].numpy())

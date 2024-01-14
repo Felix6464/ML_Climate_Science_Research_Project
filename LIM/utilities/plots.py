@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
 import seaborn as sns
 from numpy import random
 
@@ -80,7 +79,7 @@ def plot_model_forecast_PC(lstm_model, train_data, target_data, test_data, test_
     plt.suptitle('LSTM Encoder-Decoder Predictions', x=0.445, y=1.)
     plt.tight_layout()
     plt.subplots_adjust(top=0.95)
-    plt.savefig(f'final_plots/predictions_PC_{rand}_2.png')
+    plt.savefig(f'../results/final_plots/predictions_PC_{rand}_2.png')
     plt.show()
     plt.close()
 
@@ -111,7 +110,7 @@ def plot_loss(loss_train, loss_eval, identifier, loss_type):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=12)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots/loss_{loss_type}_combined_{identifier}.png', dpi=300)
+    plt.savefig(f'../results/final_plots/loss_{loss_type}_combined_{identifier}.png', dpi=300)
     plt.show()
 
 
@@ -140,7 +139,7 @@ def plot_loss_combined(loss_values, identifier, loss_type):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=12)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots/loss_{loss_type}_combined_{identifier}_.png', dpi=300)
+    plt.savefig(f'../results/final_plots/loss_{loss_type}_combined_{identifier}_.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon_combined(loss_values, identifier, loss_type, tau=None):
@@ -171,7 +170,7 @@ def plot_loss_horizon_combined(loss_values, identifier, loss_type, tau=None):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=9)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots/xloss_{loss_type}_horizon_combined_{identifier}_{tau}.png', dpi=300)
+    plt.savefig(f'../results/final_plots/xloss_{loss_type}_horizon_combined_{identifier}_{tau}.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon(loss_values, loss_type, id, tau=None):
@@ -202,7 +201,7 @@ def plot_loss_horizon(loss_values, loss_type, id, tau=None):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=12, loc="lower right")
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots/loss_{loss_type}_horizon_{id}_{tau}_x.png', dpi=300)
+    plt.savefig(f'../results/final_plots/loss_{loss_type}_horizon_{id}_{tau}_x.png', dpi=300)
     plt.show()
 
 def plot_loss_horizon_spread(loss_values, loss_type, id, tau=None):
@@ -239,7 +238,7 @@ def plot_loss_horizon_spread(loss_values, loss_type, id, tau=None):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(loc="upper left", fontsize=10)
     plt.tight_layout()  # Adjust spacing and margins
-    plt.savefig(f'final_plots/loss_{loss_type}_horizon_{id}_spread.png', dpi=300)
+    plt.savefig(f'../results/final_plots/loss_{loss_type}_horizon_{id}_spread.png', dpi=300)
     plt.show()
 
 
