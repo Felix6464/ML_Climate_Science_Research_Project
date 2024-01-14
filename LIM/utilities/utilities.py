@@ -165,7 +165,7 @@ def crop_xarray_lat(input_data):
 
     return cropped_ds
 
-def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
+def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename, add_month_feature=False):
     """
     Concatenate two datasets and save the result to a file.
 
@@ -190,12 +190,18 @@ def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
         # Save the xarray to a NetCDF file
         concatenated_xarray.to_netcdf(filename + '.nc')
     else:
+        idx_month = pc_ts.time.dt.month.astype(int) - 1
+        idx_month = torch.from_numpy(idx_month.data)
+        idx_month = idx_month.unsqueeze(0)
         ts_20 = torch.from_numpy(pc_ts.data)
         zos_10 = torch.from_numpy(pc_zos.data)
         data = torch.cat((ts_20, zos_10), dim=0)
-
         # Save the torch Tensor to a file with the given filename
-        torch.save(data, filename + '.pt')
+        if add_month_feature:
+            data = torch.cat((data, idx_month), dim=0)
+            torch.save(data, filename + '_month_feature' +'.pt')
+        else:
+            torch.save(data, filename + '.pt')
 
 
 def map2flatten(x_map: xr.Dataset) -> list:
@@ -261,7 +267,6 @@ class SpatioTemporalPCA:
     """PCA of spatio-temporal raw_data.
     Wrapper for sklearn.decomposition.PCA with xarray.DataArray input.
 
-    See EOF tutorial.
     Args:
         ds (xr.DataArray or xr.Dataset): Input dataarray to perform PCA on.
             Array dimensions (time, 'lat', 'lon')
@@ -370,16 +375,6 @@ def calculate_percentage(value, percentage):
     return (value * percentage) / 100
 
 
-def plot_loss(loss_values, loss_type, identifier):
-    epochs = range(1, len(loss_values) + 1)
-    plt.plot(epochs, loss_values, 'b', label='Loss')
-    plt.title('Loss per Epoch')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.savefig(f'temp_models/{loss_type}_loss_{identifier}.png')
-    plt.show()
-
 
 def load_text_as_json(file_path):
     with open(file_path, 'r') as file:
@@ -468,6 +463,17 @@ def numpy_to_torch(Xtrain, Ytrain, Xtest, Ytest):
 
 
 def save_dict(file_path, dictionary):
+    """
+    Save a dictionary to a JSON file, merging it with an existing dictionary if the file already exists.
+
+    This function checks if a JSON file exists at the specified path. If it does, the function loads the existing
+    dictionary from the file, merges it with the provided dictionary, and then saves the merged dictionary back to the file.
+    If the file does not exist, it creates a new file and writes the provided dictionary to it.
+
+    Parameters:
+    - file_path (str): The path of the file where the dictionary is to be saved.
+    - dictionary (dict): The dictionary to be saved or merged with the existing dictionary in the file.
+    """
     if os.path.exists(file_path):
         # Load existing dictionary from file
         with open(file_path, 'r') as file:
@@ -496,6 +502,20 @@ def dict_merge(dicts_list):
 
 
 def normalize_tensor_individual(tensor):
+    """
+        Normalize a given tensor individually for each feature using min-max normalization.
+
+        This function iterates through each feature of the tensor and applies min-max normalization.
+        The normalization is feature-wise, meaning it's applied independently to each row (assuming features are along rows).
+        In the case where a feature's maximum and minimum values are the same, it returns a tensor of ones,
+        avoiding division by zero.
+
+        Parameters:
+        - tensor (Tensor): A 2D tensor with shape (n_features, n_samples) to be normalized.
+
+        Returns:
+        - Tensor: A 2D tensor of the same shape as the input, with each feature normalized individually.
+        """
     normalized_tensor = torch.zeros(tensor.size())
 
     for feature_idx in range(len(tensor[:, 0])):
@@ -514,13 +534,36 @@ def normalize_tensor_individual(tensor):
 
 
 def load_models_testing(num_lstm_base, num_lstm, num_lstm_input, num_gru, num_ffn, num_lstm_input_tf):
+    """
+    Load various models and their hyperparameters for testing purposes.
+
+    This function loads LSTM, GRU, and FFN (Feedforward Neural Network) models from saved state dictionaries.
+    It initializes each model with the loaded hyperparameters and moves them to the appropriate device (CUDA if available, otherwise CPU).
+
+    Parameters:
+    - num_lstm_base (int): Identifier for the LSTM base model to be loaded.
+    - num_lstm (int): Identifier for the LSTM model to be loaded.
+    - num_lstm_input (int): Identifier for the LSTM input model to be loaded.
+    - num_gru (int): Identifier for the GRU model to be loaded.
+    - num_ffn (int): Identifier for the FFN model to be loaded.
+    - num_lstm_input_tf (int): Identifier for the LSTM input model with teacher forcing to be loaded.
+
+    Returns:
+    - tuple: A tuple containing the loaded models in the order:
+        LSTM base model, LSTM model, LSTM input model, FFN model, GRU model, LSTM input model with teacher forcing.
+
+    Note:
+    - The models must be saved in the '../results/final_models_trained/' directory with the naming convention 'model_{identifier}.pt'.
+    - The function assumes all models share the same number of features for input and output.
+    - Each model is expected to have a 'hyperparameters' and 'model_state_dict' key in its saved state dictionary.
+    """
     # Load the saved models
-    saved_model_lstm_base = torch.load(f"./final_models_trained/model_{num_lstm_base}.pt")
-    saved_model_lstm = torch.load(f"./final_models_trained/model_{num_lstm}.pt")
-    saved_model_lstm_input = torch.load(f"./final_models_trained/model_{num_lstm_input}.pt")
-    saved_model_lstm_input_tf = torch.load(f"./final_models_trained/model_{num_lstm_input_tf}.pt")
-    saved_model_fnn = torch.load(f"./final_models_trained/model_{num_ffn}.pt")
-    saved_model_gru = torch.load(f"./final_models_trained/model_{num_gru}.pt")
+    saved_model_lstm_base = torch.load(f"../results/final_models_trained/model_{num_lstm_base}.pt")
+    saved_model_lstm = torch.load(f"../results/final_models_trained/model_{num_lstm}.pt")
+    saved_model_lstm_input = torch.load(f"../results/final_models_trained/model_{num_lstm_input}.pt")
+    saved_model_lstm_input_tf = torch.load(f"../results/final_models_trained/model_{num_lstm_input_tf}.pt")
+    saved_model_fnn = torch.load(f"../results/final_models_trained/model_{num_ffn}.pt")
+    saved_model_gru = torch.load(f"../results/final_models_trained/model_{num_gru}.pt")
 
     # Load the hyperparameters of the lstm_model base
     params_lb = saved_model_lstm_base["hyperparameters"]
