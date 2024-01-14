@@ -8,8 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-# Implementing Linear inverse model (LIM)
 '''
 The LIM class creates a Linear Inverse Model for time series analysis.
 
@@ -22,16 +20,17 @@ L: Logarithmic matrix
 Q: Noise covariance matrix
 
 The class has a fit method that takes in raw_data, which is a numpy array with dimensions (n_components, n_time).
- The method computes the C_0 and C_tau covariance matrices of the input raw_data, and then computes the time-evolution operator G
-  using these covariance matrices.
+The method computes the C_0 and C_tau covariance matrices of the input raw_data, and then computes the time-evolution
+operator G using these covariance matrices.
 
-The method then performs a matrix decomposition on G to obtain its eigenvectors and eigenvalues, and sorts them in descending order
- based on their decay time. Using these sorted eigenvectors and eigenvalues, it computes the logarithmic matrix L,
-  which represents the linear relationship between the input and output raw_data.
+The method then performs a matrix decomposition on G to obtain its eigenvectors and eigenvalues, and sorts them in
+descending order  based on their decay time. Using these sorted eigenvectors and eigenvalues, it computes the
+logarithmic matrix L, which represents the linear relationship between the input and output raw_data.
 
-The method checks for the existence of a Nyquist mode, which occurs when the imaginary part of L is greater than a small epsilon value. 
-If a Nyquist mode exists, a warning message is printed and the imaginary part is kept in the L matrix. If not, only the real part of L is stored. 
-Finally, the method computes the noise covariance matrix Q using the C_0 and L matrices.
+The method checks for the existence of a Nyquist mode, which occurs when the imaginary part of L is greater than a small
+epsilon value. If a Nyquist mode exists, a warning message is printed and the imaginary part is kept in the L matrix.
+If not, only the real part of L is stored. Finally, the method computes the noise covariance matrix Q using the C_0
+and L matrices.
 
 The fit method does not return any value, but it stores the computed L and Q matrices as class variables.
 
@@ -42,8 +41,6 @@ Eigenvalues are the scalars λ that satisfy the equation Ax = λx for some vecto
 They represent the magnitude of the linear transformation along the eigenvectors.
 
 '''
-
-
 class LIM:
     """
     Linear Inverse Model for time series analysis.
@@ -181,12 +178,12 @@ class LIM:
         return forecast_output
     
     def forecast_mean(self, x, lag=1):
-        """Forecasting data using the time-evolution operator L.
+        """Forecasting data_generated using the time-evolution operator L.
 
             x(t+tau) = exp(L tau) x(t)
 
         Args:
-            x (np.ndarray): Input data to estimate Green's function from.
+            x (np.ndarray): Input data_generated to estimate Green's function from.
                 Dimensions (n_components, n_time).
 
         Returns:

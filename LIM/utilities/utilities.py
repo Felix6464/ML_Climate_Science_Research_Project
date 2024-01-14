@@ -1,17 +1,30 @@
 import numpy as np
 import xarray as xr
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
 import json
 import torch
 import os
 
-from LIM.neural_networks.models.LSTM_enc_dec_input import *
-from LIM.neural_networks.models.LSTM_enc_dec import *
-from LIM.neural_networks.models.FNN_model import *
-from LIM.neural_networks.models.LSTM import *
-from LIM.neural_networks.models.GRU_enc_dec import *
+from LIM.models.LSTM_enc_dec_input import *
+from LIM.models.LSTM_enc_dec import *
+from LIM.models.FNN_model import *
+from LIM.models.LSTM import *
+from LIM.models.GRU_enc_dec import *
 
+
+def getParentDir(levels=1) -> str:
+    """
+    @param path: starts without /
+    @return: Parent path at the specified levels above.
+    """
+    current_directory = os.path.dirname(__file__)
+
+    parent_directory = current_directory
+    for i in range(0, levels):
+        parent_directory = os.path.split(parent_directory)[0]
+
+    #file_path = os.path.join(parent_directory, path)
+    return parent_directory
 
 def reshape_xarray(input_data):
     """
@@ -139,12 +152,12 @@ def crop_xarray_lat(input_data):
     Crop a given xarray Dataset or DataArray along the latitude dimension.
 
     Parameters:
-    - input_data (xarray.Dataset or xarray.DataArray): The input xarray data containing latitude dimension.
+    - input_data (xarray.Dataset or xarray.DataArray): The input xarray data_generated containing latitude dimension.
 
     Returns:
-    - xarray.Dataset or xarray.DataArray: A cropped xarray object containing data within the latitude range [-30, 30].
+    - xarray.Dataset or xarray.DataArray: A cropped xarray object containing data_generated within the latitude range [-30, 30].
 
-    This function slices the input xarray object along the latitude dimension to retain only the data within the range
+    This function slices the input xarray object along the latitude dimension to retain only the data_generated within the range
     from -30 degrees to 30 degrees latitude, inclusive.
 
     """
@@ -161,14 +174,14 @@ def concatenate_and_save_data(pc_ts, pc_zos, data_type, filename):
                                                   (if data_type is "xr") or as a torch Tensor.
         pc_zos (xarray.DataArray or torch.Tensor): The second dataset, either as an xarray DataArray
                                                    (if data_type is "xr") or as a torch Tensor.
-        data_type (str): The type of data provided, either "xr" (xarray) or another format.
-        filename (str): The name of the file to save the concatenated data to.
+        data_type (str): The type of data_generated provided, either "xr" (xarray) or another format.
+        filename (str): The name of the file to save the concatenated data_generated to.
 
     Returns:
-        None: The function saves the concatenated data to a file and does not return any values.
+        None: The function saves the concatenated data_generated to a file and does not return any values.
 
     Raises:
-        ValueError: If data_type is not "xr" or any other value, indicating an unsupported data type.
+        ValueError: If data_type is not "xr" or any other value, indicating an unsupported data_generated type.
     """
     if data_type == "xr":
         # Concatenate along a specified dimension (eof)

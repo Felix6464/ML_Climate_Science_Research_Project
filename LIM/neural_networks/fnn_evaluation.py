@@ -1,27 +1,25 @@
-import utilities as ut
-from models.FNN_model import *
-from LIM.neural_networks.plots import *
-from utilities import *
-import torch.utils.data as datat
+from LIM.utilities import utilities as ut
+from LIM.utilities.plots import *
+from LIM.utilities.utilities import *
 from torch.utils.data import DataLoader
 
 
 
 def main():
-    # Load a PyTorch tensor from a file located at ./synthetic_data/data/lim_integration_200k.pt
-    data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+    # Load a PyTorch tensor from a file located at ./synthetic_data/data_generated/lim_integration_200k.pt
+    data = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 
     # Calculate the mean and standard deviation along the feature dimension using a function called 'normalize_data'
     data = ut.normalize_data(data)
 
-    # Keep only the first 30,000 rows of the data tensor
+    # Keep only the first 30,000 rows of the data_generated tensor
     data = data[:, :30000]
     print("Data shape : {}".format(data.shape))
 
-    # Calculate the index for splitting the data into training and test sets
+    # Calculate the index for splitting the data_generated into training and test sets
     index_train = int(0.9 * len(data[0, :]))
 
-    # Update the 'data' tensor to contain only the data for training (last 10% is used for testing)
+    # Update the 'data_generated' tensor to contain only the data_generated for training (last 10% is used for testing)
     data = data[:, index_train:]
 
     # Specify the model number for the model to be tested
@@ -43,7 +41,7 @@ def main():
         batch_size = params["batch_size"]
         loss_type = params["loss_type"]
 
-        # Specify the number of features and the input window size for generating time series data
+        # Specify the number of features and the input window size for generating time series data_generated
         num_features = 30
         input_window = 6
 
@@ -72,7 +70,7 @@ def main():
             model.load_state_dict(saved_model["model_state_dict"])
             model.to(device)
 
-            # Evaluate the model on the test data and obtain the loss
+            # Evaluate the model on the test data_generated and obtain the loss
             loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
             losses.append(loss)
             print(f"Test loss: {loss}")

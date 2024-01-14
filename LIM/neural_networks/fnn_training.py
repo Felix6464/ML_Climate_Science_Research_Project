@@ -1,17 +1,17 @@
-from utilities import *
+from LIM.utilities.utilities import *
 
 
-# Load a PyTorch tensor from a file located at "./synthetic_data/data/lim_integration_200k.pt"
-data = torch.load("./synthetic_data/data/lim_integration_200k.pt")
+# Load a PyTorch tensor from a file located at "./synthetic_data/data_generated/lim_integration_200k.pt"
+data = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 
-# Normalize the loaded data using a function called 'normalize_data'
+# Normalize the loaded data_generated using a function called 'normalize_data'
 data = normalize_data(data)
 
-# Keep only the first 200,000 columns of the data tensor
+# Keep only the first 200,000 columns of the data_generated tensor
 data = data[:, :200000]
 
 # Define the file path for saving training information
-training_info_pth = "final_models_trained/training_info_ffn.txt"
+training_info_pth = "results/final_models_trained/training_info_ffn.txt"
 dt = "fnp"
 
 # Define a list 'lr' with a single learning rate value of 0.0001
@@ -44,17 +44,17 @@ config = {
 
 
 if dt == "xr":
-    # If using xarray data
+    # If using xarray data_generated
     idx_train = int(len(data['time']) * 0.7)
     idx_val = int(len(data['time']) * 0.2)
     print(idx_train, idx_val)
 
-    # Split the data into train, validation, and test sets
+    # Split the data_generated into train, validation, and test sets
     train_data = data[:, :, :idx_train]
     val_data = data[:, :, idx_train: idx_train+idx_val]
     test_data = data[:, :, idx_train+idx_val:]
 
-    # Extract the numpy data from xarray
+    # Extract the numpy data_generated from xarray
     train_datan = train_data.data
     val_datan = val_data.data
     test_datan = test_data.data
@@ -66,11 +66,11 @@ if dt == "xr":
     val_dataset = TimeSeries(val_data, config["input_window"], config["output_window"])
     val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 else:
-    # If using numpy data
+    # If using numpy data_generated
     idx_train = int(len(data[0, :]) * 0.7)
     idx_val = int(len(data[0, :]) * 0.2)
 
-    # Split the data into train, validation, and test sets
+    # Split the data_generated into train, validation, and test sets
     train_data = data[:, :idx_train]
     val_data = data[:, idx_train: idx_train+idx_val]
     test_data = data[:, idx_train+idx_val:]
@@ -122,7 +122,8 @@ for l in lr:
 
     # Save the trained model, hyperparameters, and optimizer state
     torch.save({'hyperparameters': config, 'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict()}, f'./final_models_trained/model_{rand_identifier}.pt')
+                'optimizer_state_dict': optimizer.state_dict()},
+               f'results/final_models_trained/model_{rand_identifier}.pt')
     print(f"Model saved as model_{rand_identifier}.pt")
 
     # Store model information in a dictionary

@@ -1,13 +1,11 @@
-from models.LSTM_enc_dec import *
-import models.GRU_enc_dec as gru
-from plots import *
-from utilities import *
+from LIM.utilities.plots import *
+from LIM.utilities.utilities import *
 from torch.utils.data import DataLoader
 
 
 def main():
-    # Load data and normalize it
-    data = torch.load("data_piControl.pt")
+    # Load data_generated and normalize it
+    data = torch.load("../data/data_piControl.pt")
     data = normalize_data(data)
 
     # Enable or disable horizon mode
@@ -27,7 +25,7 @@ def main():
     # Loop through each model specified by model_num
     for m in range(len(model_num)):
         # Load a saved model
-        saved_model = torch.load(f"./final_models_trained/model_{model_num[m][0]}.pt")
+        saved_model = torch.load(f"./results/final_models_trained/model_{model_num[m][0]}.pt")
 
         # Load hyperparameters of the model
         params = saved_model["hyperparameters"]
@@ -40,7 +38,7 @@ def main():
         loss_eval = params["loss_test"]
 
         if horizon is True:
-            # Specify the number of features and output windows for generating time series data
+            # Specify the number of features and output windows for generating time series data_generated
             num_features = 30
             x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
             losses = []
