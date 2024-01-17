@@ -10,7 +10,7 @@ import wandb
 
 
 # Custom dataset class for sequence prediction
-class TimeSeries(Dataset):
+class TimeSeriesFNN(Dataset):
     def __init__(self, xarr, input_window, one_hot_month=False):
         self.input_window = input_window
         self.xarr = xarr.compute()
@@ -48,7 +48,7 @@ class TimeSeries(Dataset):
         return input, target, label
 
 
-class TimeSeriesnp(Dataset):
+class TimeSeriesFNNnp(Dataset):
     def __init__(self, arr, input_window):
         self.input_window = input_window
         self.arr = arr
