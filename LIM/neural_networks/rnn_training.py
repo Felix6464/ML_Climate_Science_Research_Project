@@ -1,43 +1,28 @@
 from LIM.utilities.utilities import *
 
-
 # Load data_generated from a file and store it in 'data_'
 data_ = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
 
-# Define learning rate(s)
-lr = [0.0001]
-
-# Define time window(s)
-windows = [(2, 12)]
-
-# Define data_generated size(s)
-data_sizes = [100000]
-
-# Define a model label for saving using wandb
-model_label = "LSTM-ENC-DEC"
-name = "lstm_enc_dec"
-
-# Define a variable 'dt' which specifies either "np" array or "xr" array
-dt = "np"
 
 config = {
     "wandb": False,
-    "name": name,
+    "data_type": "np",
+    "name": "lstm_enc_dec",
+    "data_sizes": [100000],
+    "windows": [(2, 12)],
     "num_features": 30,
     "hidden_size": 128,
     "dropout": 0,
     "weight_decay": 0,
-    "input_window": windows[0][0],
-    "output_window": windows[0][1],
-    "learning_rate": lr[0],
+    "learning_rate": [0.0001],
     "num_layers": 1,
     "num_epochs": 10,
     "batch_size": 128,
     "train_data_len": len(data_[0, :]),
     "training_prediction": "recursive",
     "loss_type": "MSE",
-    "model_label": model_label,
+    "model_label": "LSTM-ENC-DEC",
     "teacher_forcing_ratio": 0.5,
     "dynamic_tf": True,
     "shuffle": True,
@@ -45,8 +30,8 @@ config = {
 }
 training_info_pth = "results/final_models_trained/training_info_lstm.txt"
 
-for window in windows:
-    for data_len in data_sizes:
+for window in config["windows"]:
+    for data_len in config["data_sizes"]:
         print("Data size : {} {}".format(data_len, type(data_len)))
 
         # Slice the data_generated to the specified length and normalize it
@@ -58,7 +43,7 @@ for window in windows:
         config["input_window"] = window[0]
         config["output_window"] = window[1]
 
-        if dt == "xr":
+        if config["data_type"] == "xr":
             # If using xarray data_generated
             idx_train = int(len(data['time']) * 0.7)
             idx_val = int(len(data['time']) * 0.2)
@@ -92,13 +77,13 @@ for window in windows:
             val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0), window[0], window[1])
             val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-        for l in lr:
+        for l in config["learning_rate"]:
             # Loop through different learning rates
 
             config["learning_rate"] = l
 
             # Define a unique identifier for this training run
-            config["name"] = name + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])
+            config["name"] = config["name"] + "-" + str(l) + "-" + str(window[0]) + "-" + str(window[1])
 
             print("Start training")
 
@@ -114,7 +99,7 @@ for window in windows:
             optimizer = torch.optim.Adam(model.parameters(), lr=l, weight_decay=config["weight_decay"])
 
             # Generate a random identifier for this run
-            rand_identifier = str(np.random.randint(0, 10000000)) + dt
+            rand_identifier = str(np.random.randint(0, 10000000)) + config["data_type"]
             config["name"] = config["name"] + "-" + rand_identifier
             print(config["name"])
 

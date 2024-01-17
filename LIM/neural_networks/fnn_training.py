@@ -7,43 +7,31 @@ data = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt
 # Normalize the loaded data_generated using a function called 'normalize_data'
 data = normalize_data(data)
 
-# Keep only the first 200,000 columns of the data_generated tensor
-data = data[:, :200000]
-
-# Define the file path for saving training information
-training_info_pth = "results/final_models_trained/training_info_ffn.txt"
-dt = "fnp"
-
-# Define a list 'lr' with a single learning rate value of 0.0001
-lr = [0.0001]
-
-# Define a string variable for wandb runs
-model_label = "FFN-MODELS"
-name = "ffn"
-
 config = {
     "wandb": False,
-    "name": name,
+    "name": "ffn",
+    "model_label": "FFN-MODELS",
+    "data_type": "fnp",
     "num_features": 30,
     "hidden_size": 128,
     "input_window": 6,
     "output_window": 1,
-    "learning_rate": lr[0],
+    "learning_rate": [0.0001],
     "num_layers": 1,
     "num_epochs": 10,
     "batch_size": 64,
     "train_data_len": len(data[0, :]),
     "training_prediction": "recursive",
     "loss_type": "MSE",
-    "model_label": model_label,
     "teacher_forcing_ratio": 0.6,
     "dynamic_tf": True,
     "shuffle": True,
     "one_hot_month": False,
+    "training_info_pth": "results/final_models_trained/training_info_ffn.txt",
 }
 
 
-if dt == "xr":
+if config["data_type"] == "xr":
     # If using xarray data_generated
     idx_train = int(len(data['time']) * 0.7)
     idx_val = int(len(data['time']) * 0.2)
@@ -60,10 +48,10 @@ if dt == "xr":
     test_datan = test_data.data
 
     # Create DataLoader objects for train and validation datasets
-    train_dataset = TimeSeries(train_data, config["input_window"], config["output_window"])
+    train_dataset = TimeSeriesFNN(train_data, config["input_window"], config["output_window"])
     train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-    val_dataset = TimeSeries(val_data, config["input_window"], config["output_window"])
+    val_dataset = TimeSeriesFNN(val_data, config["input_window"], config["output_window"])
     val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 else:
     # If using numpy data_generated
@@ -76,13 +64,13 @@ else:
     test_data = data[:, idx_train+idx_val:]
 
     # Create DataLoader objects for train and validation datasets
-    train_dataset = TimeSeriesnp(train_data.permute(1, 0), config["input_window"])
+    train_dataset = TimeSeriesFNNnp(train_data.permute(1, 0), config["input_window"])
     train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-    val_dataset = TimeSeriesnp(val_data.permute(1, 0), config["input_window"])
+    val_dataset = TimeSeriesFNNnp(val_data.permute(1, 0), config["input_window"])
     val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-for l in lr:
+for l in config["learning_rate"]:
     # Loop through different learning rates
 
     # Set the learning rate for this training run
@@ -102,7 +90,7 @@ for l in lr:
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     # Generate a random identifier for this run
-    rand_identifier = str(np.random.randint(0, 10000000)) + dt
+    rand_identifier = str(np.random.randint(0, 10000000)) + config["data_type"]
     config["name"] = config["name"] + "-" + rand_identifier
 
     # Train the model and obtain training and testing losses
