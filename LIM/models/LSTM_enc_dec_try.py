@@ -1,4 +1,6 @@
 from torch.utils.data import DataLoader, Dataset
+from LIM.neural_networks.train_eval_infrastructure import RMSELoss, TimeSeriesDataset, TimeSeriesDatasetnp, TimeSeriesDropout
+
 import numpy as np
 import random
 from tqdm import trange
@@ -7,72 +9,6 @@ import torch.nn as nn
 import wandb
 
 
-
-class TimeSeriesLSTM(Dataset):
-    def __init__(self, xarr, input_window, output_window, one_hot_month=False):
-        self.input_window = input_window
-        self.output_window = output_window
-        self.xarr = xarr.compute()
-
-    def __len__(self):
-        return len(self.xarr['time']) - self.input_window - self.output_window - 2
-
-
-    def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-
-        input = self.xarr.isel(time=slice(idx, idx+self.input_window))
-        target = self.xarr.isel(time=slice(idx+self.input_window, idx+self.input_window  + self.output_window))
-
-        # One hot encoding of month
-        idx_month = input.isel(time=-1).time.dt.month.astype(int) - 1
-        one_hot_month = np.zeros(12)
-        one_hot_month[idx_month] = 1
-        one_hot_month = torch.from_numpy(one_hot_month).float()
-
-        input = torch.from_numpy(input.data).float()
-        if one_hot_month is True:
-            target = torch.from_numpy(target.data[np.newaxis]).float()
-        else:
-            target = torch.from_numpy(target.data).float()
-
-        label = {
-            'idx_input': torch.arange(idx, idx+self.input_window),
-            'idx_target': torch.arange(idx+self.input_window, idx+self.input_window  + self.output_window),
-            'month': one_hot_month
-        }
-
-        input = input.reshape(input.shape[1], input.shape[0])
-        target = target.reshape(target.shape[1], target.shape[0])
-
-        return input, target, label
-
-
-class TimeSeriesLSTMnp(Dataset):
-    def __init__(self, arr, input_window, output_window):
-        self.input_window = input_window
-        self.output_window = output_window
-        self.arr = arr
-
-    def __len__(self):
-        return len(self.arr[0, :]) - self.input_window - self.output_window - 2
-
-
-    def __getitem__(self, idx):
-
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-
-        input = self.arr[:, idx:idx+self.input_window].float()
-        target = self.arr[:, idx+self.input_window:idx+self.input_window  + self.output_window].float()
-
-        input = input.reshape(input.shape[1], input.shape[0])
-        target = target.reshape(target.shape[1], target.shape[0])
-
-        label = "not set"
-
-        return input, target, label
 
 
 
@@ -248,16 +184,6 @@ class LSTMCell(nn.Module):
 
         return h, c
 
-
-class RMSELoss(torch.nn.Module):
-    def __init__(self):
-        super(RMSELoss, self).__init__()
-
-    def forward(self, x, y):
-        criterion = nn.MSELoss()
-        eps = 1e-6
-        loss = torch.sqrt(criterion(x, y) + eps)
-        return loss
 
 class LSTM_Sequence_Prediction(nn.Module):
     """
@@ -486,4 +412,64 @@ class LSTM_Sequence_Prediction(nn.Module):
 
 
         return outputs
+
+
+    def _predict(self, input_tensor, target_len, prediction_type='test'):
+
+        """
+        : param input_tensor:      input raw_data (seq_len, input_size); PyTorch tensor
+        : param target_len:        number of target values to predict
+        : return np_outputs:       np.array containing predicted values; prediction done recursively
+        """
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        input_tensor = input_tensor.to(device)
+
+        if prediction_type == 'forecast':
+            input_tensor = input_tensor.unsqueeze(0)
+
+        hidden = self.encoder.init_hidden(input_tensor.shape[0])
+        hidden = (hidden[0].to(device), hidden[1].to(device))
+        encoder_output, encoder_hidden = self.encoder(input_tensor, hidden, prediction_type)
+
+        # Initialize outputs tensor
+        outputs = torch.zeros(input_tensor.shape[0], target_len, input_tensor.shape[2])
+        outputs = outputs.to(device)
+
+        # decode input_tensor
+        decoder_input = input_tensor[:, -1, :]
+
+        outputs, decoder_hidden = self.decoder(decoder_input,
+                                               encoder_hidden,
+                                               outputs=outputs,
+                                               target_len=target_len,
+                                               prediction_type=prediction_type)
+
+        if prediction_type == 'forecast':
+            outputs = outputs.detach()
+
+        return outputs
+
+
+    def _forward(self, input_batch, target_batch, outputs, config):
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Encoder forward pass
+        hidden = self.encoder.init_hidden(config["batch_size"])
+        hidden = (hidden[0].to(device), hidden[1].to(device))
+        encoder_output, encoder_hidden = self.encoder(input_batch, hidden)
+
+        # Decoder input for the current batch
+        decoder_input = input_batch[:, -1, :]
+
+        outputs, decoder_hidden = self.decoder(decoder_input,
+                                               encoder_hidden,
+                                               outputs=outputs,
+                                               training_prediction=config["training_prediction"],
+                                               target_len=config["output_window"],
+                                               teacher_forcing_ratio=config["teacher_forcing_ratio"],
+                                               target_batch=target_batch)
+
+        return outputs, decoder_hidden
 

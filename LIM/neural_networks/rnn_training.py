@@ -1,5 +1,9 @@
 from LIM.utilities.utilities import *
 
+# Specify the model to be used
+from LIM.models.LSTM_enc_dec_input import LSTM_Sequence_Prediction_Input as Model
+from LIM.neural_networks.train_eval_infrastructure import *
+
 # Load data_generated from a file and store it in 'data_'
 data_ = torch.load("../data/synthetic_data/data_generated/lim_integration_200k.pt")
 print("Data shape : {}".format(data_.shape))
@@ -32,12 +36,11 @@ training_info_pth = "results/final_models_trained/training_info_lstm.txt"
 
 for window in config["windows"]:
     for data_len in config["data_sizes"]:
-        print("Data size : {} {}".format(data_len, type(data_len)))
 
         # Slice the data_generated to the specified length and normalize it
         data = data_[:, :data_len]
         data = normalize_data(data)
-        print(data.shape)
+        print("Data Shape: ", data.shape)
 
         # Configure input and output window sizes based on the 'window' tuple
         config["input_window"] = window[0]
@@ -55,10 +58,10 @@ for window in config["windows"]:
             test_data = data[: :, idx_train+idx_val: ]
 
             # Create DataLoader objects for train and validation datasets
-            train_dataset = TimeSeriesLSTM(train_data, window[0], window[1])
+            train_dataset = TimeSeriesDataset(train_data, window[0], window[1])
             train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-            val_dataset = TimeSeriesLSTM(val_data, window[0], window[1])
+            val_dataset = TimeSeriesDataset(val_data, window[0], window[1])
             val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
         else:
@@ -71,10 +74,10 @@ for window in config["windows"]:
             val_data = data[:, idx_train: idx_train+idx_val]
             test_data = data[:, idx_train+idx_val: ]
             # Create DataLoader objects for train and validation datasets
-            train_dataset = TimeSeriesLSTMnp(train_data.permute(1, 0), window[0], window[1])
+            train_dataset = TimeSeriesDatasetnp(train_data.permute(1, 0), window[0], window[1])
             train_dataloader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
-            val_dataset = TimeSeriesLSTMnp(val_data.permute(1,0), window[0], window[1])
+            val_dataset = TimeSeriesDatasetnp(val_data.permute(1,0), window[0], window[1])
             val_dataloader = DataLoader(val_dataset, batch_size=config["batch_size"], shuffle=config["shuffle"], drop_last=True)
 
         for l in config["learning_rate"]:
@@ -90,8 +93,8 @@ for window in config["windows"]:
             # Determine the computing device (GPU if available, otherwise CPU)
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-            # Initialize the LSTM model and move it to the selected device
-            model = LSTM_Sequence_Prediction(input_size=config["num_features"], hidden_size=config["hidden_size"],
+            # Initialize the model and move it to the selected device
+            model = Model(input_size=config["num_features"], hidden_size=config["hidden_size"],
                                              num_layers=config["num_layers"], dropout=config["dropout"])
             model.to(device)
 
@@ -104,7 +107,7 @@ for window in config["windows"]:
             print(config["name"])
 
             # Train the model and obtain training and testing losses
-            loss, loss_test = model.train_model(train_dataloader, val_dataloader, optimizer, config)
+            loss, loss_test = train_model(model, train_dataloader, val_dataloader, optimizer, config)
 
             # Calculate the number of weights and parameters in the model
             num_of_weights = (window[0]*config["hidden_size"] + config["hidden_size"] + config["hidden_size"]*window[1] + window[1])

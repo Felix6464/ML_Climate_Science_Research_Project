@@ -1,6 +1,10 @@
 from LIM.utilities.plots import *
 from LIM.utilities.utilities import *
 from torch.utils.data import DataLoader
+from LIM.neural_networks.train_eval_infrastructure import *
+
+# Specify the model to be used
+from LIM.models.LSTM_enc_dec import LSTM_Sequence_Prediction as Model
 
 
 # Load data_generated and normalize it
@@ -22,7 +26,7 @@ loss_list_eval = []
 # Loop through each model specified by model_num
 for m in range(len(config["model_num"])):
     # Load a saved model
-    saved_model = torch.load(f"./results/final_models_trained/model_{config['model_num'][m][0]}.pt")
+    saved_model = torch.load(f"../results/final_models_trained/model_{config['model_num'][m][0]}.pt")
 
     # Load hyperparameters of the model
     params = saved_model["hyperparameters"]
@@ -43,7 +47,7 @@ for m in range(len(config["model_num"])):
         # Loop through different output windows
         for output_window in x:
             # Create a DataLoader for testing
-            test_dataset = TimeSeriesLSTMnp(data.permute(1, 0),
+            test_dataset = TimeSeriesDatasetnp(data.permute(1, 0),
                                             input_window,
                                             output_window)
             test_dataloader = DataLoader(test_dataset,
@@ -55,12 +59,12 @@ for m in range(len(config["model_num"])):
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
             # Initialize the model and load the saved state dictionary
-            model = LSTM_Sequence_Prediction(input_size=num_features, hidden_size=hidden_size, num_layers=num_layers)
+            model = Model(input_size=num_features, hidden_size=hidden_size, num_layers=num_layers)
             model.load_state_dict(saved_model["model_state_dict"])
             model.to(device)
 
             # Evaluate the model and calculate the loss
-            loss = model.evaluate_model(test_dataloader, output_window, batch_size, loss_type)
+            loss = evaluate_model(model, test_dataloader, output_window, batch_size, loss_type)
             print("Output window: {}, Loss: {}".format(output_window, loss))
             losses.append(loss)
 
@@ -72,8 +76,8 @@ for m in range(len(config["model_num"])):
 
 # If in horizon mode, plot the loss values
 if config['horizon'] is True:
-    plot_loss_horizon(loss_list, loss_type, id)
+    plot_loss_horizon(loss_list, loss_type, config["id"])
 
 # Optionally, you can also plot the train/evaluation loss curve for the model
 if config['train_eval_loss'] is True:
-    plot_loss_combined(loss_list_eval, id, loss_type)
+    plot_loss_combined(loss_list_eval, config["id"], loss_type)
