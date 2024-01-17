@@ -381,7 +381,7 @@ def create_covariates_from_df(df, train_df, test_df, history, target, eval=False
     # Extend the val set for calculating the right amount of covariates
     new_df_tail = train_df.tail(history * 2)
     test_cov = pd.concat((new_df_tail, test_df), axis=0)
-    new_df_tail = df[:10000].tail(history * 2)
+    new_df_tail = df[:200].tail(history * 2)
     train_cov = pd.concat((new_df_tail, train_df), axis=0)
 
     if eval:

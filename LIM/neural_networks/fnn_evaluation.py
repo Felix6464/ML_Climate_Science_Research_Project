@@ -48,9 +48,8 @@ for m in config["model_num"]:
 
     for output_window in x:
         # Create a test dataset using TimeSeriesLSTMnp
-        test_dataset_ffn = TimeSeriesLSTMnp(data.permute(1, 0),
-                                            input_window,
-                                            output_window)
+        test_dataset_ffn = TimeSeriesFNNnp(data.permute(1, 0),
+                                            input_window)
 
         # Create a DataLoader for the test dataset
         test_dataloader = DataLoader(test_dataset_ffn,
