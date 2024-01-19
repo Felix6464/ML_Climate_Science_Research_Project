@@ -7,7 +7,7 @@ import os
 
 from LIM.models.LSTM_enc_dec_input import *
 from LIM.models.LSTM_enc_dec import *
-from LIM.models.FNN_model import *
+from LIM.models.FFN import *
 from LIM.models.LSTM import *
 from LIM.models.GRU_enc_dec import *
 
