@@ -44,7 +44,7 @@ class TransformerModel(nn.Module):
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
-    def forward(self, src):
+    def _forward(self, src):
         if self.src_mask is None or self.src_mask.size(0) != len(src):
             device = src.device
             mask = self._generate_square_subsequent_mask(len(src)).to(device)
@@ -59,15 +59,6 @@ class TransformerModel(nn.Module):
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
         return mask
-
-# S is the source sequence length
-# T is the target sequence length
-# N is the batch size
-# E is the feature number
-
-#src = torch.rand((10, 32, 512)) # (S,N,E)
-#tgt = torch.rand((20, 32, 512)) # (T,N,E)
-#out = transformer_model(src, tgt)
 
     def _predictX(self, data_source, target_length, config):
         self.eval()
@@ -102,23 +93,27 @@ class TransformerModel(nn.Module):
         outputs = outputs.to(device)
 
         with torch.no_grad():
-            for i in range(0, config["output_window"]):
-                output = self.forward(seq[-config["output_window"]:])
-                seq = torch.cat((seq, output[-1:]))
+            for _ in range(0, config["output_window"]):
+                output = self.forward(input_tensor[-config["output_window"]:])
+                input_tensor = torch.cat((input_tensor, output[-1:]))
 
-        seq = seq.cpu().view(-1).numpy()
+        input_tensor = input_tensor.cpu().view(-1).numpy()
 
-        return seq
+        return input_tensor
+    
+    def _predict_seq(self, input_batch):
+        """Sequences data has to been windowed and passed through device"""
+        start_timer = time.time()
+        forecast_seq = torch.Tensor(0)    
+        actual = torch.Tensor(0)
+        
+        with torch.no_grad():
+            for i in range(0, len(input_batch) - 1):
+                data = input_batch
+                output = self._forward(data)            
+                forecast_seq = torch.cat((forecast_seq, output[-1].view(-1).cpu()), 0)
+                actual = torch.cat((actual, target[-1].view(-1).cpu()), 0)
+        timed = time.time()-start_timer
+        print(f"{timed} sec")
 
-    def _forward(self, input_tensor, outputs, config, target_batch=None):
-
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        input_tensor = input_tensor.to(device)
-
-        for i in range(0, config["output_window"]):
-            output = self.forward(seq[-config["output_window"]:])
-            seq = torch.cat((seq, output[-1:]))
-
-        seq = seq.cpu().view(-1).numpy()
-
-        return seq
+        return forecast_seq, actual

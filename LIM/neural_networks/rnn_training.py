@@ -1,7 +1,7 @@
 from LIM.utilities.utilities import *
 
 # Specify the model to be used
-from LIM.models.LSTM_enc_dec_input import LSTM_Sequence_Prediction_Input as Model
+from LIM.models.Transformer import TransformerModel as Model
 from LIM.neural_networks.train_eval_infrastructure import *
 
 # Load data_generated from a file and store it in 'data_'
